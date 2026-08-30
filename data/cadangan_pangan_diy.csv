@@ -1,0 +1,192 @@
+#,Wilayah,Jumlah Stok (Kg),tahun_filter,diambil_pada_utc,Jenis Komoditas,Nama,Alamat
+1.0,Provinsi DI Yogyakarta,0.0,2019,2026-08-30T15:26:57.755825+00:00,,,
+2.0,Kabupaten Kulon Progo,0.0,2019,2026-08-30T15:26:57.755825+00:00,,,
+3.0,Kabupaten Bantul,0.0,2019,2026-08-30T15:26:57.755825+00:00,,,
+4.0,Kabupaten Gunung Kidul,0.0,2019,2026-08-30T15:26:57.755825+00:00,,,
+5.0,Kota Yogyakarta,101.46,2019,2026-08-30T15:26:57.755825+00:00,,,
+6.0,Kabupaten Sleman,182.24,2019,2026-08-30T15:26:57.755825+00:00,,,
+,Total,283.7,2019,2026-08-30T15:26:57.755825+00:00,,,
+1.0,,89.45,2019,2026-08-30T15:26:57.756278+00:00,Gabah Kering Giling (GKG),,
+2.0,,135.19,2019,2026-08-30T15:26:57.756278+00:00,Beras Medium,,
+3.0,,59.02,2019,2026-08-30T15:26:57.756278+00:00,Beras Premium,,
+4.0,,0.0,2019,2026-08-30T15:26:57.756278+00:00,Jagung,,
+5.0,,15.0,2019,2026-08-30T15:26:57.756278+00:00,Kedelai,,
+,,283.675,2019,2026-08-30T15:26:57.756278+00:00,Total,,
+1.0,Provinsi DI Yogyakarta,,2019,2026-08-30T15:26:57.756601+00:00,,Dinas Pertanian dan Ketahanan Pangan DIY,Jl. Gondosuli No. 6 Yogyakarta
+2.0,Kabupaten Kulon Progo,,2019,2026-08-30T15:26:57.756601+00:00,,Among Tani,"Pencengan , Kedundang, Temon"
+3.0,Kabupaten Kulon Progo,,2019,2026-08-30T15:26:57.756601+00:00,,Asih,"Plono Timur, Pagerharjo, Samigaluh"
+4.0,Kabupaten Kulon Progo,,2019,2026-08-30T15:26:57.756601+00:00,,Asri Lestari,"Kepiton, Banjar Asri, Kalibawang"
+5.0,Kabupaten Kulon Progo,,2019,2026-08-30T15:26:57.756601+00:00,,Catur Legowo,"Sidatan, Kalidengen, Temon"
+6.0,Kabupaten Kulon Progo,,2019,2026-08-30T15:26:57.756601+00:00,,Cipta Boga,Galur Kulon Progo
+7.0,Kabupaten Kulon Progo,,2019,2026-08-30T15:26:57.756601+00:00,,Dinas Pertanian dan Pangan,"Jl. Sugiman No.21, Serut, Pengasih, Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652"
+8.0,Kabupaten Kulon Progo,,2019,2026-08-30T15:26:57.756601+00:00,,Jatimakmur,"Jimatan, Jatirejo, Lendah"
+9.0,Kabupaten Kulon Progo,,2019,2026-08-30T15:26:57.756601+00:00,,KWT Giriloji,"Tegiri II, Hargowilis, Kokap"
+10.0,Kabupaten Kulon Progo,,2019,2026-08-30T15:26:57.756601+00:00,,KWT Sarwodadi,"Menguri, Hargotirto, Kokap"
+1.0,Provinsi DI Yogyakarta,0.0,2020,2026-08-30T15:27:00.321521+00:00,,,
+2.0,Kabupaten Kulon Progo,0.0,2020,2026-08-30T15:27:00.321521+00:00,,,
+3.0,Kabupaten Bantul,0.0,2020,2026-08-30T15:27:00.321521+00:00,,,
+4.0,Kabupaten Gunung Kidul,0.0,2020,2026-08-30T15:27:00.321521+00:00,,,
+5.0,Kota Yogyakarta,101.46,2020,2026-08-30T15:27:00.321521+00:00,,,
+6.0,Kabupaten Sleman,182.24,2020,2026-08-30T15:27:00.321521+00:00,,,
+,Total,283.7,2020,2026-08-30T15:27:00.321521+00:00,,,
+1.0,,89.45,2020,2026-08-30T15:27:00.321933+00:00,Gabah Kering Giling (GKG),,
+2.0,,135.19,2020,2026-08-30T15:27:00.321933+00:00,Beras Medium,,
+3.0,,59.02,2020,2026-08-30T15:27:00.321933+00:00,Beras Premium,,
+,,283.66,2020,2026-08-30T15:27:00.321933+00:00,Total,,
+1.0,Provinsi DI Yogyakarta,,2020,2026-08-30T15:27:00.322245+00:00,,Dinas Pertanian dan Ketahanan Pangan DIY,Jl. Gondosuli No. 6 Yogyakarta
+2.0,Kabupaten Kulon Progo,,2020,2026-08-30T15:27:00.322245+00:00,,Among Tani,"Pencengan , Kedundang, Temon"
+3.0,Kabupaten Kulon Progo,,2020,2026-08-30T15:27:00.322245+00:00,,Asih,"Plono Timur, Pagerharjo, Samigaluh"
+4.0,Kabupaten Kulon Progo,,2020,2026-08-30T15:27:00.322245+00:00,,Asri Lestari,"Kepiton, Banjar Asri, Kalibawang"
+5.0,Kabupaten Kulon Progo,,2020,2026-08-30T15:27:00.322245+00:00,,Catur Legowo,"Sidatan, Kalidengen, Temon"
+6.0,Kabupaten Kulon Progo,,2020,2026-08-30T15:27:00.322245+00:00,,Cipta Boga,Galur Kulon Progo
+7.0,Kabupaten Kulon Progo,,2020,2026-08-30T15:27:00.322245+00:00,,Dinas Pertanian dan Pangan,"Jl. Sugiman No.21, Serut, Pengasih, Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652"
+8.0,Kabupaten Kulon Progo,,2020,2026-08-30T15:27:00.322245+00:00,,Jatimakmur,"Jimatan, Jatirejo, Lendah"
+9.0,Kabupaten Kulon Progo,,2020,2026-08-30T15:27:00.322245+00:00,,KWT Giriloji,"Tegiri II, Hargowilis, Kokap"
+10.0,Kabupaten Kulon Progo,,2020,2026-08-30T15:27:00.322245+00:00,,KWT Sarwodadi,"Menguri, Hargotirto, Kokap"
+1.0,Provinsi DI Yogyakarta,0.0,2021,2026-08-30T15:27:02.892530+00:00,,,
+2.0,Kabupaten Kulon Progo,0.0,2021,2026-08-30T15:27:02.892530+00:00,,,
+3.0,Kabupaten Bantul,0.0,2021,2026-08-30T15:27:02.892530+00:00,,,
+4.0,Kabupaten Gunung Kidul,0.0,2021,2026-08-30T15:27:02.892530+00:00,,,
+5.0,Kota Yogyakarta,101.46,2021,2026-08-30T15:27:02.892530+00:00,,,
+6.0,Kabupaten Sleman,182.24,2021,2026-08-30T15:27:02.892530+00:00,,,
+,Total,283.7,2021,2026-08-30T15:27:02.892530+00:00,,,
+1.0,,89.45,2021,2026-08-30T15:27:02.892893+00:00,Gabah Kering Giling (GKG),,
+2.0,,135.19,2021,2026-08-30T15:27:02.892893+00:00,Beras Medium,,
+3.0,,59.02,2021,2026-08-30T15:27:02.892893+00:00,Beras Premium,,
+,,283.66,2021,2026-08-30T15:27:02.892893+00:00,Total,,
+1.0,Provinsi DI Yogyakarta,,2021,2026-08-30T15:27:02.893191+00:00,,Dinas Pertanian dan Ketahanan Pangan DIY,Jl. Gondosuli No. 6 Yogyakarta
+2.0,Kabupaten Kulon Progo,,2021,2026-08-30T15:27:02.893191+00:00,,Among Tani,"Pencengan , Kedundang, Temon"
+3.0,Kabupaten Kulon Progo,,2021,2026-08-30T15:27:02.893191+00:00,,Asih,"Plono Timur, Pagerharjo, Samigaluh"
+4.0,Kabupaten Kulon Progo,,2021,2026-08-30T15:27:02.893191+00:00,,Asri Lestari,"Kepiton, Banjar Asri, Kalibawang"
+5.0,Kabupaten Kulon Progo,,2021,2026-08-30T15:27:02.893191+00:00,,Catur Legowo,"Sidatan, Kalidengen, Temon"
+6.0,Kabupaten Kulon Progo,,2021,2026-08-30T15:27:02.893191+00:00,,Cipta Boga,Galur Kulon Progo
+7.0,Kabupaten Kulon Progo,,2021,2026-08-30T15:27:02.893191+00:00,,Dinas Pertanian dan Pangan,"Jl. Sugiman No.21, Serut, Pengasih, Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652"
+8.0,Kabupaten Kulon Progo,,2021,2026-08-30T15:27:02.893191+00:00,,Jatimakmur,"Jimatan, Jatirejo, Lendah"
+9.0,Kabupaten Kulon Progo,,2021,2026-08-30T15:27:02.893191+00:00,,KWT Giriloji,"Tegiri II, Hargowilis, Kokap"
+10.0,Kabupaten Kulon Progo,,2021,2026-08-30T15:27:02.893191+00:00,,KWT Sarwodadi,"Menguri, Hargotirto, Kokap"
+1.0,Provinsi DI Yogyakarta,0.0,2022,2026-08-30T15:27:05.566011+00:00,,,
+2.0,Kabupaten Kulon Progo,0.0,2022,2026-08-30T15:27:05.566011+00:00,,,
+3.0,Kabupaten Bantul,0.0,2022,2026-08-30T15:27:05.566011+00:00,,,
+4.0,Kabupaten Gunung Kidul,0.0,2022,2026-08-30T15:27:05.566011+00:00,,,
+5.0,Kota Yogyakarta,101.46,2022,2026-08-30T15:27:05.566011+00:00,,,
+6.0,Kabupaten Sleman,182.24,2022,2026-08-30T15:27:05.566011+00:00,,,
+,Total,283.7,2022,2026-08-30T15:27:05.566011+00:00,,,
+1.0,,89.45,2022,2026-08-30T15:27:05.566400+00:00,Gabah Kering Giling (GKG),,
+2.0,,135.19,2022,2026-08-30T15:27:05.566400+00:00,Beras Medium,,
+3.0,,59.02,2022,2026-08-30T15:27:05.566400+00:00,Beras Premium,,
+4.0,,0.0,2022,2026-08-30T15:27:05.566400+00:00,Jagung,,
+5.0,,15.0,2022,2026-08-30T15:27:05.566400+00:00,Kedelai,,
+6.0,,0.0,2022,2026-08-30T15:27:05.566400+00:00,Ubi Kayu,,
+7.0,,0.0,2022,2026-08-30T15:27:05.566400+00:00,Ubi Jalar,,
+8.0,,25.0,2022,2026-08-30T15:27:05.566400+00:00,Kacang Tanah,,
+9.0,,0.0,2022,2026-08-30T15:27:05.566400+00:00,Kacang Hijau,,
+,,283.7,2022,2026-08-30T15:27:05.566400+00:00,Total,,
+1.0,Provinsi DI Yogyakarta,,2022,2026-08-30T15:27:05.566679+00:00,,Dinas Pertanian dan Ketahanan Pangan DIY,Jl. Gondosuli No. 6 Yogyakarta
+2.0,Kabupaten Kulon Progo,,2022,2026-08-30T15:27:05.566679+00:00,,Among Tani,"Pencengan , Kedundang, Temon"
+3.0,Kabupaten Kulon Progo,,2022,2026-08-30T15:27:05.566679+00:00,,Asih,"Plono Timur, Pagerharjo, Samigaluh"
+4.0,Kabupaten Kulon Progo,,2022,2026-08-30T15:27:05.566679+00:00,,Asri Lestari,"Kepiton, Banjar Asri, Kalibawang"
+5.0,Kabupaten Kulon Progo,,2022,2026-08-30T15:27:05.566679+00:00,,Catur Legowo,"Sidatan, Kalidengen, Temon"
+6.0,Kabupaten Kulon Progo,,2022,2026-08-30T15:27:05.566679+00:00,,Cipta Boga,Galur Kulon Progo
+7.0,Kabupaten Kulon Progo,,2022,2026-08-30T15:27:05.566679+00:00,,Dinas Pertanian dan Pangan,"Jl. Sugiman No.21, Serut, Pengasih, Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652"
+8.0,Kabupaten Kulon Progo,,2022,2026-08-30T15:27:05.566679+00:00,,Jatimakmur,"Jimatan, Jatirejo, Lendah"
+9.0,Kabupaten Kulon Progo,,2022,2026-08-30T15:27:05.566679+00:00,,KWT Giriloji,"Tegiri II, Hargowilis, Kokap"
+10.0,Kabupaten Kulon Progo,,2022,2026-08-30T15:27:05.566679+00:00,,KWT Sarwodadi,"Menguri, Hargotirto, Kokap"
+1.0,Kabupaten Kulon Progo,0.0,2023,2026-08-30T15:27:08.216566+00:00,,,
+2.0,Kabupaten Bantul,0.0,2023,2026-08-30T15:27:08.216566+00:00,,,
+3.0,Kabupaten Gunung Kidul,0.0,2023,2026-08-30T15:27:08.216566+00:00,,,
+4.0,Kota Yogyakarta,101.46,2023,2026-08-30T15:27:08.216566+00:00,,,
+5.0,Kabupaten Sleman,182.24,2023,2026-08-30T15:27:08.216566+00:00,,,
+,Total,283.7,2023,2026-08-30T15:27:08.216566+00:00,,,
+1.0,,89.45,2023,2026-08-30T15:27:08.216919+00:00,Gabah Kering Giling (GKG),,
+2.0,,135.19,2023,2026-08-30T15:27:08.216919+00:00,Beras Medium,,
+3.0,,59.02,2023,2026-08-30T15:27:08.216919+00:00,Beras Premium,,
+4.0,,0.0,2023,2026-08-30T15:27:08.216919+00:00,Jagung,,
+5.0,,15.0,2023,2026-08-30T15:27:08.216919+00:00,Kedelai,,
+6.0,,0.0,2023,2026-08-30T15:27:08.216919+00:00,Ubi Kayu,,
+7.0,,25.0,2023,2026-08-30T15:27:08.216919+00:00,Kacang Tanah,,
+8.0,,0.0,2023,2026-08-30T15:27:08.216919+00:00,Kacang Hijau,,
+9.0,,0.0,2023,2026-08-30T15:27:08.216919+00:00,Komoditas Lainnya,,
+,,283.7,2023,2026-08-30T15:27:08.216919+00:00,Total,,
+1.0,Provinsi DI Yogyakarta,,2023,2026-08-30T15:27:08.217212+00:00,,Dinas Pertanian dan Ketahanan Pangan DIY,Jl. Gondosuli No. 6 Yogyakarta
+2.0,Kabupaten Kulon Progo,,2023,2026-08-30T15:27:08.217212+00:00,,Among Tani,"Pencengan , Kedundang, Temon"
+3.0,Kabupaten Kulon Progo,,2023,2026-08-30T15:27:08.217212+00:00,,Asih,"Plono Timur, Pagerharjo, Samigaluh"
+4.0,Kabupaten Kulon Progo,,2023,2026-08-30T15:27:08.217212+00:00,,Asri Lestari,"Kepiton, Banjar Asri, Kalibawang"
+5.0,Kabupaten Kulon Progo,,2023,2026-08-30T15:27:08.217212+00:00,,Catur Legowo,"Sidatan, Kalidengen, Temon"
+6.0,Kabupaten Kulon Progo,,2023,2026-08-30T15:27:08.217212+00:00,,Cipta Boga,Galur Kulon Progo
+7.0,Kabupaten Kulon Progo,,2023,2026-08-30T15:27:08.217212+00:00,,Dinas Pertanian dan Pangan,"Jl. Sugiman No.21, Serut, Pengasih, Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652"
+8.0,Kabupaten Kulon Progo,,2023,2026-08-30T15:27:08.217212+00:00,,Jatimakmur,"Jimatan, Jatirejo, Lendah"
+9.0,Kabupaten Kulon Progo,,2023,2026-08-30T15:27:08.217212+00:00,,KWT Giriloji,"Tegiri II, Hargowilis, Kokap"
+10.0,Kabupaten Kulon Progo,,2023,2026-08-30T15:27:08.217212+00:00,,KWT Sarwodadi,"Menguri, Hargotirto, Kokap"
+1.0,Provinsi DI Yogyakarta,0.0,2024,2026-08-30T15:27:10.918671+00:00,,,
+2.0,Kabupaten Kulon Progo,0.0,2024,2026-08-30T15:27:10.918671+00:00,,,
+3.0,Kabupaten Bantul,0.0,2024,2026-08-30T15:27:10.918671+00:00,,,
+4.0,Kabupaten Gunung Kidul,0.0,2024,2026-08-30T15:27:10.918671+00:00,,,
+5.0,Kota Yogyakarta,101.46,2024,2026-08-30T15:27:10.918671+00:00,,,
+6.0,Kabupaten Sleman,182.24,2024,2026-08-30T15:27:10.918671+00:00,,,
+,Total,283.7,2024,2026-08-30T15:27:10.918671+00:00,,,
+1.0,,89.45,2024,2026-08-30T15:27:10.919025+00:00,Gabah Kering Giling (GKG),,
+2.0,,135.19,2024,2026-08-30T15:27:10.919025+00:00,Beras Medium,,
+3.0,,59.02,2024,2026-08-30T15:27:10.919025+00:00,Beras Premium,,
+4.0,,0.0,2024,2026-08-30T15:27:10.919025+00:00,Jagung,,
+5.0,,15.0,2024,2026-08-30T15:27:10.919025+00:00,Kedelai,,
+6.0,,25.0,2024,2026-08-30T15:27:10.919025+00:00,Kacang Tanah,,
+7.0,,0.0,2024,2026-08-30T15:27:10.919025+00:00,Kacang Hijau,,
+,,283.7,2024,2026-08-30T15:27:10.919025+00:00,Total,,
+1.0,Provinsi DI Yogyakarta,,2024,2026-08-30T15:27:10.919335+00:00,,Dinas Pertanian dan Ketahanan Pangan DIY,Jl. Gondosuli No. 6 Yogyakarta
+2.0,Kabupaten Kulon Progo,,2024,2026-08-30T15:27:10.919335+00:00,,Among Tani,"Pencengan , Kedundang, Temon"
+3.0,Kabupaten Kulon Progo,,2024,2026-08-30T15:27:10.919335+00:00,,Asih,"Plono Timur, Pagerharjo, Samigaluh"
+4.0,Kabupaten Kulon Progo,,2024,2026-08-30T15:27:10.919335+00:00,,Asri Lestari,"Kepiton, Banjar Asri, Kalibawang"
+5.0,Kabupaten Kulon Progo,,2024,2026-08-30T15:27:10.919335+00:00,,Catur Legowo,"Sidatan, Kalidengen, Temon"
+6.0,Kabupaten Kulon Progo,,2024,2026-08-30T15:27:10.919335+00:00,,Cipta Boga,Galur Kulon Progo
+7.0,Kabupaten Kulon Progo,,2024,2026-08-30T15:27:10.919335+00:00,,Dinas Pertanian dan Pangan,"Jl. Sugiman No.21, Serut, Pengasih, Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652"
+8.0,Kabupaten Kulon Progo,,2024,2026-08-30T15:27:10.919335+00:00,,Jatimakmur,"Jimatan, Jatirejo, Lendah"
+9.0,Kabupaten Kulon Progo,,2024,2026-08-30T15:27:10.919335+00:00,,KWT Giriloji,"Tegiri II, Hargowilis, Kokap"
+10.0,Kabupaten Kulon Progo,,2024,2026-08-30T15:27:10.919335+00:00,,KWT Sarwodadi,"Menguri, Hargotirto, Kokap"
+1.0,Kabupaten Kulon Progo,0.0,2025,2026-08-30T15:27:13.511894+00:00,,,
+2.0,Kabupaten Bantul,0.0,2025,2026-08-30T15:27:13.511894+00:00,,,
+3.0,Kabupaten Gunung Kidul,0.0,2025,2026-08-30T15:27:13.511894+00:00,,,
+4.0,Kota Yogyakarta,101.46,2025,2026-08-30T15:27:13.511894+00:00,,,
+5.0,Kabupaten Sleman,182.24,2025,2026-08-30T15:27:13.511894+00:00,,,
+,Total,283.7,2025,2026-08-30T15:27:13.511894+00:00,,,
+1.0,,89.45,2025,2026-08-30T15:27:13.512269+00:00,Gabah Kering Giling (GKG),,
+2.0,,135.19,2025,2026-08-30T15:27:13.512269+00:00,Beras Medium,,
+3.0,,59.02,2025,2026-08-30T15:27:13.512269+00:00,Beras Premium,,
+4.0,,0.0,2025,2026-08-30T15:27:13.512269+00:00,Jagung,,
+5.0,,15.0,2025,2026-08-30T15:27:13.512269+00:00,Kedelai,,
+,,283.675,2025,2026-08-30T15:27:13.512269+00:00,Total,,
+1.0,Provinsi DI Yogyakarta,,2025,2026-08-30T15:27:13.512539+00:00,,Dinas Pertanian dan Ketahanan Pangan DIY,Jl. Gondosuli No. 6 Yogyakarta
+2.0,Kabupaten Kulon Progo,,2025,2026-08-30T15:27:13.512539+00:00,,Among Tani,"Pencengan , Kedundang, Temon"
+3.0,Kabupaten Kulon Progo,,2025,2026-08-30T15:27:13.512539+00:00,,Asih,"Plono Timur, Pagerharjo, Samigaluh"
+4.0,Kabupaten Kulon Progo,,2025,2026-08-30T15:27:13.512539+00:00,,Asri Lestari,"Kepiton, Banjar Asri, Kalibawang"
+5.0,Kabupaten Kulon Progo,,2025,2026-08-30T15:27:13.512539+00:00,,Catur Legowo,"Sidatan, Kalidengen, Temon"
+6.0,Kabupaten Kulon Progo,,2025,2026-08-30T15:27:13.512539+00:00,,Cipta Boga,Galur Kulon Progo
+7.0,Kabupaten Kulon Progo,,2025,2026-08-30T15:27:13.512539+00:00,,Dinas Pertanian dan Pangan,"Jl. Sugiman No.21, Serut, Pengasih, Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652"
+8.0,Kabupaten Kulon Progo,,2025,2026-08-30T15:27:13.512539+00:00,,Jatimakmur,"Jimatan, Jatirejo, Lendah"
+9.0,Kabupaten Kulon Progo,,2025,2026-08-30T15:27:13.512539+00:00,,KWT Giriloji,"Tegiri II, Hargowilis, Kokap"
+10.0,Kabupaten Kulon Progo,,2025,2026-08-30T15:27:13.512539+00:00,,KWT Sarwodadi,"Menguri, Hargotirto, Kokap"
+1.0,Provinsi DI Yogyakarta,0.0,2026,2026-08-30T15:27:16.101016+00:00,,,
+2.0,Kabupaten Kulon Progo,0.0,2026,2026-08-30T15:27:16.101016+00:00,,,
+3.0,Kabupaten Bantul,0.0,2026,2026-08-30T15:27:16.101016+00:00,,,
+4.0,Kabupaten Gunung Kidul,0.0,2026,2026-08-30T15:27:16.101016+00:00,,,
+5.0,Kota Yogyakarta,101.46,2026,2026-08-30T15:27:16.101016+00:00,,,
+6.0,Kabupaten Sleman,182.24,2026,2026-08-30T15:27:16.101016+00:00,,,
+7.0,Kecamatan Sleman,0.0,2026,2026-08-30T15:27:16.101016+00:00,,,
+,Total,283.7,2026,2026-08-30T15:27:16.101016+00:00,,,
+1.0,,89.45,2026,2026-08-30T15:27:16.101385+00:00,Gabah Kering Giling (GKG),,
+2.0,,135.19,2026,2026-08-30T15:27:16.101385+00:00,Beras Medium,,
+3.0,,59.02,2026,2026-08-30T15:27:16.101385+00:00,Beras Premium,,
+4.0,,0.0,2026,2026-08-30T15:27:16.101385+00:00,Jagung,,
+5.0,,15.0,2026,2026-08-30T15:27:16.101385+00:00,Kedelai,,
+6.0,,25.0,2026,2026-08-30T15:27:16.101385+00:00,Kacang Tanah,,
+7.0,,0.0,2026,2026-08-30T15:27:16.101385+00:00,Kacang Hijau,,
+,,283.7,2026,2026-08-30T15:27:16.101385+00:00,Total,,
+1.0,Provinsi DI Yogyakarta,,2026,2026-08-30T15:27:16.101669+00:00,,Dinas Pertanian dan Ketahanan Pangan DIY,Jl. Gondosuli No. 6 Yogyakarta
+2.0,Kabupaten Kulon Progo,,2026,2026-08-30T15:27:16.101669+00:00,,Among Tani,"Pencengan , Kedundang, Temon"
+3.0,Kabupaten Kulon Progo,,2026,2026-08-30T15:27:16.101669+00:00,,Asih,"Plono Timur, Pagerharjo, Samigaluh"
+4.0,Kabupaten Kulon Progo,,2026,2026-08-30T15:27:16.101669+00:00,,Asri Lestari,"Kepiton, Banjar Asri, Kalibawang"
+5.0,Kabupaten Kulon Progo,,2026,2026-08-30T15:27:16.101669+00:00,,Catur Legowo,"Sidatan, Kalidengen, Temon"
+6.0,Kabupaten Kulon Progo,,2026,2026-08-30T15:27:16.101669+00:00,,Cipta Boga,Galur Kulon Progo
+7.0,Kabupaten Kulon Progo,,2026,2026-08-30T15:27:16.101669+00:00,,Dinas Pertanian dan Pangan,"Jl. Sugiman No.21, Serut, Pengasih, Wates, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta 55652"
+8.0,Kabupaten Kulon Progo,,2026,2026-08-30T15:27:16.101669+00:00,,Jatimakmur,"Jimatan, Jatirejo, Lendah"
+9.0,Kabupaten Kulon Progo,,2026,2026-08-30T15:27:16.101669+00:00,,KWT Giriloji,"Tegiri II, Hargowilis, Kokap"
+10.0,Kabupaten Kulon Progo,,2026,2026-08-30T15:27:16.101669+00:00,,KWT Sarwodadi,"Menguri, Hargotirto, Kokap"

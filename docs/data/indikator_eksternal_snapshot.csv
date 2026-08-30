@@ -1,0 +1,20 @@
+indikator,periode,nilai,satuan,sumber,catatan
+Kurs JISDOR USD/IDR,2026-08-28,17703,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,"Data harian statis (bisa WebFetch tanpa Playwright), tapi histori lama pakai __doPostBack (butuh Playwright utk otomasi penuh)"
+Kurs JISDOR USD/IDR,2026-08-27,17762,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,
+Kurs JISDOR USD/IDR,2026-08-26,17717,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,
+Kurs JISDOR USD/IDR,2026-08-24,17703,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,
+Kurs JISDOR USD/IDR,2026-08-21,17705,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,
+Kurs JISDOR USD/IDR,2026-08-20,17779,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,
+Kurs JISDOR USD/IDR,2026-08-19,17844,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,
+Kurs JISDOR USD/IDR,2026-08-18,17856,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,
+Kurs JISDOR USD/IDR,2026-08-14,17836,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,
+Kurs JISDOR USD/IDR,2026-08-13,17882,IDR per USD,https://www.bi.go.id/id/statistik/informasi-kurs/jisdor/default.aspx,
+FAO Food Price Index (headline),2026-07,131.1,indeks (2014-2016=100),https://www.fao.org/worldfoodsituation/FoodPricesIndex/en,"naik 0.6% MoM; +1.0% YoY; masih 18.2% di bawah puncak Maret 2022"
+FAO Food Price Index (sereal),2026-07,113.8,indeks,https://www.fao.org/worldfoodsituation/FoodPricesIndex/en,naik 3.4% MoM
+FAO Food Price Index (minyak nabati),2026-07,195.7,indeks,https://www.fao.org/worldfoodsituation/FoodPricesIndex/en,naik 2.0% MoM
+FAO Food Price Index (daging),2026-07,127.7,indeks,https://www.fao.org/worldfoodsituation/FoodPricesIndex/en,turun 2.8% MoM
+FAO Food Price Index (susu),2026-07,116.2,indeks,https://www.fao.org/worldfoodsituation/FoodPricesIndex/en,turun 0.7% MoM
+FAO Food Price Index (gula),2026-07,95.0,indeks,https://www.fao.org/worldfoodsituation/FoodPricesIndex/en,naik 5.6% MoM
+ENSO Nino-3.4 SST anomaly,2026-07,1.4,derajat Celsius,https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_disc_aug2026/ensodisc.shtml,"El Nino fase PENGUATAN; probabilitas >90% El Nino sangat kuat Okt-Des 2026; 69% peluang lampaui +2.5C (setara rekor sejak 1950)"
+ENSO Nino-3 SST anomaly,2026-07,1.7,derajat Celsius,https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_disc_aug2026/ensodisc.shtml,
+ENSO Nino-1+2 SST anomaly,2026-07,2.9,derajat Celsius,https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_disc_aug2026/ensodisc.shtml,
