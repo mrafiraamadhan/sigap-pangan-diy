@@ -85,6 +85,24 @@ def fetch_page(page: int) -> pd.DataFrame | None:
         return None
 
     df = tables[0]
+
+    # NORMALISASI NAMA KOLOM -- WAJIB sebelum apapun. Run 30 Agt 2026 (365
+    # halaman, 16 menit) GAGAL TOTAL di tahap pembersihan dengan IndexError
+    # karena nama kolom hasil read_html tidak selalu string polos (bisa
+    # tuple/MultiIndex/angka tergantung struktur header yang keparse), padahal
+    # kode pembersihan mencari kolom dengan `"anggal" in c` yang diam-diam
+    # tidak cocok pada kolom non-string. Setelah baris ini, SEMUA nama kolom
+    # dijamin string rata & bersih spasi.
+    if isinstance(df.columns, pd.MultiIndex):
+        # dict.fromkeys = buang bagian yang berulang TAPI pertahankan urutan,
+        # supaya header bertingkat ("Tanggal","Tanggal") jadi "Tanggal" polos
+        # (bukan "Tanggal Tanggal" yang tidak nyambung dgn halaman lain).
+        df.columns = [" ".join(dict.fromkeys(
+                          str(bagian) for bagian in tup
+                          if str(bagian) not in ("nan", "None", "")))
+                       for tup in df.columns]
+    df.columns = [str(c).strip() for c in df.columns]
+
     # Buang kolom nomor urut kalau ada (biasanya kolom pertama '#')
     if len(df.columns) and df.columns[0] in ("#", "No", "No."):
         df = df.drop(columns=[df.columns[0]])
@@ -134,22 +152,52 @@ def main():
 
     # --- PEMBERSIHAN DATA (penting -- database sumbernya punya masalah kualitas
     # data nyata: sebagian tanggal '0000-00-00' / kosong, sebagian harga = 0) ---
-    before = len(result)
-    tanggal_col = [c for c in result.columns if "anggal" in c][0]
-    harga_col = [c for c in result.columns if "arga" in c][0]
+    # PRINSIP BARU setelah insiden 30 Agt 2026 (16 menit fetch dibuang gara-gara
+    # crash di tahap ini): pembersihan TIDAK BOLEH menggagalkan penyimpanan.
+    # Kalau ada yang aneh, cetak diagnosis + simpan data mentah apa adanya --
+    # data kotor yang tersimpan jauh lebih baik daripada data hilang total.
+    tanggal_col = next((c for c in result.columns if "anggal" in str(c).lower()), None)
+    harga_col = next((c for c in result.columns if "arga" in str(c).lower()), None)
 
-    result = result[~result[tanggal_col].astype(str).str.startswith("0000")]
-    result[harga_col] = pd.to_numeric(result[harga_col], errors="coerce")
-    result = result[result[harga_col] > 0]
-    after = len(result)
-    print(f"Pembersihan data: {before} baris -> {after} baris "
-          f"(buang {before - after} baris dengan tanggal tidak valid / harga = 0)")
+    if tanggal_col and harga_col:
+        try:
+            before = len(result)
+            result = result[~result[tanggal_col].astype(str).str.startswith("0000")]
+            result[harga_col] = pd.to_numeric(result[harga_col], errors="coerce")
+            result = result[result[harga_col] > 0]
+            print(f"Pembersihan data: {before} baris -> {len(result)} baris "
+                  f"(buang {before - len(result)} baris dgn tanggal tidak valid / harga = 0)")
+        except Exception as e:
+            print(f"PERINGATAN: pembersihan gagal ({type(e).__name__}: {str(e)[:150]}) "
+                  f"-- data disimpan APA ADANYA tanpa dibersihkan.")
+    else:
+        print(f"PERINGATAN: kolom tanggal/harga tidak dikenali "
+              f"(kolom yang ada: {list(result.columns)[:8]}) "
+              f"-- data disimpan APA ADANYA tanpa dibersihkan.")
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 
-    file_exists = os.path.isfile(OUTPUT_PATH)
-    result.to_csv(OUTPUT_PATH, mode="a", header=not file_exists, index=False)
-    print(f"\n{len(result)} baris ditambahkan ke {OUTPUT_PATH}")
+    # Simpan DENGAN DEDUP antar-run (versi lama pakai mode append mentah, jadi
+    # run terjadwal harian akan menumpuk baris yang sama terus-menerus).
+    # Identitas 1 observasi = tanggal + komoditas (situs mencatat 1 harga per
+    # komoditas per hari); fallback ke semua kolom kalau kolom tak dikenali.
+    if os.path.isfile(OUTPUT_PATH):
+        lama = pd.read_csv(OUTPUT_PATH)
+        lama.columns = [str(c).strip() for c in lama.columns]
+        gabungan = pd.concat([lama, result], ignore_index=True)
+        komoditas_col = next((c for c in gabungan.columns if "omoditas" in str(c).lower()), None)
+        kunci = ([tanggal_col, komoditas_col] if (tanggal_col and komoditas_col
+                  and tanggal_col in gabungan.columns and komoditas_col in gabungan.columns)
+                 else list(gabungan.columns))
+        gabungan = gabungan[~gabungan[kunci].astype(str).duplicated(keep="first")]
+        baru = len(gabungan) - len(lama)
+        gabungan.to_csv(OUTPUT_PATH, index=False)
+    else:
+        result.to_csv(OUTPUT_PATH, index=False)
+        baru = len(result)
+
+    print(f"\n{baru} baris baru ditambahkan ke {OUTPUT_PATH} "
+          f"(dari {len(result)} baris hasil fetch).")
     print("Sumber: Dinas Pertanian dan Ketahanan Pangan (DPKP) Provinsi DIY -- "
           "https://dpkp.jogjaprov.go.id/harga-pangan/list")
 
