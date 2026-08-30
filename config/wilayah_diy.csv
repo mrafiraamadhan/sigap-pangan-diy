@@ -1,0 +1,6 @@
+kabupaten_kota,kecamatan_contoh,adm4_bmkg,catatan
+Kota Yogyakarta,Ngupasan (Kec. Gondomanan),34.71.10.1001,"Diverifikasi silang lewat bmkg.go.id/cuaca/prakiraan-cuaca/34.71.10.1001 dan kodepos.co.id -- coba tes ulang ke API sebelum production"
+Kabupaten Sleman,Triharjo (Kec. Sleman -- pusat pemkab),34.04.13.2002,"Diverifikasi silang lewat bmkg.go.id/cuaca/prakiraan-cuaca/34.04.13.2002 dan kodepos.co.id"
+Kabupaten Bantul,Bantul (Kec. Bantul),34.02.08.2003,"Diverifikasi silang lewat bmkg.go.id/cuaca/prakiraan-cuaca/34.02.08.2003 dan kodepos.co.id"
+Kabupaten Kulon Progo,Wates (Kec. Wates),34.01.02.1008,"Diverifikasi silang lewat bmkg.go.id/cuaca/prakiraan-cuaca/34.01.02.1008 dan desapos.id"
+Kabupaten Gunungkidul,Wonosari (Kec. Wonosari),34.03.01.2001,"Diverifikasi silang lewat bmkg.go.id/cuaca/prakiraan-cuaca/34.03.01.2001 dan desapos.id"
