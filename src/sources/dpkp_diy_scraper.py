@@ -31,13 +31,20 @@ import pandas as pd
 import requests
 
 BASE_URL = "https://dpkp.jogjaprov.go.id/harga-pangan/list"
-SORT_PARAM = "-tanggal"  # penting: tanpa ini urutan antar-halaman TIDAK kronologis
+# CATATAN (30 Agt 2026): sebelumnya di sini ada parameter `sort=-tanggal`,
+# TERNYATA JUSTRU BIKIN SALAH -- dites manual (WebFetch): dengan parameter itu,
+# "page=1" malah menampilkan baris 9.961-9.980 dari 10.035 (bukan yang
+# terbaru!), sementara TANPA parameter sort sama sekali, "page=1" sudah benar
+# menampilkan 20 baris data TERBARU (per 2026-08-13 saat dites). Jadi urutan
+# default situs ini SUDAH kronologis terbaru->terlama, tidak perlu dipaksa.
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_PATH = os.path.join(HERE, "..", "..", "data", "harga_pangan_dpkp_diy.csv")
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (research bot - YES2026 food security paper; "
-                  "kontak: isi-email-kamu-di-sini) AppleWebKit/537.36"
+    "User-Agent": "Mozilla/5.0 (compatible; SIGAP-Pangan-DIY/1.0; research bot - "
+                  "YES2026 food security paper) AppleWebKit/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 DELAY_SECONDS = 1.5  # jeda antar-request, jangan diturunkan
 
@@ -45,9 +52,12 @@ DELAY_SECONDS = 1.5  # jeda antar-request, jangan diturunkan
 def fetch_page(page: int) -> pd.DataFrame | None:
     """Ambil & parse 1 halaman. Sengaja SANGAT defensif -- kalau ada yang
     aneh di 1 halaman (tabel berubah struktur, dsb), lewati halaman itu
-    (return None) daripada bikin seluruh proses berhenti. Semua pesan error
-    dipotong pendek supaya log Actions tidak kebanjiran dump HTML mentah."""
-    url = f"{BASE_URL}?sort={SORT_PARAM}&page={page}"
+    (return None) daripada bikin seluruh proses berhenti. Pesan error utama
+    dipotong pendek supaya log Actions tidak kebanjiran dump HTML mentah,
+    TAPI tetap menyertakan status HTTP + panjang respons + cuplikan singkat
+    supaya kalau gagal lagi, penyebabnya (mis. situs memblokir bot) langsung
+    ketahuan dari log tanpa perlu tebak-tebakan lagi."""
+    url = f"{BASE_URL}?page={page}"
     try:
         resp = requests.get(url, headers=HEADERS, timeout=20)
         resp.raise_for_status()
@@ -58,11 +68,14 @@ def fetch_page(page: int) -> pd.DataFrame | None:
     try:
         tables = pd.read_html(resp.text)
     except Exception as e:
-        print(f"  Halaman {page}: gagal parse tabel -- {type(e).__name__}: {str(e)[:200]}")
+        print(f"  Halaman {page}: gagal parse tabel -- {type(e).__name__}: {str(e)[:150]} "
+              f"(HTTP {resp.status_code}, {len(resp.text)} char)")
         return None
 
     if not tables:
-        print(f"  Halaman {page}: tidak ada tabel ditemukan di HTML.")
+        cuplikan = resp.text[:150].replace("\n", " ")
+        print(f"  Halaman {page}: tidak ada tabel di HTML (HTTP {resp.status_code}, "
+              f"{len(resp.text)} char, cuplikan: {cuplikan!r})")
         return None
 
     df = tables[0]
@@ -77,7 +90,8 @@ def fetch_page(page: int) -> pd.DataFrame | None:
     ada_kolom_harga = any("arga" in str(c) for c in df.columns)
     if not (ada_kolom_tanggal and ada_kolom_harga):
         print(f"  Halaman {page}: tabel ditemukan tapi kolomnya tidak sesuai "
-              f"harapan (kolom: {list(df.columns)[:6]}) -- dilewati.")
+              f"harapan (kolom: {list(df.columns)[:6]}) -- dilewati. "
+              f"(HTTP {resp.status_code}, {len(resp.text)} char)")
         return None
 
     return df
