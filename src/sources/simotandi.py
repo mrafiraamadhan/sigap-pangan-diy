@@ -1,353 +1,342 @@
 """
-Scraper fase tanam padi (dasarian) DIY dari SIMOTANDI Kementan -- endpoint API asli.
+Ambil data fase pertanaman padi per KECAMATAN di DIY dari SIMOTANDI Kementan.
 
-Alur (ditemukan lewat inspeksi manual DevTools browser, 30 Agt 2026):
+=== KENAPA VERSI INI BEDA TOTAL DARI VERSI SEBELUMNYA ===
 
-1. GET https://simotandi.pertanian.go.id/data-tabular
-   -> ambil cookie sesi (Laravel: simotandi_session, XSRF-TOKEN) & CSRF token
-      dari meta tag <meta name="csrf-token" content="...">.
-   -> juga dipakai buat mencari opsi dropdown "periode" (dasarian) dengan nilai
-      TERBESAR = dasarian TERBARU yang tersedia, supaya kita tidak hardcode
-      angka yang lama-lama basi (dasarian baru terbit tiap ~10-12 hari).
+Versi lama menempuh jalur situs web SIMOTANDI (simotandi.pertanian.go.id):
+buka halaman -> ambil CSRF token -> POST minta "export Excel" -> poll status
+job -> unduh .xlsx. Jalur itu GAGAL TERUS di GitHub Actions karena situsnya
+dilindungi Cloudflare: dari IP datacenter, yang disajikan bukan halaman asli
+melainkan halaman tantangan JS ("Just a moment..."), sehingga csrf-token tidak
+pernah ketemu dan seluruh alur mati di langkah pertama. Segala trik stealth
+browser cuma menunda masalah, bukan menyelesaikannya.
 
-2. POST https://simotandi.pertanian.go.id/front/data-tabular/export
-   form data: provinsi=34 (kode BPS DI Yogyakarta), kabupaten=<kode BPS 4 digit>,
-              kecamatan=all, periode=<id dasarian terbaru>
-   header wajib: X-Csrf-Token, X-Requested-With: XMLHttpRequest, Referer
-   -> server membuat job export & mengembalikan referensi job (dipoll di
-      langkah berikut).
+Versi ini memakai SUMBER YANG SAMA tapi lewat PINTU YANG BERBEDA: server
+ArcGIS milik Kementan yang menyimpan data aslinya, di host `sig02.pertanian.go.id`.
+Server ini:
+  - TIDAK di belakang Cloudflare (tidak ada tantangan JS sama sekali)
+  - TIDAK butuh sesi, cookie, CSRF token, maupun login
+  - TIDAK butuh Playwright/browser (cukup `requests` -> jauh lebih cepat & ringan)
+  - Mengembalikan JSON rapi lewat ArcGIS REST API standar
 
-3. GET https://simotandi.pertanian.go.id/export/status/{job_id}  (poll berkala)
-   -> {"status": "done", "message": "done:100%",
-       "url": "https://minio-simotandi.pertanian.go.id/.../Data_Tabular_....xlsx"}
-   Pada sesi inspeksi manual, job_id yang dipoll SAMA dengan nilai periode yang
-   dikirim -- kode di bawah pakai itu sebagai asumsi utama, dengan fallback ke
-   id dari respons POST kalau ternyata server memberi id job terpisah.
+Semua ini sudah DIKONFIRMASI langsung pada 30 Agt 2026 dengan menarik data
+sungguhan (mis. 12 kecamatan Kulon Progo periode 5-16 Agustus 2026 keluar
+lengkap dengan angka luas per fase).
 
-4. GET file .xlsx dari url di atas (object storage publik, tanpa auth
-   tambahan) lalu parse dengan pandas.
+=== STRUKTUR SUMBER ===
 
-Kode wilayah kabupaten/kota DIY (standar BPS/Kemendagri):
-  3471 Kota Yogyakarta, 3472 Kab. Bantul, 3473 Kab. Gunung Kidul,
-  3474 Kab. Kulon Progo, 3475 Kab. Sleman
+Ada 2 "MapServer" yang relevan, dua-duanya di bawah folder `simotandi`:
+  1. simotandi/simotandi_sentinel1  -> memuat periode TERBARU
+  2. simotandi/simontadi2            -> memuat beberapa periode sebelumnya
+(ejaan "simontadi2" memang typo di sisi Kementan, jangan "dibetulkan")
 
-CATATAN: modul ini lebih kompleks dari pihps_scraper.py (perlu sesi + CSRF +
-tunggu job async), jadi kalau situs berubah struktur, jalankan lagi:
-    python3 src/sources/simotandi.py --inspect
+Di dalam tiap MapServer ada banyak layer. Sebagian besar layer adalah RASTER
+peta fase tanam ("Fase Pertanaman Padi ...", fields = null, tidak ada angka
+yang bisa diambil). Yang kita mau HANYA layer yang namanya diawali
+"Data Tabular Periode ..." -- layer inilah yang berisi tabel agregat per
+kecamatan. Karena ID layer & daftar periodenya BERUBAH tiap kali Kementan
+menerbitkan periode baru, script ini TIDAK meng-hardcode ID layer: ia selalu
+membaca dulu daftar layer, lalu menyaring yang namanya "Data Tabular".
+
+Field pada layer Data Tabular (dikonfirmasi lewat metadata layer):
+  WADMPR   = nama provinsi      (mis. "Daerah Istimewa Yogyakarta")
+  WADMKK   = nama kabupaten/kota (mis. "Kulon Progo", "Sleman")
+  WADMKC   = nama kecamatan      (mis. "Wates", "Godean")
+  KDCPUM   = kode wilayah
+  Bera     = luas lahan bera / tidak ditanami   (hektar)
+  P_Lahan  = luas fase persiapan lahan          (hektar)
+  Tanam    = luas fase tanam                    (hektar)
+  Veg_1    = luas fase vegetatif 1              (hektar)
+  Veg_2    = luas fase vegetatif 2              (hektar)
+  Gen_1    = luas fase generatif 1              (hektar)
+  Gen_2    = luas fase generatif 2              (hektar)
+  Panen    = luas fase panen                    (hektar)
+
+CATATAN PENTING soal filter provinsi: nilai WADMPR ditulis Title Case
+("Daerah Istimewa Yogyakarta"), dan klausa WHERE di ArcGIS ini
+CASE-SENSITIVE. Menulis LIKE '%YOGYAKARTA%' (huruf besar) mengembalikan 0
+baris -- sempat bikin salah sangka bahwa DIY tidak ada datanya. Karena itu
+filternya memakai '%Yogya%' persis seperti di bawah. Jangan diubah jadi
+huruf besar.
+
+Batas teknis: server ini ArcGIS 10.51 yang TIDAK mendukung paginasi
+(`resultRecordCount` ditolak dengan "Pagination is not supported"), dengan
+maxRecordCount 1000 baris per query. DIY hanya 78 kecamatan, jadi satu query
+per periode sudah pasti muat -- tidak perlu paginasi sama sekali.
+
+Cara pakai:
+    pip install requests pandas
+    python simotandi.py                  # ambil semua periode yang tersedia
+    python simotandi.py --daftar-layer   # diagnostik: lihat layer apa saja yg ada
 """
 
 import argparse
-import io
 import os
 import re
-import time
 from datetime import datetime, timezone
 
 import pandas as pd
-from playwright.sync_api import sync_playwright
+import requests
 
-BASE = "https://simotandi.pertanian.go.id"
-DATA_TABULAR_PAGE = f"{BASE}/data-tabular"
-EXPORT_ENDPOINT = f"{BASE}/front/data-tabular/export"
-STATUS_ENDPOINT_TMPL = f"{BASE}/export/status/{{job_id}}"
+BASE_ARCGIS = "https://sig02.pertanian.go.id/server/rest/services/simotandi"
 
-PROVINCE_ID_DIY = 34
-KABUPATEN_DIY = {
-    "3471": "Kota Yogyakarta",
-    "3472": "Kabupaten Bantul",
-    "3473": "Kabupaten Gunung Kidul",
-    "3474": "Kabupaten Kulon Progo",
-    "3475": "Kabupaten Sleman",
+# Urutan sengaja: sentinel1 dulu (periode terbaru), lalu simontadi2 (periode
+# lama). Ejaan "simontadi2" memang begitu di servernya -- bukan salah ketik kita.
+SERVICES = [
+    "simotandi_sentinel1",
+    "simontadi2",
+]
+
+# WAJIB Title Case -- WHERE di ArcGIS ini case-sensitive (lihat catatan di atas)
+FILTER_PROVINSI = "WADMPR LIKE '%Yogya%'"
+
+KOLOM_FASE = ["Bera", "P_Lahan", "Tanam", "Veg_1", "Veg_2", "Gen_1", "Gen_2", "Panen"]
+
+NAMA_FASE_RAPI = {
+    "Bera": "bera_ha",
+    "P_Lahan": "persiapan_lahan_ha",
+    "Tanam": "tanam_ha",
+    "Veg_1": "vegetatif_1_ha",
+    "Veg_2": "vegetatif_2_ha",
+    "Gen_1": "generatif_1_ha",
+    "Gen_2": "generatif_2_ha",
+    "Panen": "panen_ha",
 }
 
-HEADERS_BASE = {
-    "User-Agent": "Mozilla/5.0 (compatible; SIGAP-Pangan-DIY/1.0; "
-                  "+https://github.com/mrafiraamadhan/sigap-pangan-diy)",
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (compatible; SIGAP-Pangan-DIY/1.0; research bot - "
+                  "YES2026 food security paper) AppleWebKit/537.36",
+    "Accept": "application/json,text/plain,*/*",
 }
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_PATH = os.path.join(HERE, "..", "..", "data", "simotandi_fase_tanam_diy.csv")
 
-MAX_POLL = 24            # maks ~24x cek status
-POLL_INTERVAL_SEC = 5    # jeda 5 detik antar cek (~2 menit total maksimal)
+TIMEOUT = 60
+
+BULAN_ID = {
+    "januari": 1, "februari": 2, "febuari": 2, "maret": 3, "april": 4,
+    "mei": 5, "juni": 6, "juli": 7, "agustus": 8, "september": 9,
+    "oktober": 10, "november": 11, "nopember": 11, "desember": 12,
+}
 
 
-def inspect_mode():
-    """Mode diagnostik manual -- pakai ini lagi kalau alur di atas suatu saat
-    berhenti jalan (situs berubah struktur)."""
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=250)
-        page = browser.new_page()
+def parse_periode(nama_layer: str):
+    """Ubah nama layer jadi (label, tanggal_mulai, tanggal_selesai).
 
-        found = []
+    Nama layer punya beberapa bentuk yang harus ditangani semua:
+        "Data Tabular Periode 5 - 16 Agustus 2026"          -> 1 bulan, 1 tahun
+        "Data Tabular Periode 26 Maret - 6 April 2026"      -> beda bulan, 1 tahun
+        "Data Tabular Periode 28 Desember 2025 - 8 Januari 2026" -> beda tahun
 
-        def on_request(req):
-            if "export" in req.url:
-                found.append((req.method, req.url))
-                print(">> EXPORT REQUEST:", req.method, req.url)
+    Kalau formatnya tidak dikenali, kembalikan tanggal None saja (baris data
+    tetap disimpan dengan labelnya) -- lebih baik data masuk tanpa tanggal
+    daripada seluruh periode dibuang cuma karena penamaan berubah sedikit.
+    """
+    label = re.sub(r"^Data Tabular Periode\s*", "", nama_layer).strip()
+    label = re.sub(r"\.tif$", "", label).strip()
 
-        page.on("request", on_request)
-        page.goto(DATA_TABULAR_PAGE, wait_until="networkidle", timeout=60000)
+    teks = label.lower().replace("–", "-").replace("—", "-")
+    if "-" not in teks:
+        return label, None, None
 
-        print("\n=== MODE INSPEKSI SIMOTANDI ===")
-        print("1. Di jendela browser, filter Provinsi = DI Yogyakarta")
-        print("2. Pilih kabupaten/kota satu per satu (atau semua kalau bisa)")
-        print("3. Klik tombol 'Export Excel'")
-        print("4. Catat URL yang tercetak di terminal -- itu pattern query")
-        print("   yang perlu ditiru di download_export() di bawah.")
-        print("\nTekan Enter setelah selesai...")
-        input()
+    kiri, kanan = teks.split("-", 1)
+    kiri, kanan = kiri.strip(), kanan.strip()
 
-        print(f"\nTotal {len(found)} request terkait export tercatat.")
-        browser.close()
+    def pecah(bagian):
+        m = re.match(r"^(\d{1,2})\s*([a-z]+)?\s*(\d{4})?$", bagian.strip())
+        if not m:
+            return None, None, None
+        hari = int(m.group(1))
+        bulan = BULAN_ID.get(m.group(2)) if m.group(2) else None
+        tahun = int(m.group(3)) if m.group(3) else None
+        return hari, bulan, tahun
 
+    h1, b1, t1 = pecah(kiri)
+    h2, b2, t2 = pecah(kanan)
+    if h1 is None or h2 is None:
+        return label, None, None
 
-PENANDA_HALAMAN_TANTANGAN = (
-    "just a moment", "checking your browser", "cf-browser-verification",
-    "cf_chl", "attention required", "__cf_chl", "verify you are human",
-    "enable javascript and cookies",
-)
+    # Sisi kanan selalu paling lengkap -> jadi acuan untuk mengisi sisi kiri
+    b1 = b1 or b2
+    t1 = t1 or t2
+    t2 = t2 or t1
+    if not (b1 and b2 and t1 and t2):
+        return label, None, None
 
-
-def _cari_csrf(html: str):
-    m = re.search(r'name=["\']csrf-token["\']\s+content=["\']([^"\']+)["\']', html)
-    if not m:
-        m = re.search(r'content=["\']([^"\']+)["\']\s+name=["\']csrf-token["\']', html)
-    return m.group(1) if m else None
-
-
-def _kelihatan_seperti_tantangan(html: str) -> bool:
-    lower = html.lower()
-    return any(penanda in lower for penanda in PENANDA_HALAMAN_TANTANGAN)
-
-
-def buat_sesi(context):
-    """Buka halaman awal LEWAT BROWSER (bukan requests polos) supaya lolos
-    proteksi anti-bot Cloudflare yang dipakai situs ini -- dikonfirmasi lewat
-    run pertama di GitHub Actions: request 'requests' polos ditolak dengan
-    403 Forbidden, padahal di browser sungguhan (punya narahubung/user) situs
-    ini terbuka normal tanpa CAPTCHA. Setelah halaman ini berhasil dimuat di
-    context browser, sisa request (POST export, polling status, download
-    file) dikirim lewat context.request supaya cookie sesi & 'kepercayaan'
-    dari Cloudflare tetap terbawa, tanpa perlu render browser lagi tiap kali
-    (jauh lebih cepat daripada full Playwright utk semua langkah).
-
-    CATATAN (30 Agt 2026): run pertama lolos dari 403, tapi lalu gagal cari
-    csrf-token dalam waktu cuma ~4 detik -- pola ini khas Cloudflare
-    menyajikan halaman TANTANGAN JS ("Just a moment...") ke browser headless,
-    bukan halaman asli (yang otomatis tidak punya meta csrf-token). Fungsi
-    ini sekarang: (a) bikin context browser lebih 'meyakinkan' lewat
-    add_init_script di ambil_data(), (b) mendeteksi eksplisit kalau HTML yang
-    didapat kelihatan seperti halaman tantangan lalu menunggu & mencoba lagi
-    beberapa kali (tantangan Cloudflare biasanya otomatis selesai dalam
-    beberapa detik), dan (c) kalau tetap gagal, mencetak cuplikan HTML +
-    judul halaman supaya lain kali langsung ketahuan itu tantangan Cloudflare
-    vs. situs yang struktur HTML-nya sungguh berubah."""
-    page = context.new_page()
-
-    html = ""
-    csrf_token = None
-    for percobaan in range(4):
-        page.goto(DATA_TABULAR_PAGE, wait_until="networkidle", timeout=60000)
-        html = page.content()
-        csrf_token = _cari_csrf(html)
-        if csrf_token:
-            break
-        if _kelihatan_seperti_tantangan(html):
-            print(f"  Percobaan {percobaan + 1}/4: kelihatan seperti halaman "
-                  f"tantangan Cloudflare ('Just a moment...') -- tunggu 8 detik & coba lagi...")
-            page.wait_for_timeout(8000)
-        else:
-            print(f"  Percobaan {percobaan + 1}/4: csrf-token belum ketemu (bukan "
-                  f"halaman tantangan yang dikenali) -- tunggu 4 detik & coba lagi...")
-            page.wait_for_timeout(4000)
-
-    page.close()
-
-    if not csrf_token:
-        judul_match = re.search(r'<title[^>]*>([^<]*)</title>', html, re.IGNORECASE)
-        judul = judul_match.group(1).strip() if judul_match else "(tidak ada tag <title>)"
-        cuplikan = re.sub(r'\s+', ' ', html).strip()[:300]
-        raise RuntimeError(
-            "Tidak menemukan csrf-token di halaman data-tabular setelah 4x "
-            f"percobaan -- judul halaman: {judul!r}; cuplikan HTML: {cuplikan!r} "
-            "-- kemungkinan Cloudflare memblokir IP GitHub Actions secara "
-            "jaringan (bukan cuma tantangan JS biasa), atau struktur situs berubah."
-        )
-
-    return html, csrf_token
-
-
-def cari_periode_terbaru(html: str):
-    """Cari opsi dropdown 'periode' (dasarian) dengan value numerik TERBESAR
-    = dasarian paling baru yang tersedia."""
-    blok = re.search(
-        r'<select[^>]*name=["\']periode["\'][^>]*>(.*?)</select>',
-        html, re.IGNORECASE | re.DOTALL,
-    )
-    sumber = blok.group(1) if blok else html  # fallback: cari di seluruh halaman
-
-    opsi = re.findall(r'<option[^>]*value=["\'](\d+)["\'][^>]*>([^<]*)</option>', sumber)
-    if not opsi:
-        raise RuntimeError(
-            "Tidak menemukan opsi dropdown 'periode' -- struktur situs "
-            "SIMOTANDI mungkin sudah berubah."
-        )
-
-    nilai, label = max(opsi, key=lambda pasangan: int(pasangan[0]))
-    return nilai, label.strip()
-
-
-def minta_export(req, csrf_token: str, kabupaten_id: str, periode_id: str):
-    headers = {
-        "X-Csrf-Token": csrf_token,
-        "X-Requested-With": "XMLHttpRequest",
-        "Referer": DATA_TABULAR_PAGE,
-    }
-    form = {
-        "provinsi": str(PROVINCE_ID_DIY),
-        "kabupaten": str(kabupaten_id),
-        "kecamatan": "all",
-        "periode": str(periode_id),
-    }
-    resp = req.post(EXPORT_ENDPOINT, form=form, headers=headers, timeout=30000)
-    if not resp.ok:
-        raise RuntimeError(f"POST export gagal, status {resp.status}: {resp.text()[:200]}")
     try:
-        return resp.json()
-    except Exception:
-        print(f"  -> respons POST export bukan JSON (mungkin sesi/CSRF invalid): "
-              f"{resp.text()[:200]}")
-        return {}
+        mulai = datetime(t1, b1, h1).date().isoformat()
+        selesai = datetime(t2, b2, h2).date().isoformat()
+    except ValueError:
+        return label, None, None
+
+    return label, mulai, selesai
 
 
-def tunggu_dan_ambil_url(req, job_id: str):
-    url_status = STATUS_ENDPOINT_TMPL.format(job_id=job_id)
-    for percobaan in range(MAX_POLL):
-        resp = req.get(url_status, timeout=30000)
-        if not resp.ok:
-            raise RuntimeError(f"GET status export gagal, status {resp.status}: {resp.text()[:200]}")
-        payload = resp.json()
-        status = payload.get("status")
-        print(f"  status export (cek {percobaan + 1}/{MAX_POLL}): "
-              f"{status} -- {payload.get('message')}")
-        if status == "done" and payload.get("url"):
-            return payload["url"]
-        if status in ("failed", "error"):
-            raise RuntimeError(f"Export gagal di server SIMOTANDI: {payload}")
-        time.sleep(POLL_INTERVAL_SEC)
-    raise TimeoutError("Export tidak selesai dalam waktu wajar -- dilewati run ini.")
+def daftar_layer(service: str):
+    """Baca daftar layer sebuah MapServer. ID layer TIDAK di-hardcode karena
+    berubah tiap Kementan menerbitkan periode baru."""
+    url = f"{BASE_ARCGIS}/{service}/MapServer"
+    resp = requests.get(url, params={"f": "json"}, headers=HEADERS, timeout=TIMEOUT)
+    resp.raise_for_status()
+    data = resp.json()
+    if "error" in data:
+        raise RuntimeError(f"ArcGIS menolak: {data['error']}")
+    return data.get("layers", [])
+
+
+def ambil_layer_tabular(service: str, layer_id: int):
+    """Tarik baris DIY dari satu layer Data Tabular.
+
+    returnGeometry=false itu penting: tanpa itu, tiap baris ikut membawa
+    poligon batas kecamatan (ratusan KB per baris) -- lambat & tidak kita pakai.
+    """
+    url = f"{BASE_ARCGIS}/{service}/MapServer/{layer_id}/query"
+    params = {
+        "where": FILTER_PROVINSI,
+        "outFields": "*",
+        "returnGeometry": "false",
+        "f": "json",
+    }
+    resp = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)
+    resp.raise_for_status()
+    data = resp.json()
+    if "error" in data:
+        raise RuntimeError(f"ArcGIS menolak query: {data['error']}")
+    return [f.get("attributes", {}) for f in data.get("features", [])]
 
 
 def ambil_data() -> pd.DataFrame:
-    semua_baris = []
+    semua = []
     diambil_pada = datetime.now(timezone.utc).isoformat()
+    sudah_diambil = set()   # anti-dobel: layer periode yang sama muncul di 2 service
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True,
-            args=["--disable-blink-features=AutomationControlled"],
-        )
-        context = browser.new_context(
-            user_agent=HEADERS_BASE["User-Agent"],
-            viewport={"width": 1366, "height": 768},
-            locale="id-ID",
-            timezone_id="Asia/Jakarta",
-            extra_http_headers={"Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"},
-        )
-        # Samarkan tanda-tanda paling umum yang dipakai Cloudflare (dan situs
-        # lain) untuk mendeteksi browser headless/otomatis, supaya context ini
-        # tidak langsung disodori halaman tantangan JS.
-        context.add_init_script(
-            """
-            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
-            window.chrome = window.chrome || { runtime: {} };
-            Object.defineProperty(navigator, 'languages', {get: () => ['id-ID', 'id', 'en-US', 'en']});
-            Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
-            """
-        )
+    for service in SERVICES:
         try:
-            html, csrf_token = buat_sesi(context)
-            periode_id, periode_label = cari_periode_terbaru(html)
-            print(f"Periode dasarian terbaru terdeteksi: {periode_id} ({periode_label})")
+            layers = daftar_layer(service)
+        except Exception as e:
+            print(f"[{service}] GAGAL baca daftar layer: {type(e).__name__}: {str(e)[:200]}")
+            continue
 
-            req = context.request  # request context browser -- ikut cookie & "kepercayaan" Cloudflare
+        tabular = [l for l in layers
+                   if str(l.get("name", "")).strip().lower().startswith("data tabular")]
+        print(f"[{service}] {len(layers)} layer, {len(tabular)} di antaranya Data Tabular.")
 
-            for kabupaten_id, nama_kabupaten in KABUPATEN_DIY.items():
-                print(f"Minta export SIMOTANDI: {nama_kabupaten} ({kabupaten_id})")
-                try:
-                    hasil_minta = minta_export(req, csrf_token, kabupaten_id, periode_id)
-                    print(f"  respons minta export: {hasil_minta}")
-                    # Berdasarkan observasi manual, job_id yang dipoll SAMA dengan
-                    # periode_id yang dikirim. Fallback ke id dari respons POST kalau
-                    # ternyata server memberi id job terpisah di respons JSON-nya.
-                    job_id = str(hasil_minta.get("id", periode_id)) if isinstance(hasil_minta, dict) else periode_id
+        for l in tabular:
+            nama = str(l.get("name", ""))
+            label, mulai, selesai = parse_periode(nama)
 
-                    url_file = tunggu_dan_ambil_url(req, job_id)
-                    print(f"  file siap: {url_file}")
+            if label in sudah_diambil:
+                print(f"  - '{label}' sudah diambil dari service lain -- dilewati.")
+                continue
 
-                    file_resp = req.get(url_file, timeout=60000)
-                    if not file_resp.ok:
-                        raise RuntimeError(f"Download file gagal, status {file_resp.status}")
+            try:
+                baris = ambil_layer_tabular(service, l["id"])
+            except Exception as e:
+                print(f"  - '{label}' GAGAL: {type(e).__name__}: {str(e)[:200]}")
+                continue
 
-                    df = pd.read_excel(io.BytesIO(file_resp.body()))
-                    df["kabupaten_kota"] = nama_kabupaten
-                    df["kode_kabupaten"] = kabupaten_id
-                    df["periode_dasarian"] = periode_label
-                    df["periode_id"] = periode_id
-                    df["diambil_pada_utc"] = diambil_pada
-                    semua_baris.append(df)
-                except Exception as e:
-                    print(f"  -> GAGAL untuk {nama_kabupaten}: {type(e).__name__}: {str(e)[:200]}")
-        finally:
-            browser.close()
+            if not baris:
+                print(f"  - '{label}': 0 baris DIY (layer mungkin belum lengkap terisi).")
+                continue
 
-    if not semua_baris:
+            df = pd.DataFrame(baris)
+            df = df.rename(columns={
+                "WADMPR": "provinsi",
+                "WADMKK": "kabupaten_kota",
+                "WADMKC": "kecamatan",
+                "KDCPUM": "kode_wilayah",
+                **NAMA_FASE_RAPI,
+            })
+
+            kolom_fase_ada = [NAMA_FASE_RAPI[k] for k in KOLOM_FASE
+                              if NAMA_FASE_RAPI[k] in df.columns]
+            for k in kolom_fase_ada:
+                df[k] = pd.to_numeric(df[k], errors="coerce")
+
+            # Total luas sawah terpantau = jumlah semua fase. Berguna sebagai
+            # penyebut waktu menghitung proporsi tiap fase per kecamatan.
+            if kolom_fase_ada:
+                df["total_luas_ha"] = df[kolom_fase_ada].sum(axis=1)
+
+            df["periode"] = label
+            df["periode_mulai"] = mulai
+            df["periode_selesai"] = selesai
+            df["sumber_layer"] = f"{service}/{l['id']}"
+            df["diambil_pada_utc"] = diambil_pada
+
+            kolom_inti = ["periode", "periode_mulai", "periode_selesai", "provinsi",
+                          "kabupaten_kota", "kecamatan", "kode_wilayah"]
+            urutan = ([c for c in kolom_inti if c in df.columns]
+                      + kolom_fase_ada
+                      + [c for c in ["total_luas_ha", "sumber_layer", "diambil_pada_utc"]
+                         if c in df.columns])
+            df = df[urutan]
+
+            semua.append(df)
+            sudah_diambil.add(label)
+            print(f"  - '{label}': {len(df)} kecamatan DIY berhasil diambil.")
+
+    if not semua:
         return pd.DataFrame()
 
-    return pd.concat(semua_baris, ignore_index=True)
+    return pd.concat(semua, ignore_index=True)
 
 
-def append_csv(df: pd.DataFrame):
+def simpan(df: pd.DataFrame):
+    """Simpan dengan dedup. Pipeline jalan berkali-kali seminggu sementara
+    periode SIMOTANDI cuma berganti ~12 hari sekali, jadi tanpa dedup baris
+    yang sama persis akan menumpuk terus tiap run."""
     if df.empty:
         print("Tidak ada data SIMOTANDI untuk disimpan pada run ini.")
         return
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    file_exists = os.path.isfile(OUTPUT_PATH)
 
-    if file_exists:
-        existing = pd.read_csv(OUTPUT_PATH)
-        gabungan = pd.concat([existing, df], ignore_index=True)
-        # dedup berdasarkan semua kolom KECUALI timestamp pengambilan (itu
-        # pasti beda tiap run walau datanya sama persis). Bandingkan sebagai
-        # string dulu supaya angka yang "berubah tipe" gara-gara baca-ulang
-        # CSV (mis. "49" jadi int 49) tetap dianggap sama.
-        kolom_pembanding = [c for c in gabungan.columns if c != "diambil_pada_utc"]
-        kunci_dup = gabungan[kolom_pembanding].astype(str).duplicated(keep="first")
-        gabungan = gabungan[~kunci_dup]
-        baru = len(gabungan) - len(existing)
+    if os.path.isfile(OUTPUT_PATH):
+        lama = pd.read_csv(OUTPUT_PATH)
+        gabungan = pd.concat([lama, df], ignore_index=True)
+        # Kunci identitas satu observasi = periode + kecamatan. Kolom waktu
+        # pengambilan sengaja tidak ikut dibandingkan (pasti beda tiap run).
+        kunci = [c for c in ["periode", "kabupaten_kota", "kecamatan"] if c in gabungan.columns]
+        gabungan = gabungan[~gabungan[kunci].astype(str).duplicated(keep="first")]
+        baru = len(gabungan) - len(lama)
         gabungan.to_csv(OUTPUT_PATH, index=False)
     else:
         df.to_csv(OUTPUT_PATH, index=False)
         baru = len(df)
 
-    print(f"{baru} baris baru ditambahkan ke {OUTPUT_PATH}.")
+    print(f"\n{baru} baris baru ditambahkan ke {OUTPUT_PATH} "
+          f"(dari {len(df)} baris hasil tarik).")
+    print("Sumber: SIMOTANDI Kementerian Pertanian RI (ArcGIS REST) -- "
+          f"{BASE_ARCGIS}")
+
+
+def mode_daftar_layer():
+    """Diagnostik: cetak semua layer di kedua service. Pakai ini kalau suatu
+    saat penamaan layer berubah & penyaring 'Data Tabular' berhenti cocok."""
+    for service in SERVICES:
+        print(f"\n=== {service} ===")
+        try:
+            for l in daftar_layer(service):
+                tanda = "<-- TABULAR" if str(l.get("name", "")).lower().startswith("data tabular") else ""
+                print(f"  id={l.get('id'):>3}  {l.get('name')} {tanda}")
+        except Exception as e:
+            print(f"  GAGAL: {type(e).__name__}: {str(e)[:200]}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--inspect", action="store_true",
-                         help="Mode diagnostik manual (buka browser) -- pakai kalau "
-                              "alur export berhenti jalan & perlu dicek ulang")
+    parser.add_argument("--daftar-layer", action="store_true",
+                        help="Diagnostik: cetak daftar layer di server ArcGIS "
+                             "SIMOTANDI (pakai kalau penamaan layer berubah).")
     args = parser.parse_args()
 
-    if args.inspect:
-        inspect_mode()
-    else:
-        try:
-            hasil = ambil_data()
-            append_csv(hasil)
-        except Exception as e:
-            print(f"GAGAL total: {type(e).__name__}: {str(e)[:300]}")
-            raise SystemExit(1)
+    try:
+        if args.daftar_layer:
+            mode_daftar_layer()
+        else:
+            simpan(ambil_data())
+    except Exception as e:
+        print(f"GAGAL total: {type(e).__name__}: {str(e)[:300]}")
+        raise SystemExit(1)
