@@ -24,6 +24,7 @@ tidak membebani server DPKP DIY. Jangan hapus/percepat delay-nya.
 """
 
 import argparse
+import io
 import os
 import time
 
@@ -66,7 +67,12 @@ def fetch_page(page: int) -> pd.DataFrame | None:
         return None
 
     try:
-        tables = pd.read_html(resp.text)
+        # PENTING: pandas versi baru (3.x) TIDAK LAGI menerima string HTML
+        # mentah langsung di read_html() -- harus dibungkus io.StringIO(),
+        # kalau tidak akan salah dikira nama file & gagal dgn FileNotFoundError
+        # yang isinya seluruh HTML (ini bug nyata yang bikin scraper ini
+        # gagal total sebelumnya, BUKAN soal situs diblokir).
+        tables = pd.read_html(io.StringIO(resp.text))
     except Exception as e:
         print(f"  Halaman {page}: gagal parse tabel -- {type(e).__name__}: {str(e)[:150]} "
               f"(HTTP {resp.status_code}, {len(resp.text)} char)")
