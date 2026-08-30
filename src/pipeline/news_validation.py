@@ -58,11 +58,22 @@ def validasi_anomali(tanggal: str, komoditas: str, kabupaten: str) -> dict:
     }
 
 
+# Batasan supaya ramah kuota API gratis Firecrawl. Run 30 Agt 2026 mencoba
+# memvalidasi SEMUA 360 anomali sekaligus tanpa jeda -> hampir semua ditolak
+# "429 Too Many Requests" -> nol hasil tersimpan. Untuk sistem peringatan
+# dini, yang paling bernilai divalidasi adalah anomali TERBARU -- histori lama
+# tidak perlu diverifikasi ulang tiap run.
+MAKS_VALIDASI = 20        # maksimal query pencarian per run
+JEDA_ANTAR_QUERY = 7      # detik -- di bawah ~10 request/menit (batas tier gratis)
+MAKS_429_BERUNTUN = 3     # kalau tetap ditolak berkali-kali, berhenti sopan
+
+
 def main():
     if not os.path.isfile(ANOMALI_PATH):
         print(f"Belum ada {ANOMALI_PATH} -- jalankan merge_and_detect.py dulu.")
         return
 
+    import time
     import pandas as pd
     df = pd.read_csv(ANOMALI_PATH)
     anomali = df[df.get("anomali_harga", False) == True]
@@ -71,14 +82,39 @@ def main():
         print("Tidak ada anomali untuk divalidasi.")
         return
 
+    # Prioritaskan anomali TERBARU, dan jangan mengulang query yang identik
+    # (banyak anomali jatuh di komoditas & bulan yang sama -> 1 pencarian
+    # berita cukup mewakili semuanya).
+    anomali = anomali.sort_values("tanggal", ascending=False)
+    total_kandidat = len(anomali)
+
     hasil_semua = []
+    query_terpakai = set()
+    beruntun_429 = 0
     for _, row in anomali.iterrows():
+        if len(hasil_semua) >= MAKS_VALIDASI:
+            print(f"Batas {MAKS_VALIDASI} validasi per run tercapai "
+                  f"(dari {total_kandidat} kandidat) -- sisanya dilewati, "
+                  f"run berikutnya akan memvalidasi anomali baru lagi.")
+            break
+        kunci_query = f"{row['komoditas']}|{str(row['tanggal'])[:7]}"
+        if kunci_query in query_terpakai:
+            continue
         print(f"Validasi: {row['tanggal']} - {row['komoditas']} - {row['kabupaten_kota']}")
         try:
             hasil = validasi_anomali(row["tanggal"], row["komoditas"], row["kabupaten_kota"])
             hasil_semua.append(hasil)
+            query_terpakai.add(kunci_query)
+            beruntun_429 = 0
         except Exception as e:
             print(f"  GAGAL: {e}")
+            if "429" in str(e):
+                beruntun_429 += 1
+                if beruntun_429 >= MAKS_429_BERUNTUN:
+                    print(f"{MAKS_429_BERUNTUN}x ditolak rate-limit beruntun -- "
+                          "berhenti untuk run ini, hasil yang sudah ada tetap disimpan.")
+                    break
+        time.sleep(JEDA_ANTAR_QUERY)
 
     if hasil_semua:
         os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
