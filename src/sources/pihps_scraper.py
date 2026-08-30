@@ -102,12 +102,15 @@ def inspect_mode():
         browser.close()
 
 
-def ambil_data():
-    """Panggil endpoint JSON asli PIHPS langsung (tanpa browser), ambil data
-    harga pangan DI Yogyakarta beberapa hari terakhir."""
-    end_date = datetime.now(timezone.utc).date()
-    start_date = end_date - timedelta(days=WINDOW_DAYS)
+BACKFILL_CHUNK_DAYS = 55  # aman di bawah rentang yang terbukti cepat direspons server
+                          # (tes manual 30 Agt 2026: 61 hari -> sukses cepat; 182 hari -> timeout).
+                          # Backfill jangka panjang dipecah jadi potongan sebesar ini.
 
+
+def ambil_data_rentang(start_date, end_date):
+    """Panggil endpoint JSON asli PIHPS langsung (tanpa browser) untuk SATU
+    rentang tanggal spesifik. Dipakai baik oleh ambil_data() (mode harian
+    biasa) maupun backfill() (mode isi histori panjang, dipecah per potongan)."""
     params = {
         "price_type_id": PRICE_TYPE_ID,
         "comcat_id": "",
@@ -120,7 +123,7 @@ def ambil_data():
         "_": int(time.time() * 1000),
     }
 
-    resp = requests.get(GRID_ENDPOINT, params=params, headers=HEADERS, timeout=30)
+    resp = requests.get(GRID_ENDPOINT, params=params, headers=HEADERS, timeout=60)
     resp.raise_for_status()
     payload = resp.json()
     rows = payload.get("data", [])
@@ -162,6 +165,42 @@ def ambil_data():
     return hasil
 
 
+def ambil_data():
+    """Mode harian biasa -- ambil WINDOW_DAYS (14) hari terakhir saja, dipakai
+    tiap kali pipeline jalan otomatis via jadwal."""
+    end_date = datetime.now(timezone.utc).date()
+    start_date = end_date - timedelta(days=WINDOW_DAYS)
+    return ambil_data_rentang(start_date, end_date)
+
+
+def backfill(hari_mundur: int):
+    """Mode ISI HISTORI: ambil data dari `hari_mundur` hari yang lalu s.d. hari
+    ini, dipecah otomatis per potongan BACKFILL_CHUNK_DAYS supaya tiap request
+    ke API tetap cepat & tidak timeout. Dipicu manual lewat GitHub Actions
+    (workflow_dispatch input `hari_backfill_pihps`), BUKAN dijalankan tiap
+    jadwal rutin (supaya run harian tetap ringan/cepat)."""
+    end_date = datetime.now(timezone.utc).date()
+    batas_mulai = end_date - timedelta(days=hari_mundur)
+
+    semua_hasil = []
+    potongan_akhir = end_date
+    while potongan_akhir > batas_mulai:
+        potongan_mulai = max(batas_mulai, potongan_akhir - timedelta(days=BACKFILL_CHUNK_DAYS))
+        print(f"  Ambil potongan {potongan_mulai} s.d. {potongan_akhir} ...")
+        try:
+            hasil = ambil_data_rentang(potongan_mulai, potongan_akhir)
+            print(f"    -> {len(hasil)} baris didapat.")
+            semua_hasil.extend(hasil)
+        except Exception as e:
+            print(f"    -> GAGAL potongan ini, lanjut ke potongan berikutnya: "
+                  f"{type(e).__name__}: {str(e)[:200]}")
+        potongan_akhir = potongan_mulai - timedelta(days=1)
+        if potongan_akhir > batas_mulai:
+            time.sleep(2)  # jeda sopan antar-potongan, jangan hajar API bertubi-tubi
+
+    return semua_hasil
+
+
 def append_csv(rows):
     if not rows:
         print("Tidak ada baris untuk disimpan (respons API kosong).")
@@ -195,10 +234,23 @@ if __name__ == "__main__":
     parser.add_argument("--inspect", action="store_true",
                          help="Mode diagnostik manual (buka browser) -- pakai kalau "
                               "endpoint API berhenti jalan & perlu dicek ulang")
+    parser.add_argument("--hari-mundur", type=int, default=0,
+                         help="Kalau >0: mode ISI HISTORI, ambil data dari N hari lalu "
+                              "s.d. hari ini (dipecah otomatis per potongan supaya tidak "
+                              "timeout). Kalau 0 (default): mode harian biasa, 14 hari terakhir.")
     args = parser.parse_args()
 
-    if args.inspect:
-        inspect_mode()
-    else:
-        data = ambil_data()
-        append_csv(data)
+    try:
+        if args.inspect:
+            inspect_mode()
+        elif args.hari_mundur and args.hari_mundur > 0:
+            print(f"Mode ISI HISTORI: mengambil {args.hari_mundur} hari ke belakang "
+                  f"(dipecah per potongan {BACKFILL_CHUNK_DAYS} hari)...")
+            data = backfill(args.hari_mundur)
+            append_csv(data)
+        else:
+            data = ambil_data()
+            append_csv(data)
+    except Exception as e:
+        print(f"GAGAL total: {type(e).__name__}: {str(e)[:300]}")
+        raise SystemExit(1)
