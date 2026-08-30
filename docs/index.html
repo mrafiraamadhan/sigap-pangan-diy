@@ -261,19 +261,39 @@ function cariKolomWaktuTerbaru(rows, kolomUtama) {
   return terbaru;
 }
 
+// Dua basis pengambilan data, dicoba berurutan:
+//   1. "data/" = salinan di GitHub Pages sendiri (same-origin) -- diisi otomatis
+//      oleh langkah "Commit hasil" di workflow. Cepat & bebas rate-limit.
+//   2. raw.githubusercontent.com = langsung dari branch main -- cadangan kalau
+//      salinan Pages belum ada. Server ini kadang MENOLAK sementara kalau
+//      dipanggil terlalu sering (rate limit) -- itulah penyebab bagian dashboard
+//      kadang tampak "kosong" sesaat padahal datanya ada di repo. Karena itu
+//      tiap basis dicoba sampai 2x dengan jeda singkat sebelum menyerah.
+const SUMBER_DATA = ["data/", REPO_RAW];
+
+function tunggu(ms) { return new Promise(r => setTimeout(r, ms)); }
+
 async function ambilCsv(file) {
-  try {
-    const res = await fetch(REPO_RAW + file + "?t=" + Date.now(), { cache: "no-store" });
-    if (!res.ok) return null;
-    const teks = await res.text();
-    if (!teks || teks.trim().length === 0) return null;
-    if (/^\s*404:\s*Not Found/i.test(teks)) return null;
-    const parsed = Papa.parse(teks, { header: true, dynamicTyping: true, skipEmptyLines: true });
-    return parsed.data.filter(r => Object.values(r).some(v => v !== null && v !== ""));
-  } catch (e) {
-    console.warn("Gagal ambil " + file, e);
-    return null;
+  for (const basis of SUMBER_DATA) {
+    for (let percobaan = 0; percobaan < 2; percobaan++) {
+      try {
+        const res = await fetch(basis + file + "?t=" + Date.now(), { cache: "no-store" });
+        if (res.status === 404) break;   // memang tidak ada di basis ini -> coba basis berikutnya
+        if (!res.ok) { await tunggu(700); continue; }  // error sementara (mis. rate limit) -> ulangi
+        const teks = await res.text();
+        if (!teks || teks.trim().length === 0) break;
+        if (/^\s*404:\s*Not Found/i.test(teks)) break;
+        const parsed = Papa.parse(teks, { header: true, dynamicTyping: true, skipEmptyLines: true });
+        const baris = parsed.data.filter(r => Object.values(r).some(v => v !== null && v !== ""));
+        if (baris.length) return baris;
+        break;
+      } catch (e) {
+        console.warn("Gagal ambil " + basis + file + " (percobaan " + (percobaan + 1) + ")", e);
+        await tunggu(700);
+      }
+    }
   }
+  return null;
 }
 
 function buatKartuStatus(pilar, rows) {
