@@ -31,8 +31,13 @@ Kode wilayah kabupaten/kota DIY (standar BPS/Kemendagri):
   3471 Kota Yogyakarta, 3472 Kab. Bantul, 3473 Kab. Gunung Kidul,
   3474 Kab. Kulon Progo, 3475 Kab. Sleman
 
-CATATAN: modul ini lebih kompleks dari pihps_scraper.py (perlu sesi + CSRF +
-tunggu job async), jadi kalau situs berubah struktur, jalankan lagi:
+CATATAN PENTING (30 Agt 2026): run pertama di GitHub Actions gagal dengan
+403 Forbidden -- situs ini ternyata dilindungi Cloudflare yang menolak
+request 'requests' polos dari server. Makanya SEMUA request (bukan cuma
+buka halaman awal) sekarang dikirim lewat context Playwright (browser
+sungguhan), bukan library requests, supaya lolos.
+
+Kalau suatu saat alur ini berhenti jalan lagi, jalankan:
     python3 src/sources/simotandi.py --inspect
 """
 
@@ -44,7 +49,6 @@ import time
 from datetime import datetime, timezone
 
 import pandas as pd
-import requests
 from playwright.sync_api import sync_playwright
 
 BASE = "https://simotandi.pertanian.go.id"
@@ -103,17 +107,24 @@ def inspect_mode():
         browser.close()
 
 
-def buat_sesi():
-    """Buka halaman awal buat ambil cookie sesi + CSRF token Laravel, dan HTML
-    halaman itu sendiri (dipakai buat cari periode terbaru)."""
-    sesi = requests.Session()
-    sesi.headers.update(HEADERS_BASE)
-    resp = sesi.get(DATA_TABULAR_PAGE, timeout=30)
-    resp.raise_for_status()
+def buat_sesi(context):
+    """Buka halaman awal LEWAT BROWSER (bukan requests polos) supaya lolos
+    proteksi anti-bot Cloudflare yang dipakai situs ini -- dikonfirmasi lewat
+    run pertama di GitHub Actions: request 'requests' polos ditolak dengan
+    403 Forbidden, padahal di browser sungguhan (punya narahubung/user) situs
+    ini terbuka normal tanpa CAPTCHA. Setelah halaman ini berhasil dimuat di
+    context browser, sisa request (POST export, polling status, download
+    file) dikirim lewat context.request supaya cookie sesi & 'kepercayaan'
+    dari Cloudflare tetap terbawa, tanpa perlu render browser lagi tiap kali
+    (jauh lebih cepat daripada full Playwright utk semua langkah)."""
+    page = context.new_page()
+    page.goto(DATA_TABULAR_PAGE, wait_until="networkidle", timeout=60000)
+    html = page.content()
+    page.close()
 
-    m = re.search(r'name=["\']csrf-token["\']\s+content=["\']([^"\']+)["\']', resp.text)
+    m = re.search(r'name=["\']csrf-token["\']\s+content=["\']([^"\']+)["\']', html)
     if not m:
-        m = re.search(r'content=["\']([^"\']+)["\']\s+name=["\']csrf-token["\']', resp.text)
+        m = re.search(r'content=["\']([^"\']+)["\']\s+name=["\']csrf-token["\']', html)
     if not m:
         raise RuntimeError(
             "Tidak menemukan csrf-token di halaman data-tabular -- "
@@ -121,7 +132,7 @@ def buat_sesi():
         )
     csrf_token = m.group(1)
 
-    return sesi, resp.text, csrf_token
+    return html, csrf_token
 
 
 def cari_periode_terbaru(html: str):
@@ -144,33 +155,35 @@ def cari_periode_terbaru(html: str):
     return nilai, label.strip()
 
 
-def minta_export(sesi, csrf_token: str, kabupaten_id: str, periode_id: str):
+def minta_export(req, csrf_token: str, kabupaten_id: str, periode_id: str):
     headers = {
         "X-Csrf-Token": csrf_token,
         "X-Requested-With": "XMLHttpRequest",
         "Referer": DATA_TABULAR_PAGE,
     }
-    data = {
-        "provinsi": PROVINCE_ID_DIY,
-        "kabupaten": kabupaten_id,
+    form = {
+        "provinsi": str(PROVINCE_ID_DIY),
+        "kabupaten": str(kabupaten_id),
         "kecamatan": "all",
-        "periode": periode_id,
+        "periode": str(periode_id),
     }
-    resp = sesi.post(EXPORT_ENDPOINT, data=data, headers=headers, timeout=30)
-    resp.raise_for_status()
+    resp = req.post(EXPORT_ENDPOINT, form=form, headers=headers, timeout=30000)
+    if not resp.ok:
+        raise RuntimeError(f"POST export gagal, status {resp.status}: {resp.text()[:200]}")
     try:
         return resp.json()
-    except ValueError:
+    except Exception:
         print(f"  -> respons POST export bukan JSON (mungkin sesi/CSRF invalid): "
-              f"{resp.text[:200]}")
+              f"{resp.text()[:200]}")
         return {}
 
 
-def tunggu_dan_ambil_url(sesi, job_id: str):
+def tunggu_dan_ambil_url(req, job_id: str):
     url_status = STATUS_ENDPOINT_TMPL.format(job_id=job_id)
     for percobaan in range(MAX_POLL):
-        resp = sesi.get(url_status, timeout=30)
-        resp.raise_for_status()
+        resp = req.get(url_status, timeout=30000)
+        if not resp.ok:
+            raise RuntimeError(f"GET status export gagal, status {resp.status}: {resp.text()[:200]}")
         payload = resp.json()
         status = payload.get("status")
         print(f"  status export (cek {percobaan + 1}/{MAX_POLL}): "
@@ -184,38 +197,47 @@ def tunggu_dan_ambil_url(sesi, job_id: str):
 
 
 def ambil_data() -> pd.DataFrame:
-    sesi, html, csrf_token = buat_sesi()
-    periode_id, periode_label = cari_periode_terbaru(html)
-    print(f"Periode dasarian terbaru terdeteksi: {periode_id} ({periode_label})")
-
     semua_baris = []
     diambil_pada = datetime.now(timezone.utc).isoformat()
 
-    for kabupaten_id, nama_kabupaten in KABUPATEN_DIY.items():
-        print(f"Minta export SIMOTANDI: {nama_kabupaten} ({kabupaten_id})")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(user_agent=HEADERS_BASE["User-Agent"])
         try:
-            hasil_minta = minta_export(sesi, csrf_token, kabupaten_id, periode_id)
-            print(f"  respons minta export: {hasil_minta}")
-            # Berdasarkan observasi manual, job_id yang dipoll SAMA dengan
-            # periode_id yang dikirim. Fallback ke id dari respons POST kalau
-            # ternyata server memberi id job terpisah di respons JSON-nya.
-            job_id = str(hasil_minta.get("id", periode_id)) if isinstance(hasil_minta, dict) else periode_id
+            html, csrf_token = buat_sesi(context)
+            periode_id, periode_label = cari_periode_terbaru(html)
+            print(f"Periode dasarian terbaru terdeteksi: {periode_id} ({periode_label})")
 
-            url_file = tunggu_dan_ambil_url(sesi, job_id)
-            print(f"  file siap: {url_file}")
+            req = context.request  # request context browser -- ikut cookie & "kepercayaan" Cloudflare
 
-            file_resp = sesi.get(url_file, timeout=60)
-            file_resp.raise_for_status()
+            for kabupaten_id, nama_kabupaten in KABUPATEN_DIY.items():
+                print(f"Minta export SIMOTANDI: {nama_kabupaten} ({kabupaten_id})")
+                try:
+                    hasil_minta = minta_export(req, csrf_token, kabupaten_id, periode_id)
+                    print(f"  respons minta export: {hasil_minta}")
+                    # Berdasarkan observasi manual, job_id yang dipoll SAMA dengan
+                    # periode_id yang dikirim. Fallback ke id dari respons POST kalau
+                    # ternyata server memberi id job terpisah di respons JSON-nya.
+                    job_id = str(hasil_minta.get("id", periode_id)) if isinstance(hasil_minta, dict) else periode_id
 
-            df = pd.read_excel(io.BytesIO(file_resp.content))
-            df["kabupaten_kota"] = nama_kabupaten
-            df["kode_kabupaten"] = kabupaten_id
-            df["periode_dasarian"] = periode_label
-            df["periode_id"] = periode_id
-            df["diambil_pada_utc"] = diambil_pada
-            semua_baris.append(df)
-        except Exception as e:
-            print(f"  -> GAGAL untuk {nama_kabupaten}: {e}")
+                    url_file = tunggu_dan_ambil_url(req, job_id)
+                    print(f"  file siap: {url_file}")
+
+                    file_resp = req.get(url_file, timeout=60000)
+                    if not file_resp.ok:
+                        raise RuntimeError(f"Download file gagal, status {file_resp.status}")
+
+                    df = pd.read_excel(io.BytesIO(file_resp.body()))
+                    df["kabupaten_kota"] = nama_kabupaten
+                    df["kode_kabupaten"] = kabupaten_id
+                    df["periode_dasarian"] = periode_label
+                    df["periode_id"] = periode_id
+                    df["diambil_pada_utc"] = diambil_pada
+                    semua_baris.append(df)
+                except Exception as e:
+                    print(f"  -> GAGAL untuk {nama_kabupaten}: {type(e).__name__}: {str(e)[:200]}")
+        finally:
+            browser.close()
 
     if not semua_baris:
         return pd.DataFrame()
@@ -260,5 +282,9 @@ if __name__ == "__main__":
     if args.inspect:
         inspect_mode()
     else:
-        hasil = ambil_data()
-        append_csv(hasil)
+        try:
+            hasil = ambil_data()
+            append_csv(hasil)
+        except Exception as e:
+            print(f"GAGAL total: {type(e).__name__}: {str(e)[:300]}")
+            raise SystemExit(1)
