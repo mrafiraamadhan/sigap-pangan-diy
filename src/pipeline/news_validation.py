@@ -37,7 +37,17 @@ def cari_berita(query: str, limit: int = 5) -> list:
     )
     resp.raise_for_status()
     data = resp.json()
-    return data.get("data", {}).get("web", []) or data.get("data", [])
+    # Bentuk respons Firecrawl /v1/search TERBUKTI (run 30 Agt 2026, setelah
+    # rate-limit teratasi): {"success": true, "data": [ ...daftar hasil... ]}
+    # -- "data" adalah LIST langsung. Kode lama mengira "data" adalah dict
+    # berisi kunci "web", sehingga SEMUA query gagal dengan
+    # "'list' object has no attribute 'get'". Penanganan di bawah menerima
+    # kedua bentuk (list langsung, maupun dict {"web": [...]}), supaya tahan
+    # kalau Firecrawl mengubah format lagi.
+    isi = data.get("data") if isinstance(data, dict) else data
+    if isinstance(isi, dict):
+        isi = isi.get("web") or isi.get("results") or []
+    return isi if isinstance(isi, list) else []
 
 
 def validasi_anomali(tanggal: str, komoditas: str, kabupaten: str) -> dict:
@@ -91,20 +101,28 @@ def main():
     hasil_semua = []
     query_terpakai = set()
     beruntun_429 = 0
+    percobaan = 0
     for _, row in anomali.iterrows():
-        if len(hasil_semua) >= MAKS_VALIDASI:
-            print(f"Batas {MAKS_VALIDASI} validasi per run tercapai "
+        # PENTING: batas dihitung dari PERCOBAAN, bukan dari yang berhasil.
+        # Versi sebelumnya menghitung len(hasil_semua) -- kalau semua query
+        # gagal (mis. format respons berubah), hitungan tak pernah naik dan
+        # loop menggiling SELURUH ratusan anomali x 7 detik (~40 menit sia-sia
+        # di run 30 Agt 2026). Sekarang: maksimal MAKS_VALIDASI percobaan,
+        # titik, apapun hasilnya.
+        if percobaan >= MAKS_VALIDASI:
+            print(f"Batas {MAKS_VALIDASI} percobaan validasi per run tercapai "
                   f"(dari {total_kandidat} kandidat) -- sisanya dilewati, "
                   f"run berikutnya akan memvalidasi anomali baru lagi.")
             break
         kunci_query = f"{row['komoditas']}|{str(row['tanggal'])[:7]}"
         if kunci_query in query_terpakai:
             continue
+        percobaan += 1
+        query_terpakai.add(kunci_query)
         print(f"Validasi: {row['tanggal']} - {row['komoditas']} - {row['kabupaten_kota']}")
         try:
             hasil = validasi_anomali(row["tanggal"], row["komoditas"], row["kabupaten_kota"])
             hasil_semua.append(hasil)
-            query_terpakai.add(kunci_query)
             beruntun_429 = 0
         except Exception as e:
             print(f"  GAGAL: {e}")
