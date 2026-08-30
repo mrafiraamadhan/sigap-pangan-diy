@@ -1,48 +1,80 @@
 """
-Scraper harga pangan harian DIY dari PIHPS Bank Indonesia.
+Scraper harga pangan harian DIY dari PIHPS Bank Indonesia -- endpoint API ASLI.
 
-PENTING: situs ini memuat data lewat AJAX dan (sejauh penelusuran kami)
-belum punya API publik terdokumentasi. Ada 2 mode di script ini:
+Endpoint & parameter di bawah ini ditemukan lewat mode --inspect (Playwright,
+network capture manual di browser sungguhan pada 30 Agt 2026). province_id=15
+sudah dikonfirmasi = DI Yogyakarta lewat endpoint GetRefProvince.
 
-1) --inspect  : buka browser (headed) supaya kamu bisa pilih filter secara
-                manual sekali, sambil script mencatat semua request XHR/fetch
-                yang lewat -- dari situ kita cari tahu apakah ada endpoint
-                JSON asli yang bisa dipanggil langsung (jauh lebih stabil).
-2) (default)  : mode otomatis -- scrape tabel HTML hasil filter untuk semua
-                kab/kota DIY, simpan ke data/harga_pangan_diy.csv.
+Contoh URL asli yang terbukti jalan (hasil klik "DI Yogyakarta" di UI):
+https://www.bi.go.id/hargapangan/WebSite/TabelHarga/GetGridDataDaerah?
+  price_type_id=4&comcat_id=&province_id=15&regency_id=&market_id=&
+  tipe_laporan=1&start_date=2026-08-22&end_date=2026-08-30&_=<timestamp>
 
-Kalau kamu menemukan endpoint JSON lewat mode --inspect, isi DATA_ENDPOINT
-di bawah ini dan pakai fungsi fetch_via_api() supaya jauh lebih cepat &
-stabil daripada scraping tabel HTML tiap hari.
+Struktur respons JSON (dikonfirmasi via fetch langsung):
+{
+  "data": [
+    {"no": "I", "name": "Beras", "level": 1, "24/08/2026": "14,100", ...},
+    {"no": 1, "name": "Beras Kualitas Bawah I", "level": 2, "24/08/2026": "12,750", ...},
+    ...
+  ]
+}
+- Kolom tanggal bersifat DINAMIS (key = "DD/MM/YYYY"), jumlahnya mengikuti
+  rentang start_date..end_date yang diminta (dan dibatasi data yang memang
+  sudah tersedia -- biasanya ada jeda 1-2 hari dari tanggal hari ini).
+- "level": 1 = baris kelompok komoditas (mis. "Beras", "Daging Ayam"),
+  "level": 2 = rincian per kualitas/jenis di bawah kelompok itu. Keduanya
+  kita simpan apa adanya -- untuk deteksi anomali, nama komoditas yang beda
+  ya dianggap deret data yang beda, tidak masalah kalau ada baris ringkasan
+  & baris rincian sekaligus.
+- Harga berformat string dengan pemisah ribuan tanda koma, mis. "14,100"
+  artinya Rp 14.100 (bukan 14,1 -- ini format en-US bawaan ASP.NET grid,
+  bukan format Indonesia).
+
+Cakupan data: dengan regency_id dikosongkan, endpoint ini mengembalikan data
+TINGKAT PROVINSI DI Yogyakarta (bukan pecahan per kabupaten/kota). Ini sudah
+sesuai dengan sifat halaman "Produsen Daerah" PIHPS & tetap sah dipakai
+sebagai pilar data tingkat provinsi untuk sistem peringatan dini.
+
+Kalau suatu saat endpoint ini berubah/berhenti jalan, jalankan lagi:
+    python3 src/sources/pihps_scraper.py --inspect
+lalu ulangi proses inspeksi manual (pilih provinsi di browser yang terbuka,
+lihat request baru yang tercetak di terminal).
 """
 
 import argparse
 import csv
 import os
-from datetime import datetime, timezone
+import time
+from datetime import datetime, timedelta, timezone
 
-import pandas as pd
+import requests
 from playwright.sync_api import sync_playwright
 
-URL = "https://www.bi.go.id/hargapangan/TabelHarga/ProdusenDaerah"
+INSPECT_URL = "https://www.bi.go.id/hargapangan/TabelHarga/ProdusenDaerah"
+GRID_ENDPOINT = "https://www.bi.go.id/hargapangan/WebSite/TabelHarga/GetGridDataDaerah"
 
-# Isi ini kalau endpoint JSON asli sudah ditemukan lewat mode --inspect, mis:
-# DATA_ENDPOINT = "https://www.bi.go.id/hargapangan/api/GetHargaProdusenDaerah"
-DATA_ENDPOINT = None
+PROVINCE_ID_DIY = 15
+PRICE_TYPE_ID = 4     # sesuai hasil inspeksi (mode "Produsen")
+TIPE_LAPORAN = 1
+WINDOW_DAYS = 14       # minta 14 hari terakhir tiap run -- kalau ada run yang
+                       # gagal/lewat, hari yang kelewat tetap ke-cover & di-dedup
 
-DAERAH_DIY = [
-    "Kota Yogyakarta",
-    "Kabupaten Sleman",
-    "Kabupaten Bantul",
-    "Kabupaten Kulon Progo",
-    "Kabupaten Gunung Kidul",
-]
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (compatible; SIGAP-Pangan-DIY/1.0; "
+                  "+https://github.com/mrafiraamadhan/sigap-pangan-diy)",
+    "Referer": INSPECT_URL,
+    "X-Requested-With": "XMLHttpRequest",
+}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_PATH = os.path.join(HERE, "..", "..", "data", "harga_pangan_diy.csv")
+FIELDNAMES = ["tanggal", "komoditas", "level", "no_urut", "harga_rp",
+              "provinsi", "diambil_pada_utc"]
 
 
 def inspect_mode():
+    """Mode diagnostik manual -- pakai ini lagi kalau endpoint di atas suatu
+    saat berhenti jalan (situs berubah struktur)."""
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False, slow_mo=250)
         page = browser.new_page()
@@ -55,7 +87,7 @@ def inspect_mode():
                 print(">>", req.method, req.url)
 
         page.on("request", on_request)
-        page.goto(URL, wait_until="networkidle", timeout=60000)
+        page.goto(INSPECT_URL, wait_until="networkidle", timeout=60000)
 
         print("\n=== MODE INSPEKSI ===")
         print("1. Di jendela browser yang terbuka, pilih Provinsi = DI Yogyakarta")
@@ -70,66 +102,103 @@ def inspect_mode():
         browser.close()
 
 
-def scrape_html_table(page, daerah: str) -> pd.DataFrame:
-    """Otomasi filter di UI + scrape tabel HTML hasil.
-    Selector di bawah PERKIRAAN berdasarkan pola umum ASP.NET MVC -- sesuaikan
-    setelah menjalankan --inspect kalau selector-nya beda."""
-    page.goto(URL, wait_until="networkidle", timeout=60000)
+def ambil_data():
+    """Panggil endpoint JSON asli PIHPS langsung (tanpa browser), ambil data
+    harga pangan DI Yogyakarta beberapa hari terakhir."""
+    end_date = datetime.now(timezone.utc).date()
+    start_date = end_date - timedelta(days=WINDOW_DAYS)
 
-    # TODO: sesuaikan selector setelah inspeksi manual, contoh:
-    # page.select_option("#Propinsi", label="DI Yogyakarta")
-    # page.wait_for_timeout(1000)
-    # page.select_option("#Kabupaten", label=daerah)
-    # page.click("text=Lihat Laporan")
-    # page.wait_for_selector("table.table-data", timeout=30000)
-    # html = page.inner_html("table.table-data")
-    # tables = pd.read_html(html)
-    # df = tables[0]
-    # df["kabupaten_kota"] = daerah
-    # df["diambil_pada_utc"] = datetime.now(timezone.utc).isoformat()
-    # return df
+    params = {
+        "price_type_id": PRICE_TYPE_ID,
+        "comcat_id": "",
+        "province_id": PROVINCE_ID_DIY,
+        "regency_id": "",
+        "market_id": "",
+        "tipe_laporan": TIPE_LAPORAN,
+        "start_date": start_date.strftime("%Y-%m-%d"),
+        "end_date": end_date.strftime("%Y-%m-%d"),
+        "_": int(time.time() * 1000),
+    }
 
-    raise NotImplementedError(
-        "Selector belum dikonfirmasi. Jalankan --inspect dulu, lalu isi "
-        "bagian yang di-comment di atas sesuai struktur halaman yang kamu lihat."
-    )
+    resp = requests.get(GRID_ENDPOINT, params=params, headers=HEADERS, timeout=30)
+    resp.raise_for_status()
+    payload = resp.json()
+    rows = payload.get("data", [])
 
+    hasil = []
+    diambil_pada = datetime.now(timezone.utc).isoformat()
 
-def automated_mode():
-    all_rows = []
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        for daerah in DAERAH_DIY:
-            print(f"Scraping: {daerah}")
+    for row in rows:
+        nama_komoditas = row.get("name")
+        level = row.get("level")
+        no_urut = row.get("no")
+
+        for key, value in row.items():
+            if key in ("no", "name", "level"):
+                continue
             try:
-                df = scrape_html_table(page, daerah)
-                all_rows.append(df)
-            except NotImplementedError as e:
-                print(f"  -> {e}")
-                break
-            except Exception as e:
-                print(f"  -> GAGAL untuk {daerah}: {e}")
-        browser.close()
+                tanggal = datetime.strptime(key, "%d/%m/%Y").date().isoformat()
+            except ValueError:
+                # kolom bukan tanggal (jaga-jaga kalau ada field lain di masa depan)
+                continue
 
-    if not all_rows:
-        print("\nTidak ada data yang berhasil di-scrape. Lihat pesan di atas.")
+            if value in (None, "", "-"):
+                continue
+            try:
+                harga = float(str(value).replace(",", "").strip())
+            except ValueError:
+                continue
+
+            hasil.append({
+                "tanggal": tanggal,
+                "komoditas": nama_komoditas,
+                "level": level,
+                "no_urut": no_urut,
+                "harga_rp": harga,
+                "provinsi": "DI Yogyakarta",
+                "diambil_pada_utc": diambil_pada,
+            })
+
+    return hasil
+
+
+def append_csv(rows):
+    if not rows:
+        print("Tidak ada baris untuk disimpan (respons API kosong).")
         return
 
-    result = pd.concat(all_rows, ignore_index=True)
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    existing_keys = set()
     file_exists = os.path.isfile(OUTPUT_PATH)
-    result.to_csv(OUTPUT_PATH, mode="a", header=not file_exists, index=False)
-    print(f"\n{len(result)} baris ditambahkan ke {OUTPUT_PATH}")
+    if file_exists:
+        with open(OUTPUT_PATH, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for r in reader:
+                existing_keys.add((r["tanggal"], r["komoditas"], str(r["no_urut"])))
+
+    baru = [r for r in rows
+            if (r["tanggal"], r["komoditas"], str(r["no_urut"])) not in existing_keys]
+
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    with open(OUTPUT_PATH, "a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        if not file_exists:
+            writer.writeheader()
+        for r in baru:
+            writer.writerow(r)
+
+    print(f"{len(baru)} baris baru ditambahkan ke {OUTPUT_PATH} "
+          f"(dari {len(rows)} baris hasil fetch, {len(rows) - len(baru)} sudah ada sebelumnya).")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--inspect", action="store_true",
-                         help="Buka browser untuk eksplorasi manual & temukan endpoint asli")
+                         help="Mode diagnostik manual (buka browser) -- pakai kalau "
+                              "endpoint API berhenti jalan & perlu dicek ulang")
     args = parser.parse_args()
 
     if args.inspect:
         inspect_mode()
     else:
-        automated_mode()
+        data = ambil_data()
+        append_csv(data)
