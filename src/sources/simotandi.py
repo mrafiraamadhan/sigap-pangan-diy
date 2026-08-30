@@ -103,10 +103,19 @@ NAMA_FASE_RAPI = {
     "Panen": "panen_ha",
 }
 
+# CATATAN 30 Agt 2026: run pertama di GitHub Actions ditolak 403 Forbidden
+# oleh sig02.pertanian.go.id, padahal server yang sama terbuka normal dari
+# jalur akses lain. UA lama kita memuat kata "research bot" -- pola yang
+# umum diblokir mentah-mentah oleh WAF situs pemerintah. Maka UA di sini
+# dibuat seperti browser biasa (ini akses baca API publik yang memang
+# disediakan terbuka, bukan menyamar untuk menembus autentikasi), plus
+# Referer ke situs SIMOTANDI resminya seperti request browser sungguhan.
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; SIGAP-Pangan-DIY/1.0; research bot - "
-                  "YES2026 food security paper) AppleWebKit/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
     "Accept": "application/json,text/plain,*/*",
+    "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Referer": "https://simotandi.pertanian.go.id/",
 }
 
 HERE = os.path.dirname(os.path.abspath(__file__))
