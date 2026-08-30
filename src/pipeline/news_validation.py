@@ -56,14 +56,20 @@ def validasi_anomali(tanggal: str, komoditas: str, kabupaten: str) -> dict:
     bulan_tahun = tanggal[:7]  # 'YYYY-MM'
     query = f"harga {komoditas} {kabupaten} {bulan_tahun} naik turun"
     hasil = cari_berita(query, limit=3)
+    teratas = hasil[0] if hasil else {}
+    # "description" = cuplikan/ringkasan singkat artikel dari hasil pencarian
+    # Firecrawl -- dipakai dashboard untuk menampilkan kliping berita yang
+    # layak baca (judul + media + ringkasan), bukan sekadar tautan.
+    ringkasan = str(teratas.get("description") or teratas.get("snippet") or "").strip()
     return {
         "tanggal": tanggal,
         "komoditas": komoditas,
         "kabupaten_kota": kabupaten,
         "query": query,
         "jumlah_berita_ditemukan": len(hasil),
-        "judul_teratas": hasil[0]["title"] if hasil else "",
-        "url_teratas": hasil[0]["url"] if hasil else "",
+        "judul_teratas": teratas.get("title", ""),
+        "url_teratas": teratas.get("url", ""),
+        "ringkasan": ringkasan[:400],
         "tervalidasi": len(hasil) > 0,
     }
 
