@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGAP Pangan DIY — Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root {
+    --hijau: #2f6f4f;
+    --hijau-tua: #1f4d36;
+    --cokelat: #8a5a2b;
+    --emas: #c99a2e;
+    --bg: #f6f3ec;
+    --kartu: #ffffff;
+    --teks: #26332c;
+    --teks-lembut: #5c6a61;
+    --merah: #c0392b;
+    --border: #e3ddcf;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--teks);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+  }
+  header {
+    background: linear-gradient(120deg, var(--hijau-tua), var(--hijau));
+    color: #fff;
+    padding: 28px 20px 24px;
+  }
+  header .wrap { max-width: 1100px; margin: 0 auto; }
+  header h1 { margin: 0 0 4px; font-size: 1.6rem; letter-spacing: 0.3px; }
+  header p.tagline { margin: 0; opacity: 0.9; font-size: 0.95rem; }
+  header .meta {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #7be08a; display: inline-block; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+  section { margin-bottom: 34px; }
+  h2 {
+    font-size: 1.1rem;
+    color: var(--hijau-tua);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .catatan { font-size: 0.85rem; color: var(--teks-lembut); margin-top: 6px; }
+
+  .grid-status {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 12px;
+  }
+  .kartu-status {
+    background: var(--kartu);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .kartu-status .nama { font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; }
+  .status-line { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; margin-bottom: 4px; }
+  .status-line .lampu { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .lampu.aktif { background: #2f9e4f; }
+  .lampu.kosong { background: #c7c1af; }
+  .detail { font-size: 0.78rem; color: var(--teks-lembut); }
+
+  .grid-ringkasan {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .kartu-angka {
+    background: var(--kartu);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .kartu-angka .angka { font-size: 1.9rem; font-weight: 700; color: var(--hijau-tua); }
+  .kartu-angka .label { font-size: 0.8rem; color: var(--teks-lembut); margin-top: 2px; }
+  .kartu-angka.merah .angka { color: var(--merah); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--kartu); border-radius: 10px; overflow: hidden; }
+  th, td { padding: 9px 12px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+  th { background: #eef2ea; color: var(--hijau-tua); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .pill-anomali { color: var(--merah); font-weight: 600; }
+  .pill-cuaca { display: inline-block; margin-left: 6px; font-size: 0.75rem; background: #fdecea; color: var(--merah); padding: 1px 7px; border-radius: 999px; }
+  .kosong-panel {
+    background: var(--kartu);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    text-align: center;
+    color: var(--teks-lembut);
+    font-size: 0.9rem;
+  }
+
+  .kontrol { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  select {
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 0.88rem;
+  }
+  .kartu-grafik { background: var(--kartu); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+
+  footer {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 20px 40px;
+    font-size: 0.8rem;
+    color: var(--teks-lembut);
+  }
+  footer a { color: var(--hijau); }
+  .loading { text-align: center; padding: 40px; color: var(--teks-lembut); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>🌾 SIGAP Pangan DIY</h1>
+    <p class="tagline">Sistem Deteksi Dini Anomali Ketahanan Pangan — Daerah Istimewa Yogyakarta</p>
+    <div class="meta">
+      <span class="badge"><span class="dot"></span> Data diperbarui otomatis lewat GitHub Actions</span>
+      <span class="badge" id="badge-update">Memuat data terbaru…</span>
+    </div>
+  </div>
+</header>
+
+<main id="app">
+  <div class="loading">Memuat data dari repositori GitHub…</div>
+</main>
+
+<footer>
+  Dibangun untuk submisi <em>Yogyakarta Economics Symposium (YES) 2026</em> — paper "SIGAP Pangan DIY".
+  Sumber data: PIHPS Bank Indonesia, BMKG, DPKP DIY, SIMOTANDI Kementan, Cadangan Pangan Pemerintah DIY,
+  Google Trends, NOAA (indeks ENSO/ONI). Kode sumber &amp; data mentah:
+  <a href="https://github.com/mrafiraamadhan/sigap-pangan-diy" target="_blank" rel="noopener">github.com/mrafiraamadhan/sigap-pangan-diy</a>.
+</footer>
+
+<script>
+const REPO_RAW = "https://raw.githubusercontent.com/mrafiraamadhan/sigap-pangan-diy/main/data/";
+
+const PILAR = [
+  { key: "pihps",     file: "harga_pangan_diy.csv",         nama: "PIHPS Bank Indonesia — Harga Pangan",         ts: "diambil_pada_utc" },
+  { key: "bmkg",       file: "cuaca_diy.csv",                nama: "BMKG — Cuaca",                                 ts: "fetched_at_utc" },
+  { key: "dpkp",       file: "harga_pangan_dpkp_diy.csv",    nama: "DPKP DIY — Harga Pangan per Kab/Kota",         ts: null },
+  { key: "simotandi",  file: "simotandi_fase_tanam_diy.csv", nama: "SIMOTANDI Kementan — Fase Tanam Padi",         ts: "diambil_pada_utc" },
+  { key: "cadangan",   file: "cadangan_pangan_diy.csv",      nama: "Cadangan Pangan Pemerintah DIY",               ts: "diambil_pada_utc" },
+  { key: "trends",     file: "google_trends_panik.csv",      nama: "Google Trends — Proksi Kepanikan Publik",      ts: "diambil_pada_utc" },
+  { key: "enso",       file: "enso_oni.csv",                 nama: "NOAA — Indeks ENSO/El Niño (ONI)",             ts: "diambil_pada_utc" },
+  { key: "berita",     file: "validasi_berita.csv",          nama: "Validasi Berita (Firecrawl)",                  ts: null },
+];
+
+function fmtWaktu(iso) {
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" }) + " WIB";
+  } catch (e) { return String(iso); }
+}
+
+function cariKolomWaktuTerbaru(rows, kolomUtama) {
+  if (!rows || !rows.length) return null;
+  const kandidat = kolomUtama ? [kolomUtama] : Object.keys(rows[0] || {}).filter(c => /waktu|tanggal|date|utc/i.test(c));
+  let terbaru = null;
+  for (const kolom of kandidat) {
+    for (const r of rows) {
+      const v = r[kolom];
+      if (!v) continue;
+      const d = new Date(v);
+      if (isNaN(d.getTime())) continue;
+      if (!terbaru || d > terbaru) terbaru = d;
+    }
+  }
+  return terbaru;
+}
+
+async function ambilCsv(file) {
+  try {
+    const res = await fetch(REPO_RAW + file + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) return null;
+    const teks = await res.text();
+    if (!teks || teks.trim().length === 0) return null;
+    if (/^\s*404:\s*Not Found/i.test(teks)) return null;
+    const parsed = Papa.parse(teks, { header: true, dynamicTyping: true, skipEmptyLines: true });
+    return parsed.data.filter(r => Object.values(r).some(v => v !== null && v !== ""));
+  } catch (e) {
+    console.warn("Gagal ambil " + file, e);
+    return null;
+  }
+}
+
+function buatKartuStatus(pilar, rows) {
+  const ada = rows && rows.length > 0;
+  const el = document.createElement("div");
+  el.className = "kartu-status";
+  let detail = "Belum ada data — pilar ini belum berhasil menghasilkan data pada run pipeline manapun.";
+  if (ada) {
+    const waktu = cariKolomWaktuTerbaru(rows, pilar.ts);
+    detail = rows.length.toLocaleString("id-ID") + " baris tercatat";
+    if (waktu) detail += " · terakhir diperbarui " + fmtWaktu(waktu.toISOString());
+  }
+  el.innerHTML = `
+    <div class="nama">${pilar.nama}</div>
+    <div class="status-line"><span class="lampu ${ada ? "aktif" : "kosong"}"></span>${ada ? "Aktif — ada data" : "Belum ada data"}</div>
+    <div class="detail">${detail}</div>
+  `;
+  return el;
+}
+
+function buatKartuAngka(angka, label, merah) {
+  const el = document.createElement("div");
+  el.className = "kartu-angka" + (merah ? " merah" : "");
+  el.innerHTML = `<div class="angka">${angka}</div><div class="label">${label}</div>`;
+  return el;
+}
+
+function isTrue(v) {
+  return v === true || v === "True" || v === "TRUE" || v === "true";
+}
+
+async function render() {
+  const app = document.getElementById("app");
+  const hasil = {};
+  for (const p of PILAR) {
+    hasil[p.key] = await ambilCsv(p.file);
+  }
+  // "gabungan_anomali.csv" adalah OUTPUT olahan (bukan sumber data mentah),
+  // jadi diambil terpisah dari daftar PILAR (yang dipakai utk kartu status
+  // di Bagian 1) supaya tidak dobel ditampilkan sbg "pilar sumber".
+  const gab = await ambilCsv("gabungan_anomali.csv");
+
+  // badge waktu update keseluruhan (ambil timestamp paling baru dari semua pilar yang ada datanya)
+  let waktuTerbaruGlobal = null;
+  for (const p of PILAR) {
+    const w = cariKolomWaktuTerbaru(hasil[p.key], p.ts);
+    if (w && (!waktuTerbaruGlobal || w > waktuTerbaruGlobal)) waktuTerbaruGlobal = w;
+  }
+  const wGab = cariKolomWaktuTerbaru(gab, "diambil_pada_utc");
+  if (wGab && (!waktuTerbaruGlobal || wGab > waktuTerbaruGlobal)) waktuTerbaruGlobal = wGab;
+  document.getElementById("badge-update").textContent = waktuTerbaruGlobal
+    ? "Update terakhir: " + fmtWaktu(waktuTerbaruGlobal.toISOString())
+    : "Belum ada data";
+
+  app.innerHTML = "";
+
+  // ==== Section 1: status pilar ====
+  const s1 = document.createElement("section");
+  s1.innerHTML = "<h2>📡 Status Pilar Data</h2>";
+  const grid1 = document.createElement("div");
+  grid1.className = "grid-status";
+  for (const p of PILAR) grid1.appendChild(buatKartuStatus(p, hasil[p.key]));
+  s1.appendChild(grid1);
+  const aktifCount = PILAR.filter(p => hasil[p.key] && hasil[p.key].length).length;
+  const catatan1 = document.createElement("p");
+  catatan1.className = "catatan";
+  catatan1.textContent = `${aktifCount} dari ${PILAR.length} pilar data sedang aktif mengalirkan data. Pipeline berjalan otomatis via GitHub Actions dan tetap mencoba pilar yang belum aktif pada tiap jadwal berikutnya.`;
+  s1.appendChild(catatan1);
+  app.appendChild(s1);
+
+  // ==== Section 2: ringkasan anomali ====
+  const s2 = document.createElement("section");
+  s2.innerHTML = "<h2>🚨 Ringkasan Deteksi Anomali Harga</h2>";
+  if (gab && gab.length) {
+    const totalData = gab.length;
+    const totalAnomali = gab.filter(r => isTrue(r.anomali_harga)).length;
+    const totalKonteksCuaca = gab.filter(r => isTrue(r.anomali_dengan_konteks_cuaca)).length;
+    const grid2 = document.createElement("div");
+    grid2.className = "grid-ringkasan";
+    grid2.appendChild(buatKartuAngka(totalData.toLocaleString("id-ID"), "Total titik data harga dipantau"));
+    grid2.appendChild(buatKartuAngka(totalAnomali.toLocaleString("id-ID"), "Anomali harga terdeteksi", totalAnomali > 0));
+    grid2.appendChild(buatKartuAngka(totalKonteksCuaca.toLocaleString("id-ID"), "...disertai cuaca ekstrem", totalKonteksCuaca > 0));
+    s2.appendChild(grid2);
+
+    const anomaliRows = gab.filter(r => isTrue(r.anomali_harga))
+      .sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal))
+      .slice(0, 15);
+
+    const wrapTabel = document.createElement("div");
+    wrapTabel.style.marginTop = "14px";
+    if (anomaliRows.length) {
+      let baris = anomaliRows.map(r => `
+        <tr>
+          <td>${r.tanggal ?? "-"}</td>
+          <td>${r.kabupaten_kota ?? "-"}</td>
+          <td>${r.komoditas ?? "-"}</td>
+          <td>Rp ${Number(r.harga ?? 0).toLocaleString("id-ID")}</td>
+          <td class="pill-anomali">z=${r.z_score != null ? Number(r.z_score).toFixed(2) : "-"}</td>
+          <td>${isTrue(r.cuaca_ekstrem) ? '<span class="pill-cuaca">cuaca ekstrem</span>' : "-"}</td>
+        </tr>`).join("");
+      wrapTabel.innerHTML = `
+        <table>
+          <thead><tr><th>Tanggal</th><th>Kab/Kota</th><th>Komoditas</th><th>Harga</th><th>Z-score</th><th>Konteks</th></tr></thead>
+          <tbody>${baris}</tbody>
+        </table>`;
+    } else {
+      wrapTabel.innerHTML = `<div class="kosong-panel">Belum ada anomali harga terdeteksi pada data saat ini — wajar di awal, karena deteksi butuh histori harga yang lebih panjang (minimal 5 hari per komoditas) supaya perhitungan tren stabil.</div>`;
+    }
+    s2.appendChild(wrapTabel);
+  } else {
+    s2.appendChild(Object.assign(document.createElement("div"), {
+      className: "kosong-panel",
+      textContent: "Data gabungan & deteksi anomali belum tersedia."
+    }));
+  }
+  app.appendChild(s2);
+
+  // ==== Section 3: grafik tren harga ====
+  const s3 = document.createElement("section");
+  s3.innerHTML = "<h2>📈 Grafik Tren Harga Komoditas</h2>";
+  const sumberHarga = (gab && gab.length) ? gab : hasil["pihps"];
+  if (sumberHarga && sumberHarga.length) {
+    const kolomHarga = sumberHarga[0].harga !== undefined ? "harga" : "harga_rp";
+    const komoditasList = [...new Set(sumberHarga.map(r => r.komoditas).filter(Boolean))].sort();
+
+    const kontrol = document.createElement("div");
+    kontrol.className = "kontrol";
+    kontrol.innerHTML = `<label for="pilih-komoditas">Pilih komoditas:</label>
+      <select id="pilih-komoditas">${komoditasList.map(k => `<option value="${k}">${k}</option>`).join("")}</select>`;
+    s3.appendChild(kontrol);
+
+    const kartuGrafik = document.createElement("div");
+    kartuGrafik.className = "kartu-grafik";
+    kartuGrafik.innerHTML = `<canvas id="grafik-harga" height="90"></canvas>`;
+    s3.appendChild(kartuGrafik);
+    app.appendChild(s3);
+
+    let chart = null;
+    function gambarGrafik(komoditas) {
+      const dataKomoditas = sumberHarga
+        .filter(r => r.komoditas === komoditas)
+        .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+      const labels = dataKomoditas.map(r => r.tanggal);
+      const harga = dataKomoditas.map(r => r[kolomHarga]);
+      const anomaliMask = dataKomoditas.map(r => isTrue(r.anomali_harga));
+
+      if (chart) chart.destroy();
+      const ctx = document.getElementById("grafik-harga").getContext("2d");
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            label: "Harga (Rp) — " + komoditas,
+            data: harga,
+            borderColor: "#2f6f4f",
+            backgroundColor: "rgba(47,111,79,0.08)",
+            tension: 0.25,
+            pointRadius: harga.map((_, i) => anomaliMask[i] ? 6 : 2),
+            pointBackgroundColor: harga.map((_, i) => anomaliMask[i] ? "#c0392b" : "#2f6f4f"),
+            fill: true,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: true },
+            tooltip: {
+              callbacks: {
+                afterLabel: (item) => anomaliMask[item.dataIndex] ? "⚠ Anomali harga terdeteksi" : ""
+              }
+            }
+          },
+          scales: {
+            y: { ticks: { callback: (v) => "Rp " + Number(v).toLocaleString("id-ID") } }
+          }
+        }
+      });
+    }
+
+    if (komoditasList.length) {
+      gambarGrafik(komoditasList[0]);
+      document.getElementById("pilih-komoditas").addEventListener("change", (e) => gambarGrafik(e.target.value));
+    }
+  } else {
+    s3.appendChild(Object.assign(document.createElement("div"), {
+      className: "kosong-panel",
+      textContent: "Data harga belum tersedia untuk digrafikkan."
+    }));
+    app.appendChild(s3);
+  }
+
+  // ==== Section 4: konteks cuaca & iklim ====
+  const s4 = document.createElement("section");
+  s4.innerHTML = "<h2>🌦️ Konteks Cuaca &amp; Iklim Terkini</h2>";
+  const grid4 = document.createElement("div");
+  grid4.className = "grid-ringkasan";
+
+  const cuaca = hasil["bmkg"];
+  if (cuaca && cuaca.length) {
+    const kabList = [...new Set(cuaca.map(r => r.kabupaten_kota).filter(Boolean))];
+    const rataHujan = cuaca.reduce((a, r) => a + (Number(r.curah_hujan_mm) || 0), 0) / cuaca.length;
+    const rataSuhu = cuaca.reduce((a, r) => a + (Number(r.suhu_c) || 0), 0) / cuaca.length;
+    grid4.appendChild(buatKartuAngka(kabList.length, "Kab/kota terpantau BMKG"));
+    grid4.appendChild(buatKartuAngka(rataHujan.toFixed(1) + " mm", "Rata-rata curah hujan per slot"));
+    grid4.appendChild(buatKartuAngka(rataSuhu.toFixed(1) + " °C", "Rata-rata suhu"));
+  }
+
+  const enso = hasil["enso"];
+  if (enso && enso.length) {
+    const terakhir = enso[enso.length - 1];
+    const kartuEnso = document.createElement("div");
+    kartuEnso.className = "kartu-angka";
+    kartuEnso.innerHTML = `<div class="angka" style="font-size:1.1rem">${terakhir.status_enso ?? "-"}</div>
+      <div class="label">Status ENSO terkini (${terakhir.musim ?? ""} ${terakhir.tahun ?? ""})</div>`;
+    grid4.appendChild(kartuEnso);
+  }
+
+  if (grid4.children.length) {
+    s4.appendChild(grid4);
+  } else {
+    s4.appendChild(Object.assign(document.createElement("div"), {
+      className: "kosong-panel",
+      textContent: "Data cuaca/iklim belum tersedia."
+    }));
+  }
+  app.appendChild(s4);
+}
+
+render();
+</script>
+</body>
+</html>
