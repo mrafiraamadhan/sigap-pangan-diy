@@ -39,6 +39,10 @@ jobs:
         run: python src/sources/dpkp_diy_scraper.py --pages 1-10
         continue-on-error: true
 
+      - name: Ambil data SIMOTANDI (fase tanam padi)
+        run: python src/sources/simotandi.py
+        continue-on-error: true
+
       - name: Ambil data cadangan pangan DIY
         run: python src/sources/cadangan_pangan_scraper.py
         continue-on-error: true
