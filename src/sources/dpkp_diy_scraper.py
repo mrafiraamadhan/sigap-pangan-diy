@@ -43,27 +43,43 @@ DELAY_SECONDS = 1.5  # jeda antar-request, jangan diturunkan
 
 
 def fetch_page(page: int) -> pd.DataFrame | None:
+    """Ambil & parse 1 halaman. Sengaja SANGAT defensif -- kalau ada yang
+    aneh di 1 halaman (tabel berubah struktur, dsb), lewati halaman itu
+    (return None) daripada bikin seluruh proses berhenti. Semua pesan error
+    dipotong pendek supaya log Actions tidak kebanjiran dump HTML mentah."""
     url = f"{BASE_URL}?sort={SORT_PARAM}&page={page}"
     try:
         resp = requests.get(url, headers=HEADERS, timeout=20)
         resp.raise_for_status()
     except Exception as e:
-        print(f"  Halaman {page}: GAGAL request ({e})")
+        print(f"  Halaman {page}: GAGAL request ({str(e)[:200]})")
         return None
 
     try:
         tables = pd.read_html(resp.text)
-    except ValueError:
-        print(f"  Halaman {page}: tidak ada tabel ditemukan (mungkin format berubah)")
+    except Exception as e:
+        print(f"  Halaman {page}: gagal parse tabel -- {type(e).__name__}: {str(e)[:200]}")
         return None
 
     if not tables:
+        print(f"  Halaman {page}: tidak ada tabel ditemukan di HTML.")
         return None
 
     df = tables[0]
     # Buang kolom nomor urut kalau ada (biasanya kolom pertama '#')
-    if df.columns[0] in ("#", "No", "No."):
+    if len(df.columns) and df.columns[0] in ("#", "No", "No."):
         df = df.drop(columns=[df.columns[0]])
+
+    # Validasi minimal: tabel harus punya kolom tanggal & harga yang bisa
+    # dikenali, kalau tidak berarti ini BUKAN tabel data (mis. tabel
+    # navigasi/kalender yang ikut keparse) -- lewati saja.
+    ada_kolom_tanggal = any("anggal" in str(c) for c in df.columns)
+    ada_kolom_harga = any("arga" in str(c) for c in df.columns)
+    if not (ada_kolom_tanggal and ada_kolom_harga):
+        print(f"  Halaman {page}: tabel ditemukan tapi kolomnya tidak sesuai "
+              f"harapan (kolom: {list(df.columns)[:6]}) -- dilewati.")
+        return None
+
     return df
 
 
@@ -119,4 +135,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        # Jaring pengaman terakhir: apapun yang gagal, cetak ringkas saja
+        # (bukan traceback penuh/dump HTML) supaya log Actions tetap terbaca.
+        print(f"GAGAL total: {type(e).__name__}: {str(e)[:300]}")
+        raise SystemExit(1)
