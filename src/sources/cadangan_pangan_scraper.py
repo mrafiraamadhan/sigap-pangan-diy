@@ -20,6 +20,7 @@ Cara pakai:
 """
 
 import argparse
+import io
 import os
 import time
 from datetime import datetime, timezone
@@ -53,7 +54,12 @@ def fetch_tahun(tahun: int) -> list:
         print(f"Tahun {tahun}: GAGAL request ({str(e)[:200]})")
         return []
     try:
-        tables = pd.read_html(resp.text)
+        # PENTING: pandas versi baru (3.x) TIDAK LAGI menerima string HTML
+        # mentah langsung di read_html() -- harus dibungkus io.StringIO(),
+        # kalau tidak akan salah dikira nama file & gagal dgn FileNotFoundError
+        # (bug nyata yang bikin scraper ini gagal total sebelumnya, BUKAN
+        # soal situs diblokir -- respons HTTP-nya sebenarnya normal/200).
+        tables = pd.read_html(io.StringIO(resp.text))
     except Exception as e:
         print(f"Tahun {tahun}: gagal parse tabel -- {type(e).__name__}: {str(e)[:150]} "
               f"(HTTP {resp.status_code}, {len(resp.text)} char)")
