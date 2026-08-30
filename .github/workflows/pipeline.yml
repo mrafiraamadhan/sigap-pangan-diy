@@ -92,4 +92,12 @@ jobs:
           cp -f data/*.csv docs/data/ 2>/dev/null || true
           git add data/ docs/data/
           git diff --cached --quiet || git commit -m "chore: update data pipeline $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          # PENTING (pelajaran run 30 Agt yang gagal setelah 1 jam): kalau ada
+          # commit lain masuk ke main SELAMA pipeline jalan (mis. kita commit
+          # perbaikan kode lewat web editor), `git push` polos DITOLAK
+          # (non-fast-forward) -> seluruh hasil run hangus. Maka: tarik dulu
+          # commit terbaru & susun ulang commit data kita di atasnya, baru push.
+          # File data pipeline tidak pernah diedit manual, jadi rebase-nya
+          # selalu mulus tanpa konflik.
+          git pull --rebase origin main
           git push
