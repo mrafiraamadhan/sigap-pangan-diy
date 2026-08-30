@@ -21,21 +21,48 @@ ROLLING_WINDOW = 14   # hari
 Z_THRESHOLD = 2.0
 
 
+PROVINSI_LABEL = "DI Yogyakarta"
+
+
 def load_harga() -> pd.DataFrame:
+    """Baca harga_pangan_diy.csv. File ini bisa datang dari 2 sumber dengan
+    skema beda: dpkp_diy_scraper.py (per kabupaten/kota, kolom 'harga') atau
+    pihps_scraper.py versi API baru (tingkat provinsi, kolom 'harga_rp',
+    tanpa 'kabupaten_kota'). Normalisasi supaya keduanya bisa diproses sama."""
     df = pd.read_csv(HARGA_PATH, parse_dates=["tanggal"])
-    return df.sort_values(["kabupaten_kota", "komoditas", "tanggal"])
+
+    if "harga" not in df.columns and "harga_rp" in df.columns:
+        df = df.rename(columns={"harga_rp": "harga"})
+
+    if "kabupaten_kota" not in df.columns:
+        # data PIHPS versi API baru: tingkat provinsi, bukan per kab/kota.
+        df["kabupaten_kota"] = df["provinsi"] if "provinsi" in df.columns else PROVINSI_LABEL
+
+    sort_cols = [c for c in ["kabupaten_kota", "komoditas", "tanggal"] if c in df.columns]
+    return df.sort_values(sort_cols)
 
 
 def load_cuaca_harian() -> pd.DataFrame:
     """Ringkas data cuaca per-jam BMKG jadi agregat harian per kab/kota:
     curah hujan total & suhu rata-rata -- supaya bisa di-join dengan harga
-    yang granularitasnya harian."""
+    yang granularitasnya harian. Juga tambahkan 1 baris agregat TINGKAT
+    PROVINSI per tanggal (rata-rata/OR dari semua kab/kota), supaya data
+    harga yang tingkat provinsi (lihat load_harga) tetap bisa di-join
+    dengan konteks cuaca, bukan cuma yang datanya per kab/kota."""
     df = pd.read_csv(CUACA_PATH, parse_dates=["waktu_lokal"])
     df["tanggal"] = df["waktu_lokal"].dt.date
     agg = df.groupby(["kabupaten_kota", "tanggal"]).agg(
         curah_hujan_mm_total=("curah_hujan_mm", "sum"),
         suhu_c_rata2=("suhu_c", "mean"),
     ).reset_index()
+
+    provinsi_agg = agg.groupby("tanggal").agg(
+        curah_hujan_mm_total=("curah_hujan_mm_total", "mean"),
+        suhu_c_rata2=("suhu_c_rata2", "mean"),
+    ).reset_index()
+    provinsi_agg["kabupaten_kota"] = PROVINSI_LABEL
+
+    agg = pd.concat([agg, provinsi_agg], ignore_index=True)
     agg["tanggal"] = pd.to_datetime(agg["tanggal"])
     return agg
 
@@ -49,7 +76,12 @@ def detect_price_anomalies(df_harga: pd.DataFrame) -> pd.DataFrame:
         g["anomali_harga"] = g["z_score"].abs() > Z_THRESHOLD
         return g
 
-    return df_harga.groupby(["kabupaten_kota", "komoditas"], group_keys=False).apply(_per_group)
+    # PENTING: index kolom secara eksplisit -- kalau tidak, pandas diam-diam
+    # membuang kolom "kabupaten_kota"/"komoditas" dari hasil groupby().apply()
+    # ini (perilaku default DataFrameGroupBy.apply utk kolom yang dipakai
+    # sebagai kunci group), bikin hasil akhir kehilangan identitas grupnya.
+    kolom = df_harga.columns.tolist()
+    return df_harga.groupby(["kabupaten_kota", "komoditas"], group_keys=False)[kolom].apply(_per_group)
 
 
 def flag_cuaca_ekstrem(df_cuaca: pd.DataFrame) -> pd.DataFrame:
