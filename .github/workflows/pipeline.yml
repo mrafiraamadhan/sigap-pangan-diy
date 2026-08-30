@@ -47,6 +47,10 @@ jobs:
         run: python src/sources/google_trends_panik.py
         continue-on-error: true
 
+      - name: Ambil indeks ENSO/El Nino (NOAA ONI)
+        run: python src/sources/enso_noaa.py
+        continue-on-error: true
+
       - name: Gabungkan & deteksi anomali
         run: python src/pipeline/merge_and_detect.py
         continue-on-error: true
