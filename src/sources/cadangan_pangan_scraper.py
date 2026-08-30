@@ -35,18 +35,23 @@ def fetch_tahun(tahun: int) -> list:
         resp = requests.get(BASE_URL, params={"y": tahun}, headers=HEADERS, timeout=20)
         resp.raise_for_status()
     except Exception as e:
-        print(f"Tahun {tahun}: GAGAL request ({e})")
+        print(f"Tahun {tahun}: GAGAL request ({str(e)[:200]})")
         return []
     try:
         tables = pd.read_html(resp.text)
-    except ValueError:
-        print(f"Tahun {tahun}: tidak ada tabel ditemukan.")
+    except Exception as e:
+        print(f"Tahun {tahun}: gagal parse tabel -- {type(e).__name__}: {str(e)[:200]}")
         return []
     frames = []
-    for df in tables:
+    for i, df in enumerate(tables):
+        if df.empty or len(df.columns) < 2:
+            continue  # lewati tabel kosong/tabel layout (bukan tabel data)
+        df = df.copy()
         df["tahun_filter"] = tahun
         df["diambil_pada_utc"] = datetime.now(timezone.utc).isoformat()
         frames.append(df)
+    if not frames:
+        print(f"Tahun {tahun}: tabel ditemukan tapi tidak ada yang terlihat seperti data asli.")
     return frames
 
 
@@ -72,4 +77,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"GAGAL total: {type(e).__name__}: {str(e)[:300]}")
+        raise SystemExit(1)
