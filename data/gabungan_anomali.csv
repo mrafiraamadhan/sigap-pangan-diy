@@ -1,0 +1,201 @@
+tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,rolling_mean,rolling_std,z_score,anomali_harga,curah_hujan_mm_total,suhu_c_rata2,cuaca_ekstrem,anomali_dengan_konteks_cuaca
+2026-08-17,Bawang Merah,1,V,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Bawang Merah,1,V,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Bawang Merah,1,V,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Bawang Merah,1,V,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Bawang Merah,1,V,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,28650.0,0.0,,False,,,,False
+2026-08-24,Bawang Merah,1,V,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,28650.0,0.0,,False,,,,False
+2026-08-25,Bawang Merah,1,V,24650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,28078.571428571428,1511.8578920369087,-2.267786838055363,True,,,,False
+2026-08-26,Bawang Merah,1,V,24650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,27650.0,1851.6401995451026,-1.6201851746019653,False,,,,False
+2026-08-27,Bawang Merah,1,V,24650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,27316.666666666668,1999.9999999999998,-1.3333333333333341,False,,,,False
+2026-08-28,Bawang Merah,1,V,24650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,27050.0,2065.5911179772893,-1.1618950038622249,False,,,,False
+2026-08-17,Bawang Merah Ukuran Sedang,2,1,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Bawang Merah Ukuran Sedang,2,1,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Bawang Merah Ukuran Sedang,2,1,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Bawang Merah Ukuran Sedang,2,1,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Bawang Merah Ukuran Sedang,2,1,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,28650.0,0.0,,False,,,,False
+2026-08-24,Bawang Merah Ukuran Sedang,2,1,28650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,28650.0,0.0,,False,,,,False
+2026-08-25,Bawang Merah Ukuran Sedang,2,1,24650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,28078.571428571428,1511.8578920369087,-2.267786838055363,True,,,,False
+2026-08-26,Bawang Merah Ukuran Sedang,2,1,24650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,27650.0,1851.6401995451026,-1.6201851746019653,False,,,,False
+2026-08-27,Bawang Merah Ukuran Sedang,2,1,24650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,27316.666666666668,1999.9999999999998,-1.3333333333333341,False,,,,False
+2026-08-28,Bawang Merah Ukuran Sedang,2,1,24650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,27050.0,2065.5911179772893,-1.1618950038622249,False,,,,False
+2026-08-17,Beras,1,I,14100.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Beras,1,I,14100.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Beras,1,I,14100.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Beras,1,I,14100.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Beras,1,I,14100.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,14100.0,0.0,,False,,,,False
+2026-08-24,Beras,1,I,14100.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,14100.0,0.0,,False,,,,False
+2026-08-25,Beras,1,I,14250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,14121.42857142857,56.69467095138425,2.2677868380553705,True,,,,False
+2026-08-26,Beras,1,I,14250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,14137.5,69.43650748294156,1.6201851746019602,False,,,,False
+2026-08-27,Beras,1,I,14250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,14150.0,75.00000000000017,1.3333333333333304,False,,,,False
+2026-08-28,Beras,1,I,14250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,14160.0,77.45966692414848,1.1618950038622229,False,,,,False
+2026-08-17,Beras Kualitas Bawah I,2,1,12750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Beras Kualitas Bawah I,2,1,12750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Beras Kualitas Bawah I,2,1,12750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Beras Kualitas Bawah I,2,1,12750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Beras Kualitas Bawah I,2,1,12750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,12750.0,0.0,,False,,,,False
+2026-08-24,Beras Kualitas Bawah I,2,1,12750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,12750.0,0.0,,False,,,,False
+2026-08-25,Beras Kualitas Bawah I,2,1,13000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,12785.714285714286,94.49111825230669,2.2677868380553607,True,,,,False
+2026-08-26,Beras Kualitas Bawah I,2,1,13000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,12812.5,115.72751247156879,1.620185174601967,False,,,,False
+2026-08-27,Beras Kualitas Bawah I,2,1,13000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,12833.333333333334,124.99999999999983,1.3333333333333304,False,,,,False
+2026-08-28,Beras Kualitas Bawah I,2,1,13000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,12850.0,129.09944487358038,1.1618950038622267,False,,,,False
+2026-08-17,Beras Kualitas Medium I,2,2,13600.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Beras Kualitas Medium I,2,2,13600.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Beras Kualitas Medium I,2,2,13600.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Beras Kualitas Medium I,2,2,13600.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Beras Kualitas Medium I,2,2,13600.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,13600.0,0.0,,False,,,,False
+2026-08-24,Beras Kualitas Medium I,2,2,13600.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,13600.0,0.0,,False,,,,False
+2026-08-25,Beras Kualitas Medium I,2,2,13850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,13635.714285714286,94.49111825230669,2.2677868380553607,True,,,,False
+2026-08-26,Beras Kualitas Medium I,2,2,13850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,13662.5,115.72751247156879,1.620185174601967,False,,,,False
+2026-08-27,Beras Kualitas Medium I,2,2,13850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,13683.333333333334,124.99999999999983,1.3333333333333304,False,,,,False
+2026-08-28,Beras Kualitas Medium I,2,2,13850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,13700.0,129.09944487358038,1.1618950038622267,False,,,,False
+2026-08-17,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,15950.0,0.0,,False,,,,False
+2026-08-24,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,15950.0,0.0,,False,,,,False
+2026-08-25,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,15950.0,0.0,,False,,,,False
+2026-08-26,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,15950.0,0.0,,False,,,,False
+2026-08-27,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,15950.0,0.0,,False,,,,False
+2026-08-28,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,15950.0,0.0,,False,,,,False
+2026-08-17,Cabai Merah,1,VI,25850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Cabai Merah,1,VI,25850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Cabai Merah,1,VI,25850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Cabai Merah,1,VI,25850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Cabai Merah,1,VI,25850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,25850.0,0.0,,False,,,,False
+2026-08-24,Cabai Merah,1,VI,25850.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,25850.0,0.0,,False,,,,False
+2026-08-25,Cabai Merah,1,VI,23150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,25464.285714285714,1020.5040771249135,-2.267786838055363,True,,,,False
+2026-08-26,Cabai Merah,1,VI,23150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,25175.0,1249.8571346929443,-1.6201851746019653,False,,,,False
+2026-08-27,Cabai Merah,1,VI,23150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,24950.0,1349.9999999999998,-1.3333333333333335,False,,,,False
+2026-08-28,Cabai Merah,1,VI,23150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,24770.0,1394.2740046346698,-1.1618950038622253,False,,,,False
+2026-08-17,Cabai Merah Besar,2,1,31650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Cabai Merah Besar,2,1,31650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Cabai Merah Besar,2,1,31650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Cabai Merah Besar,2,1,31650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Cabai Merah Besar,2,1,31650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,31650.0,0.0,,False,,,,False
+2026-08-24,Cabai Merah Besar,2,1,31650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,31650.0,0.0,,False,,,,False
+2026-08-25,Cabai Merah Besar,2,1,29650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,31364.285714285714,755.9289460184543,-2.267786838055363,True,,,,False
+2026-08-26,Cabai Merah Besar,2,1,29650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,31150.0,925.8200997725513,-1.6201851746019653,False,,,,False
+2026-08-27,Cabai Merah Besar,2,1,29650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,30983.333333333332,999.9999999999998,-1.3333333333333324,False,,,,False
+2026-08-28,Cabai Merah Besar,2,1,29650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,30850.0,1032.7955589886442,-1.1618950038622253,False,,,,False
+2026-08-17,Cabai Merah Keriting ,2,2,20000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Cabai Merah Keriting ,2,2,20000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Cabai Merah Keriting ,2,2,20000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Cabai Merah Keriting ,2,2,20000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Cabai Merah Keriting ,2,2,20000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,20000.0,0.0,,False,,,,False
+2026-08-24,Cabai Merah Keriting ,2,2,20000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,20000.0,0.0,,False,,,,False
+2026-08-25,Cabai Merah Keriting ,2,2,16650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,19521.428571428572,1266.1809845809114,-2.267786838055364,True,,,,False
+2026-08-26,Cabai Merah Keriting ,2,2,16650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,19162.5,1550.748667119024,-1.6201851746019647,False,,,,False
+2026-08-27,Cabai Merah Keriting ,2,2,16650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,18883.333333333332,1675.0000000000002,-1.3333333333333324,False,,,,False
+2026-08-28,Cabai Merah Keriting ,2,2,16650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,18660.0,1729.9325613059796,-1.161895003862225,False,,,,False
+2026-08-17,Cabai Rawit,1,VII,31250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Cabai Rawit,1,VII,31250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Cabai Rawit,1,VII,31250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Cabai Rawit,1,VII,31250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Cabai Rawit,1,VII,31250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,31250.0,0.0,,False,,,,False
+2026-08-24,Cabai Rawit,1,VII,31250.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,31250.0,0.0,,False,,,,False
+2026-08-25,Cabai Rawit,1,VII,34700.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,31742.85714285714,1303.9774318818343,2.267786838055364,True,,,,False
+2026-08-26,Cabai Rawit,1,VII,34700.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,32112.5,1597.0396721076515,1.6201851746019649,False,,,,False
+2026-08-27,Cabai Rawit,1,VII,34700.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,32400.0,1725.0000000000002,1.3333333333333333,False,,,,False
+2026-08-28,Cabai Rawit,1,VII,34700.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,32630.0,1781.572339255412,1.1618950038622249,False,,,,False
+2026-08-17,Cabai Rawit Hijau,2,1,33150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Cabai Rawit Hijau,2,1,33150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Cabai Rawit Hijau,2,1,33150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Cabai Rawit Hijau,2,1,33150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Cabai Rawit Hijau,2,1,33150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,33150.0,0.0,,False,,,,False
+2026-08-24,Cabai Rawit Hijau,2,1,33150.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,33150.0,0.0,,False,,,,False
+2026-08-25,Cabai Rawit Hijau,2,1,34350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,33321.42857142857,453.5573676110725,2.267786838055362,True,,,,False
+2026-08-26,Cabai Rawit Hijau,2,1,34350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,33450.0,555.4920598635306,1.620185174601966,False,,,,False
+2026-08-27,Cabai Rawit Hijau,2,1,34350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,33550.0,599.9999999999998,1.333333333333334,False,,,,False
+2026-08-28,Cabai Rawit Hijau,2,1,34350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,33630.0,619.6773353931865,1.1618950038622256,False,,,,False
+2026-08-17,Cabai Rawit Merah,2,2,29350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Cabai Rawit Merah,2,2,29350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Cabai Rawit Merah,2,2,29350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Cabai Rawit Merah,2,2,29350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Cabai Rawit Merah,2,2,29350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,29350.0,0.0,,False,,,,False
+2026-08-24,Cabai Rawit Merah,2,2,29350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,29350.0,0.0,,False,,,,False
+2026-08-25,Cabai Rawit Merah,2,2,35000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,30157.14285714286,2135.4992725021334,2.267786838055363,True,,,,False
+2026-08-26,Cabai Rawit Merah,2,2,35000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,30762.5,2615.4417818574575,1.6201851746019653,False,,,,False
+2026-08-27,Cabai Rawit Merah,2,2,35000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,31233.333333333332,2825.0,1.3333333333333337,False,,,,False
+2026-08-28,Cabai Rawit Merah,2,2,35000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,31610.0,2917.6474541429207,1.161895003862225,False,,,,False
+2026-08-17,Daging Ayam,1,II,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Daging Ayam,1,II,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Daging Ayam,1,II,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Daging Ayam,1,II,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Daging Ayam,1,II,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,23650.0,0.0,,False,,,,False
+2026-08-24,Daging Ayam,1,II,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,23650.0,0.0,,False,,,,False
+2026-08-25,Daging Ayam,1,II,28350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,24321.428571428572,1776.4330231433678,2.267786838055363,True,,,,False
+2026-08-26,Daging Ayam,1,II,28350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,24825.0,2175.6772344654955,1.6201851746019653,False,,,,False
+2026-08-27,Daging Ayam,1,II,28350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,25216.666666666668,2349.9999999999995,1.333333333333333,False,,,,False
+2026-08-28,Daging Ayam,1,II,28350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,25530.0,2427.0695636233145,1.161895003862225,False,,,,False
+2026-08-17,Daging Ayam Ras Segar,2,1,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Daging Ayam Ras Segar,2,1,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Daging Ayam Ras Segar,2,1,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Daging Ayam Ras Segar,2,1,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Daging Ayam Ras Segar,2,1,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,23650.0,0.0,,False,,,,False
+2026-08-24,Daging Ayam Ras Segar,2,1,23650.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,23650.0,0.0,,False,,,,False
+2026-08-25,Daging Ayam Ras Segar,2,1,28350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,24321.428571428572,1776.4330231433678,2.267786838055363,True,,,,False
+2026-08-26,Daging Ayam Ras Segar,2,1,28350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,24825.0,2175.6772344654955,1.6201851746019653,False,,,,False
+2026-08-27,Daging Ayam Ras Segar,2,1,28350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,25216.666666666668,2349.9999999999995,1.333333333333333,False,,,,False
+2026-08-28,Daging Ayam Ras Segar,2,1,28350.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,25530.0,2427.0695636233145,1.161895003862225,False,,,,False
+2026-08-17,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-24,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-25,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-26,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-27,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-28,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-17,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-24,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-25,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-26,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-27,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-28,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,140000.0,0.0,,False,,,,False
+2026-08-17,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-24,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-25,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-26,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-27,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-28,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-17,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-24,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-25,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-26,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-27,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-28,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,16000.0,0.0,,False,,,,False
+2026-08-17,Telur Ayam,1,IV,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Telur Ayam,1,IV,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Telur Ayam,1,IV,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Telur Ayam,1,IV,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Telur Ayam,1,IV,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,23000.0,0.0,,False,,,,False
+2026-08-24,Telur Ayam,1,IV,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,23000.0,0.0,,False,,,,False
+2026-08-25,Telur Ayam,1,IV,19750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,22535.714285714286,1228.3845372799888,-2.2677868380553634,True,,,,False
+2026-08-26,Telur Ayam,1,IV,19750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,22187.5,1504.4576621303963,-1.6201851746019649,False,,,,False
+2026-08-27,Telur Ayam,1,IV,19750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,21916.666666666668,1625.0000000000002,-1.333333333333334,False,,,,False
+2026-08-28,Telur Ayam,1,IV,19750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,21700.0,1678.2927833565477,-1.1618950038622249,False,,,,False
+2026-08-17,Telur Ayam Ras Segar,2,1,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-18,Telur Ayam Ras Segar,2,1,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-19,Telur Ayam Ras Segar,2,1,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-20,Telur Ayam Ras Segar,2,1,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,,,,False,,,,False
+2026-08-21,Telur Ayam Ras Segar,2,1,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,23000.0,0.0,,False,,,,False
+2026-08-24,Telur Ayam Ras Segar,2,1,23000.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,23000.0,0.0,,False,,,,False
+2026-08-25,Telur Ayam Ras Segar,2,1,19750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,22535.714285714286,1228.3845372799888,-2.2677868380553634,True,,,,False
+2026-08-26,Telur Ayam Ras Segar,2,1,19750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,22187.5,1504.4576621303963,-1.6201851746019649,False,,,,False
+2026-08-27,Telur Ayam Ras Segar,2,1,19750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,21916.666666666668,1625.0000000000002,-1.333333333333334,False,,,,False
+2026-08-28,Telur Ayam Ras Segar,2,1,19750.0,DI Yogyakarta,2026-08-30T10:03:35.195323+00:00,DI Yogyakarta,21700.0,1678.2927833565477,-1.1618950038622249,False,,,,False
