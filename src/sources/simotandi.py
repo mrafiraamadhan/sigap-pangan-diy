@@ -31,13 +31,8 @@ Kode wilayah kabupaten/kota DIY (standar BPS/Kemendagri):
   3471 Kota Yogyakarta, 3472 Kab. Bantul, 3473 Kab. Gunung Kidul,
   3474 Kab. Kulon Progo, 3475 Kab. Sleman
 
-CATATAN PENTING (30 Agt 2026): run pertama di GitHub Actions gagal dengan
-403 Forbidden -- situs ini ternyata dilindungi Cloudflare yang menolak
-request 'requests' polos dari server. Makanya SEMUA request (bukan cuma
-buka halaman awal) sekarang dikirim lewat context Playwright (browser
-sungguhan), bukan library requests, supaya lolos.
-
-Kalau suatu saat alur ini berhenti jalan lagi, jalankan:
+CATATAN: modul ini lebih kompleks dari pihps_scraper.py (perlu sesi + CSRF +
+tunggu job async), jadi kalau situs berubah struktur, jalankan lagi:
     python3 src/sources/simotandi.py --inspect
 """
 
@@ -107,6 +102,25 @@ def inspect_mode():
         browser.close()
 
 
+PENANDA_HALAMAN_TANTANGAN = (
+    "just a moment", "checking your browser", "cf-browser-verification",
+    "cf_chl", "attention required", "__cf_chl", "verify you are human",
+    "enable javascript and cookies",
+)
+
+
+def _cari_csrf(html: str):
+    m = re.search(r'name=["\']csrf-token["\']\s+content=["\']([^"\']+)["\']', html)
+    if not m:
+        m = re.search(r'content=["\']([^"\']+)["\']\s+name=["\']csrf-token["\']', html)
+    return m.group(1) if m else None
+
+
+def _kelihatan_seperti_tantangan(html: str) -> bool:
+    lower = html.lower()
+    return any(penanda in lower for penanda in PENANDA_HALAMAN_TANTANGAN)
+
+
 def buat_sesi(context):
     """Buka halaman awal LEWAT BROWSER (bukan requests polos) supaya lolos
     proteksi anti-bot Cloudflare yang dipakai situs ini -- dikonfirmasi lewat
@@ -116,21 +130,50 @@ def buat_sesi(context):
     context browser, sisa request (POST export, polling status, download
     file) dikirim lewat context.request supaya cookie sesi & 'kepercayaan'
     dari Cloudflare tetap terbawa, tanpa perlu render browser lagi tiap kali
-    (jauh lebih cepat daripada full Playwright utk semua langkah)."""
+    (jauh lebih cepat daripada full Playwright utk semua langkah).
+
+    CATATAN (30 Agt 2026): run pertama lolos dari 403, tapi lalu gagal cari
+    csrf-token dalam waktu cuma ~4 detik -- pola ini khas Cloudflare
+    menyajikan halaman TANTANGAN JS ("Just a moment...") ke browser headless,
+    bukan halaman asli (yang otomatis tidak punya meta csrf-token). Fungsi
+    ini sekarang: (a) bikin context browser lebih 'meyakinkan' lewat
+    add_init_script di ambil_data(), (b) mendeteksi eksplisit kalau HTML yang
+    didapat kelihatan seperti halaman tantangan lalu menunggu & mencoba lagi
+    beberapa kali (tantangan Cloudflare biasanya otomatis selesai dalam
+    beberapa detik), dan (c) kalau tetap gagal, mencetak cuplikan HTML +
+    judul halaman supaya lain kali langsung ketahuan itu tantangan Cloudflare
+    vs. situs yang struktur HTML-nya sungguh berubah."""
     page = context.new_page()
-    page.goto(DATA_TABULAR_PAGE, wait_until="networkidle", timeout=60000)
-    html = page.content()
+
+    html = ""
+    csrf_token = None
+    for percobaan in range(4):
+        page.goto(DATA_TABULAR_PAGE, wait_until="networkidle", timeout=60000)
+        html = page.content()
+        csrf_token = _cari_csrf(html)
+        if csrf_token:
+            break
+        if _kelihatan_seperti_tantangan(html):
+            print(f"  Percobaan {percobaan + 1}/4: kelihatan seperti halaman "
+                  f"tantangan Cloudflare ('Just a moment...') -- tunggu 8 detik & coba lagi...")
+            page.wait_for_timeout(8000)
+        else:
+            print(f"  Percobaan {percobaan + 1}/4: csrf-token belum ketemu (bukan "
+                  f"halaman tantangan yang dikenali) -- tunggu 4 detik & coba lagi...")
+            page.wait_for_timeout(4000)
+
     page.close()
 
-    m = re.search(r'name=["\']csrf-token["\']\s+content=["\']([^"\']+)["\']', html)
-    if not m:
-        m = re.search(r'content=["\']([^"\']+)["\']\s+name=["\']csrf-token["\']', html)
-    if not m:
+    if not csrf_token:
+        judul_match = re.search(r'<title[^>]*>([^<]*)</title>', html, re.IGNORECASE)
+        judul = judul_match.group(1).strip() if judul_match else "(tidak ada tag <title>)"
+        cuplikan = re.sub(r'\s+', ' ', html).strip()[:300]
         raise RuntimeError(
-            "Tidak menemukan csrf-token di halaman data-tabular -- "
-            "struktur situs SIMOTANDI mungkin sudah berubah."
+            "Tidak menemukan csrf-token di halaman data-tabular setelah 4x "
+            f"percobaan -- judul halaman: {judul!r}; cuplikan HTML: {cuplikan!r} "
+            "-- kemungkinan Cloudflare memblokir IP GitHub Actions secara "
+            "jaringan (bukan cuma tantangan JS biasa), atau struktur situs berubah."
         )
-    csrf_token = m.group(1)
 
     return html, csrf_token
 
@@ -201,8 +244,28 @@ def ambil_data() -> pd.DataFrame:
     diambil_pada = datetime.now(timezone.utc).isoformat()
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(user_agent=HEADERS_BASE["User-Agent"])
+        browser = p.chromium.launch(
+            headless=True,
+            args=["--disable-blink-features=AutomationControlled"],
+        )
+        context = browser.new_context(
+            user_agent=HEADERS_BASE["User-Agent"],
+            viewport={"width": 1366, "height": 768},
+            locale="id-ID",
+            timezone_id="Asia/Jakarta",
+            extra_http_headers={"Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"},
+        )
+        # Samarkan tanda-tanda paling umum yang dipakai Cloudflare (dan situs
+        # lain) untuk mendeteksi browser headless/otomatis, supaya context ini
+        # tidak langsung disodori halaman tantangan JS.
+        context.add_init_script(
+            """
+            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+            window.chrome = window.chrome || { runtime: {} };
+            Object.defineProperty(navigator, 'languages', {get: () => ['id-ID', 'id', 'en-US', 'en']});
+            Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
+            """
+        )
         try:
             html, csrf_token = buat_sesi(context)
             periode_id, periode_label = cari_periode_terbaru(html)
