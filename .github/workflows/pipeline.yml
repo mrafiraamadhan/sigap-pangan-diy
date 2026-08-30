@@ -10,7 +10,22 @@ on:
     - cron: "0 1 * * 1"
     # Google Trends (proksi kepanikan publik): tiap hari, jeda dari job lain
     - cron: "0 2 * * *"
-  workflow_dispatch: {}   # supaya bisa dipicu manual dari tab Actions
+  workflow_dispatch:      # bisa dipicu manual dari tab Actions -- isi 2 kotak di
+                          # bawah kalau mau ISI HISTORI sekali (biarkan default
+                          # kalau cuma mau jalan seperti biasa)
+    inputs:
+      hari_backfill_pihps:
+        description: >-
+          Isi histori PIHPS berapa hari ke belakang? (0 = mode biasa/14 hari
+          terakhir saja; isi mis. 180 utk ~6 bulan, 365 utk ~1 tahun)
+        required: false
+        default: "0"
+      halaman_dpkp:
+        description: >-
+          Isi histori DPKP DIY berapa halaman? (1 halaman = 1 hari; default 10
+          = mode biasa; isi mis. 180 utk ~6 bulan, 365 utk ~1 tahun, maks ~502)
+        required: false
+        default: "10"
 
 jobs:
   run-pipeline:
@@ -32,11 +47,11 @@ jobs:
         continue-on-error: true
 
       - name: Ambil data PIHPS
-        run: python src/sources/pihps_scraper.py
+        run: python src/sources/pihps_scraper.py --hari-mundur "${{ github.event.inputs.hari_backfill_pihps || 0 }}"
         continue-on-error: true
 
       - name: Ambil data DPKP DIY (harga pangan)
-        run: python src/sources/dpkp_diy_scraper.py --pages 1-10
+        run: python src/sources/dpkp_diy_scraper.py --pages "1-${{ github.event.inputs.halaman_dpkp || 10 }}"
         continue-on-error: true
 
       - name: Ambil data SIMOTANDI (fase tanam padi)
@@ -44,7 +59,7 @@ jobs:
         continue-on-error: true
 
       - name: Ambil data cadangan pangan DIY
-        run: python src/sources/cadangan_pangan_scraper.py
+        run: python src/sources/cadangan_pangan_scraper.py --semua-tahun
         continue-on-error: true
 
       - name: Ambil sinyal Google Trends (proksi kepanikan publik)
