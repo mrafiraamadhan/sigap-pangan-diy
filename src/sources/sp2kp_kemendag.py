@@ -23,12 +23,11 @@ MENEMUKAN SENDIRI bentuk balasan API saat pertama kali berjalan:
   - mencoba beberapa kemungkinan nama parameter sampai ada yang mengembalikan data
   - mengenali bentuk balasan (list polos, {"data": [...]}, atau {"result": [...]})
   - memetakan nama kolom secara lentur (tanggal/date/tgl, harga/price/nilai, dst.)
-  - MEMIPIHKAN nilai bersarang, mis. {"komoditas": {"id": 12, "nama": "Bawang"}}
-  - MENCETAK record mentah DAN hasil pemetaannya ke log, supaya bentuk aslinya
+  - MENCETAK satu record mentah ke log bila pemetaan gagal, supaya bentuk aslinya
     dapat dibaca dan modul ini diperbaiki tanpa menebak lagi
 
-Jadi bila run gagal, lihat log langkah ini: di sana tercetak contoh balasan
-mentah yang dibutuhkan untuk membetulkan pemetaan.
+Jadi bila run pertama gagal, lihat log langkah ini: di sana tercetak contoh
+balasan mentah yang dibutuhkan untuk membetulkan pemetaan.
 
 Keluaran: data/harga_sp2kp_diy.csv
 """
@@ -200,8 +199,92 @@ def petakan(rec):
     return out if ("tanggal" in out and "harga" in out) else None
 
 
-def tarik_rentang(tgl_awal, tgl_akhir):
-    """Coba tiap pola parameter sampai ada yang mengembalikan record."""
+# Kata yang menandakan wilayah DIY pada nama pasar / kabupaten.
+DIY_KATA = ("yogyakarta", "jogja", "sleman", "bantul", "kulon progo", "kulonprogo",
+            "gunungkidul", "gunung kidul", "wates", "wonosari", "sewon", "godean")
+
+
+def wilayah_diy(b):
+    """Apakah baris hasil pemetaan berasal dari DIY?"""
+    teks = " ".join(str(b.get(k, "")) for k in ("kabupaten_kota", "pasar")).lower()
+    return any(k in teks for k in DIY_KATA)
+
+
+def bersihkan_riwayat():
+    """Buang baris riwayat yang bukan dari DIY, lalu tulis ulang bila perlu.
+
+    Dijalankan PALING AWAL, sebelum menyentuh API. Run 31 Agt sempat menuliskan
+    10 baris harga baja ringan dari Banda Aceh ke riwayat. Baris seperti itu
+    bukan cuma salah isinya: ia juga ikut jadi acuan "varian yang dikenal",
+    sehingga balasan API yang salah justru tampak sah. Membersihkannya lebih
+    dulu membuat riwayat memulihkan diri tanpa unggah ulang manual.
+    """
+    if not os.path.exists(KELUARAN):
+        return
+    try:
+        d = pd.read_csv(KELUARAN)
+    except Exception as e:
+        catat(f"Riwayat tidak terbaca ({type(e).__name__}), pembersihan dilewati.")
+        return
+    if not {"kabupaten_kota", "pasar"} <= set(d.columns):
+        return
+    for k in ("kabupaten_kota", "pasar"):
+        d[k] = d[k].fillna("").astype(str)
+    bersih = d.apply(wilayah_diy, axis=1)
+    n = int((~bersih).sum())
+    if n:
+        buang = sorted(set(d.loc[~bersih, "varian"].astype(str)))[:6] if "varian" in d else []
+        catat(f"Membersihkan {n} baris riwayat yang bukan dari DIY: {buang}")
+        d[bersih].to_csv(KELUARAN, index=False)
+        catat(f"Riwayat kini {int(bersih.sum())} baris.")
+
+
+def varian_riwayat():
+    """Daftar varian yang SUDAH terbukti benar, dibaca dari riwayat."""
+    if not os.path.exists(KELUARAN):
+        return set()
+    try:
+        d = pd.read_csv(KELUARAN, usecols=["varian"])
+        return {str(v).strip().lower() for v in d.varian.dropna().unique()}
+    except Exception:
+        return set()
+
+
+def nilai_balasan(rows, awal, akhir, kenal):
+    """Seberapa cocok balasan API dengan yang sebenarnya kita minta.
+
+    Pelajaran run 31 Agt: pola parameter pertama mengembalikan 10 record, jadi
+    dianggap berhasil. Padahal isinya harga baja ringan di Banda Aceh tertanggal
+    Januari 2024. API MENERIMA parameter kita lalu MENGABAIKANNYA, dan modul ini
+    berhenti mencoba pola lain karena mengira sudah berhasil.
+
+    Karena itu "ada isinya" tidak pernah cukup. Balasan dinilai dulu: berapa
+    persen barisnya jatuh di rentang tanggal yang diminta, berapa persen dari
+    DIY, dan berapa persen varian yang dikenali dari riwayat.
+    """
+    baris = [b for b in (petakan(r) for r in rows) if b]
+    if not baris:
+        return {"n": 0, "tanggal": 0.0, "diy": 0.0, "kenal": 0.0}
+
+    def frac(f):
+        return sum(1 for b in baris if f(b)) / len(baris)
+
+    def di_rentang(b):
+        t = pd.to_datetime(b.get("tanggal"), errors="coerce")
+        return bool(pd.notna(t) and awal <= t.date() <= akhir)
+
+    return {
+        "n": len(baris),
+        "tanggal": frac(di_rentang),
+        "diy": frac(wilayah_diy),
+        "kenal": (frac(lambda b: str(b.get("varian", "")).strip().lower() in kenal)
+                  if kenal else 1.0),
+    }
+
+
+def tarik_rentang(tgl_awal, tgl_akhir, kenal):
+    """Coba tiap pola parameter, terima hanya yang balasannya benar-benar cocok."""
+    terbaik = None
     for i, p in enumerate(POLA_PARAM, 1):
         params = {
             p["tgl_awal"]: tgl_awal.isoformat(),
@@ -211,9 +294,22 @@ def tarik_rentang(tgl_awal, tgl_akhir):
         catat(f"  pola parameter {i}/{len(POLA_PARAM)}: {list(params)}")
         js = ambil(EP_HARGA, params)
         rows = daftar_dari(js) if js else []
-        if rows:
-            catat(f"    -> {len(rows)} record diterima")
+        if not rows:
+            continue
+        s = nilai_balasan(rows, tgl_awal, tgl_akhir, kenal)
+        catat(f"    -> {len(rows)} record; dalam rentang tanggal {s['tanggal']:.0%}, "
+              f"dari DIY {s['diy']:.0%}, varian dikenali {s['kenal']:.0%}")
+        if s["diy"] >= 0.5 and s["tanggal"] >= 0.5:
+            catat("    diterima: balasan cocok dengan yang diminta.")
             return rows, p
+        catat("    DITOLAK: parameter tampaknya diabaikan API, pola lain dicoba.")
+        if terbaik is None or s["diy"] > terbaik[1]["diy"]:
+            terbaik = (rows, s, i)
+
+    if terbaik:
+        catat(f"Tidak ada pola parameter yang menghasilkan data DIY. Percobaan "
+              f"terbaik (pola {terbaik[2]}) hanya {terbaik[1]['diy']:.0%} dari DIY "
+              f"dan {terbaik[1]['tanggal']:.0%} di rentang tanggal.")
     return [], None
 
 
@@ -229,13 +325,19 @@ def main():
     awal = akhir - timedelta(days=args.hari_mundur)
     catat(f"SP2KP: menarik {awal} s.d. {akhir} ({args.hari_mundur} hari)")
 
+    bersihkan_riwayat()
+    kenal = varian_riwayat()
+    if kenal:
+        catat(f"Riwayat memuat {len(kenal)} varian yang sudah terbukti benar; "
+              "balasan API akan diperiksa terhadap daftar itu.")
+
     semua, pola = [], None
     t = awal
     while t <= akhir:
         t2 = min(t + timedelta(days=args.potong_hari - 1), akhir)
         catat(f"  potongan {t} s.d. {t2}")
         if pola is None:
-            rows, pola = tarik_rentang(t, t2)
+            rows, pola = tarik_rentang(t, t2, kenal)
         else:
             params = {pola["tgl_awal"]: t.isoformat(), pola["tgl_akhir"]: t2.isoformat(),
                       pola["prov"]: KODE_PROVINSI}
@@ -246,9 +348,10 @@ def main():
         time.sleep(2)
 
     if not semua:
-        catat("TIDAK ADA DATA. Kemungkinan penyebab: nama parameter berbeda, "
+        catat("TIDAK ADA DATA DIY. Kemungkinan penyebab: nama parameter berbeda, "
               "API menuntut kunci akses, atau alamat IP runner diblokir.")
-        catat("Langkah ini sengaja TIDAK menggagalkan pipeline. Pilar lain tetap jalan.")
+        catat("Riwayat yang sudah ada TIDAK diubah, jadi papan pantau tetap memakai "
+              "data lama yang benar. Langkah ini sengaja TIDAK menggagalkan pipeline.")
         return 0
 
     catat(f"Total {len(semua)} record mentah.")
@@ -259,6 +362,18 @@ def main():
     if not baris:
         catat("PEMETAAN GAGAL: tidak ada record yang punya kolom tanggal + harga.")
         catat(f"  kunci yang tersedia: {sorted(semua[0].keys())}")
+        return 0
+
+    # Saringan terakhir per baris. Penilaian di tarik_rentang() memakai ambang
+    # mayoritas, jadi beberapa baris nyasar masih bisa lolos. Data pangan DIY
+    # tidak boleh tercampur harga bahan bangunan dari provinsi lain.
+    sebelum_saring = len(baris)
+    baris = [b for b in baris if wilayah_diy(b)]
+    dibuang = sebelum_saring - len(baris)
+    if dibuang:
+        catat(f"{dibuang} baris dibuang karena bukan dari DIY.")
+    if not baris:
+        catat("SEMUA baris bukan dari DIY. Berkas riwayat TIDAK ditimpa.")
         return 0
 
     df = pd.DataFrame(baris)
