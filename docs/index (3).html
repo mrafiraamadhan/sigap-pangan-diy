@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGAP Pangan DIY | Sistem Peringatan Dini Ketahanan Pangan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Library dimuat SAME-ORIGIN dulu (docs/lib/) supaya tidak bergantung CDN;
+     kalau gagal, fallback otomatis ke cdnjs. Guard terakhir ada di runtime. -->
+<script src="lib/papaparse.min.js"></script>
+<script src="lib/chart.umd.min.js"></script>
+<script>
+  if (!window.Papa) document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>');
+  if (!window.Chart) document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"><\/script>');
+</script>
+
+<style>
+  :root {
+    --hijau-900: #14331f; --hijau-800: #1c4a2e; --hijau-700: #24603c;
+    --hijau-600: #2f7a4c; --hijau-500: #3d8f5c; --hijau-100: #e3efe6;
+    --bg: #f5f4ef; --surface: #ffffff; --surface-2: #faf9f5;
+    --ink: #1f2a24; --ink-2: #57635b; --ink-3: #8b948d;
+    --border: #e5e1d5; --border-2: #efece2;
+    --bahaya: #a11c1c;  --bahaya-bg: #fbecec;  --bahaya-bd: #e5b8b8;
+    --anomali: #b0530a; --anomali-bg: #fdf0e2; --anomali-bd: #eac89e;
+    --waspada: #8a6a00; --waspada-bg: #fbf5da; --waspada-bd: #e2d28e;
+    --aman: #1b7a3d;    --aman-bg: #e9f5ec;    --aman-bd: #b4dcbf;
+    --naik: #a11c1c; --turun: #1b7a3d;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(25,40,30,.05), 0 4px 14px rgba(25,40,30,.05);
+    --font-judul: "Plus Jakarta Sans", -apple-system, "Segoe UI", sans-serif;
+    --font-isi: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font-family: var(--font-isi); font-size: 14.5px; line-height: 1.55; }
+  a { color: var(--hijau-600); }
+  h1, h2, h3, .angka-hero { font-family: var(--font-judul); }
+  .num, .tnum { font-variant-numeric: tabular-nums; }
+
+  /* ===== Header ===== */
+  /* ===== Sampul: satu blok foto yang memuat identitas + judul + dua tindakan =====
+     Tingginya dibatasi 62vh (bukan 100vh seperti laman wisata) supaya tab navigasi
+     dan angka keputusan tetap terjangkau tanpa banyak menggulir. Foto perbukitan
+     Menoreh dipilih karena lanskap itulah tempat pangan DIY ditanam. */
+  /* overflow:hidden DIPINDAH ke .sampul-klip. Kalau dipasang di .sampul, nav yang
+     position:sticky di dalamnya berhenti lengket -- leluhur ber-overflow memotong
+     konteks sticky. Ini jebakan CSS yang mudah terlewat. */
+  .sampul { position: relative; color: #fff; isolation: isolate; background: #0d2416;
+            margin-top: calc(-1 * var(--tinggi-bilah)); }
+  .sampul-klip { position: absolute; inset: 0; overflow: hidden; z-index: -2; }
+  .sampul::before {                       /* gelapkan supaya teks putih tetap terbaca */
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background:
+      linear-gradient(180deg, rgba(10,30,18,.58) 0%, rgba(12,36,22,.16) 44%, rgba(14,42,26,.52) 100%),
+      linear-gradient(100deg, rgba(10,30,18,.52) 0%, rgba(10,30,18,.03) 62%, rgba(10,30,18,.10) 100%);
+  }
+  header { position: relative; background: transparent; color: #fff; }
+
+  .hero { max-width: 1180px; margin: 0 auto;
+          padding: calc(var(--tinggi-bilah) + 34px) 22px 74px; }
+  .hero-pil {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 17px 7px 14px;
+    border-radius: 999px; font-size: .74rem; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: #eafaf0;
+    background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.26);
+    backdrop-filter: blur(3px);
+  }
+  .hero-pil .titik { width: 8px; height: 8px; border-radius: 50%; background: #7ee2a4;
+                     box-shadow: 0 0 0 3px rgba(126,226,164,.22); flex: none; }
+  .hero h2 {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-weight: 700; font-size: clamp(2.1rem, 6.2vw, 4.05rem); line-height: 1.03;
+    letter-spacing: -.022em; margin: 20px 0 0; text-wrap: balance;
+    color: #fff;                    /* wajib tegas: aturan h2 global memasang warna hijau tua */
+    text-shadow: 0 2px 22px rgba(6,20,12,.44);
+  }
+  .hero h2 .baris2 { display: block; color: #8fe3ad; }
+  .hero-sub { max-width: 45ch; margin: 17px 0 0; font-size: 1.03rem; line-height: 1.62;
+              color: #e9f3ed; text-shadow: 0 1px 12px rgba(6,20,12,.45); }
+  .hero-aksi { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 27px; }
+  .hero-aksi button {
+    font: inherit; font-weight: 700; font-size: .95rem; cursor: pointer;
+    padding: 14px 27px; border-radius: 999px; border: 1px solid transparent;
+    transition: transform .14s ease, background .14s ease, border-color .14s ease;
+  }
+  .hero-aksi .utama  { background: #1f9d55; color: #fff; }
+  .hero-aksi .utama:hover  { background: #23af5f; transform: translateY(-1px); }
+  .hero-aksi .kedua  { background: rgba(255,255,255,.10); color: #fff;
+                       border-color: rgba(255,255,255,.34); }
+  .hero-aksi .kedua:hover  { background: rgba(255,255,255,.19); transform: translateY(-1px); }
+  .hero-aksi button:focus-visible { outline: 3px solid #8fe3ad; outline-offset: 3px; }
+  @keyframes turunNaik { 0%,100% { transform: translateY(0) } 50% { transform: translateY(4px) } }
+
+  /* Lengkung putih yang menyambung sampul ke isi, seperti pada rujukan */
+  .sampul-lengkung { display: block; width: 100%; height: 52px; margin-bottom: -1px; }
+
+  /* ===== Animasi masuk =====
+     Dipasang lewat kelas .anim yang ditambahkan JavaScript pada <html>. Kalau
+     JavaScript gagal atau dimatikan, kelas itu tidak pernah ada, sehingga tidak
+     ada satu pun elemen yang tersembunyi. Isi papan pantau tidak boleh bergantung
+     pada animasi untuk bisa dibaca. */
+  .sampul-foto {
+    position: absolute; inset: 0;
+    background: #12301d url("img/hero-tugu.jpg") center 26% / cover no-repeat;
+    will-change: transform;
+  }
+  .anim .sampul-foto { transform: scale(1.06); }
+  .anim.siap .sampul-foto { transform: scale(1); transition: transform 1600ms cubic-bezier(.22,.61,.36,1); }
+
+  .anim .masuk { opacity: 0; transform: translateY(15px); }
+  .anim .masuk.tampil {
+    opacity: 1; transform: none;
+    transition: opacity 620ms cubic-bezier(.22,.61,.36,1) var(--tunda, 0ms),
+                transform 620ms cubic-bezier(.22,.61,.36,1) var(--tunda, 0ms);
+  }
+
+  /* Bagi yang memilih mengurangi gerak: semuanya langsung tampil, tanpa transisi. */
+  @media (prefers-reduced-motion: reduce) {
+    .anim .masuk, .anim .masuk.tampil { opacity: 1; transform: none; transition: none; }
+    .anim .sampul-foto, .anim.siap .sampul-foto { transform: none; transition: none; }
+  }
+
+  /* Di layar sempit foto terpotong ke bagian kabut yang lebih terang, sehingga
+     kontras subjudul turun di bawah ambang WCAG AA. Selubungnya dipekatkan khusus
+     di sini, diukur ulang setelahnya. */
+  @media (max-width: 700px) {
+    .sampul::before {
+      background:
+        linear-gradient(180deg, rgba(10,30,18,.74) 0%, rgba(12,36,22,.52) 42%, rgba(14,42,26,.70) 100%),
+        linear-gradient(100deg, rgba(10,30,18,.66) 0%, rgba(10,30,18,.34) 66%, rgba(10,30,18,.44) 100%);
+    }
+  }
+  @media (max-width: 680px) {
+    .hero { padding: calc(var(--tinggi-bilah) + 22px) 16px 54px; }
+    .hero-aksi button { flex: 1 1 100%; }
+    .sampul-lengkung { height: 32px; }
+  }
+  header .wrap { max-width: 1180px; margin: 0 auto; padding: 26px 22px 18px; }
+  .brand { display: flex; align-items: center; gap: 13px; }
+  .logo { width: 44px; height: 44px; border-radius: 11px; background: rgba(255,255,255,.12);
+          border: 1px solid rgba(255,255,255,.22); display: flex; align-items: center;
+          justify-content: center; font-size: 23px; flex-shrink: 0; }
+  header h1 { margin: 0; font-size: 1.42rem; font-weight: 800; letter-spacing: .2px; }
+  .tagline { margin: 1px 0 0; font-size: .84rem; opacity: .88; }
+  .metahead { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: .74rem; opacity: .85; }
+  .metahead b { font-weight: 600; }
+
+  /* ===== Bilah atas =====
+     Diletakkan SEBAGAI SAUDARA sampul, bukan anaknya. Elemen position:sticky tidak
+     bisa keluar dari induknya; ketika nav masih di dalam sampul yang tingginya 62vh,
+     ia ikut hilang begitu sampul tergulir habis. Di sini tingginya dipatok tetap
+     (--tinggi-bilah) supaya sampul bisa ditarik naik tepat sebanyak itu, dan
+     fotonya mengalir di belakang bilah tanpa pergeseran tata letak. */
+  :root { --tinggi-bilah: 62px; }
+  .bilah { position: sticky; top: 0; z-index: 60; height: var(--tinggi-bilah);
+           background: transparent; border-bottom: 1px solid transparent;
+           transition: background .22s ease, border-color .22s ease, box-shadow .22s ease; }
+  .bilah.nempel { background: rgba(10,30,18,.95); backdrop-filter: blur(10px);
+                  border-bottom-color: rgba(255,255,255,.13); box-shadow: 0 6px 22px rgba(0,0,0,.28); }
+  .bilah > .wrap { max-width: 1180px; height: 100%; margin: 0 auto; padding: 0 22px;
+                   display: flex; align-items: center; gap: 18px; }
+  .merek { display: flex; align-items: center; gap: 10px; flex: none; color: #fff;
+           font-weight: 700; font-size: 1.02rem; letter-spacing: -.01em; }
+  .merek .logo { width: 32px; height: 32px; display: grid; place-items: center; font-size: 1.05rem;
+                 border-radius: 9px; background: rgba(255,255,255,.14);
+                 border: 1px solid rgba(255,255,255,.22); }
+  nav.tabs { flex: 1; min-width: 0; }
+  nav.tabs > div { display: flex; justify-content: flex-end; gap: 3px;
+                   overflow-x: auto; scrollbar-width: none; }
+  nav.tabs > div::-webkit-scrollbar { display: none; }
+  .tabbtn { font: inherit; font-weight: 600; font-size: .88rem; white-space: nowrap;
+            padding: 8px 15px; border-radius: 999px; border: 1px solid transparent;
+            background: transparent; color: rgba(255,255,255,.84); cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: background .16s ease, color .16s ease; }
+  .tabbtn:hover { background: rgba(255,255,255,.14); color: #fff; }
+  .tabbtn.aktif { background: #fff; color: var(--hijau-900); font-weight: 700; }
+  .tabbtn:focus-visible { outline: 3px solid #8fe3ad; outline-offset: 2px; }
+  .tabbtn .bulat { display: inline-flex; align-items: center; justify-content: center;
+                   min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+                   font-size: .68rem; font-weight: 700;
+                   background: rgba(255,255,255,.22); color: #fff; }
+  .tabbtn.aktif .bulat { background: var(--aman-bg); color: var(--aman); }
+
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 30px;
+               font-size: .8rem; color: rgba(233,243,237,.82); }
+  .hero-meta b { color: #fff; font-weight: 600; }
+
+  @media (max-width: 860px) {
+    :root { --tinggi-bilah: 56px; }
+    .merek span { display: none; }
+    nav.tabs > div { justify-content: flex-start; }
+    .bilah > .wrap { padding: 0 14px; gap: 10px; }
+    .tabbtn { font-size: .83rem; padding: 7px 12px; }
+  }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 22px 56px; }
+  .tabpane[hidden] { display: none; }
+  section.blok { margin-bottom: 30px; }
+  h2 { font-size: 1.06rem; font-weight: 700; color: var(--hijau-900); margin: 0 0 4px; }
+  .sub { font-size: .8rem; color: var(--ink-2); margin: 0 0 14px; }
+  h3 { font-size: .92rem; font-weight: 700; color: var(--hijau-900); margin: 0 0 4px; }
+
+  .kartu { background: var(--surface); border: 1px solid var(--border);
+           border-radius: var(--radius); box-shadow: var(--shadow); }
+
+  /* ===== Banner ===== */
+  .banner { padding: 18px 20px; }
+  .banner .tgl { font-size: .8rem; color: var(--ink-2); margin-bottom: 12px; }
+  .chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .chip { border-radius: 10px; padding: 13px 15px; border: 1px solid; }
+  .chip .n { font-family: var(--font-judul); font-size: 1.75rem; font-weight: 800; line-height: 1.05; }
+  .chip .l { font-size: .74rem; font-weight: 700; letter-spacing: .6px; margin-top: 3px; }
+  .chip .d { font-size: .7rem; margin-top: 2px; opacity: .85; }
+  .chip.bahaya  { background: var(--bahaya-bg);  border-color: var(--bahaya-bd);  color: var(--bahaya); }
+  .chip.anomali { background: var(--anomali-bg); border-color: var(--anomali-bd); color: var(--anomali); }
+  .chip.waspada { background: var(--waspada-bg); border-color: var(--waspada-bd); color: var(--waspada); }
+  .chip.aman    { background: var(--aman-bg);    border-color: var(--aman-bd);    color: var(--aman); }
+  .rekomendasi { margin-top: 14px; padding: 13px 16px; border-radius: 10px; background: #eef4ef;
+                 border-left: 4px solid var(--hijau-600); font-size: .9rem; }
+  .rekomendasi strong { color: var(--hijau-900); }
+
+  /* ===== Kondisi pilar ===== */
+  .grid-pilar { display: grid; grid-template-columns: repeat(auto-fill, minmax(262px, 1fr)); gap: 12px; }
+  .kartu-pilar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+                 box-shadow: var(--shadow); padding: 14px 16px; display: flex; flex-direction: column; gap: 7px; }
+  .kp-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .kp-nama { font-weight: 650; font-size: .84rem; }
+  .kp-sumber { font-size: .68rem; color: var(--ink-3); margin-top: 1px; }
+  .kp-baca { font-family: var(--font-judul); font-size: 1.12rem; font-weight: 750; color: var(--hijau-900); }
+  .kp-ket { font-size: .76rem; color: var(--ink-2); line-height: 1.45; }
+  .tag { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; padding: 2px 10px;
+         border-radius: 999px; font-size: .7rem; border: 1px solid; white-space: nowrap; }
+  .tag.bahaya  { color: var(--bahaya);  background: var(--bahaya-bg);  border-color: var(--bahaya-bd); }
+  .tag.anomali { color: var(--anomali); background: var(--anomali-bg); border-color: var(--anomali-bd); }
+  .tag.waspada { color: var(--waspada); background: var(--waspada-bg); border-color: var(--waspada-bd); }
+  .tag.aman    { color: var(--aman);    background: var(--aman-bg);    border-color: var(--aman-bd); }
+  .tag.netral  { color: var(--ink-2); background: var(--surface-2); border-color: var(--border); }
+
+  /* Lencana kesegaran data per pilar. Sengaja kecil dan tidak memakai merah, karena
+     data terlambat adalah keterangan, bukan peringatan risiko. */
+  .lencana-segar { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px;
+                   font-size: .62rem; font-weight: 700; letter-spacing: .02em;
+                   border: 1px solid; white-space: nowrap; vertical-align: 1px; }
+  .lencana-segar.baru   { color: var(--aman);    background: var(--aman-bg);    border-color: var(--aman-bd); }
+  .lencana-segar.sedang { color: var(--ink-2);   background: var(--surface-2);  border-color: var(--border); }
+  .lencana-segar.lama   { color: var(--waspada); background: var(--waspada-bg); border-color: var(--waspada-bd); }
+
+  /* ===== Papan status ===== */
+  .grup { margin-bottom: 22px; }
+  .grup-head { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 10px;
+               border: 1px solid; font-weight: 700; font-size: .9rem; }
+  .grup-head .jml { font-family: var(--font-judul); font-size: 1.05rem; }
+  .grup-head.bahaya  { color: var(--bahaya);  background: var(--bahaya-bg);  border-color: var(--bahaya-bd); }
+  .grup-head.anomali { color: var(--anomali); background: var(--anomali-bg); border-color: var(--anomali-bd); }
+  .grup-head.waspada { color: var(--waspada); background: var(--waspada-bg); border-color: var(--waspada-bd); }
+  .grup-head.aman    { color: var(--aman);    background: var(--aman-bg);    border-color: var(--aman-bd); }
+  .grup-nota { font-size: .8rem; color: var(--ink-2); margin: 8px 2px 12px; line-height: 1.55; }
+  .grup-nota strong { color: var(--ink); }
+  .grup-kosong { font-size: .8rem; color: var(--ink-2); padding: 6px 2px 0; }
+  .grid-kom { display: grid; grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 12px; }
+  /* ===== Jendela grafik besar =====
+     Sparkline di kartu sengaja tanpa sumbu supaya ringkas, tetapi itu membuat
+     besaran perubahan sulit dinilai. Menekan sparkline membuka grafik penuh
+     lengkap dengan sumbu, tanggal, dan penanda anomali. */
+  .lb-tirai { position: fixed; inset: 0; z-index: 90; display: none;
+              background: rgba(8,22,14,.62); backdrop-filter: blur(3px);
+              align-items: center; justify-content: center; padding: 20px; }
+  .lb-tirai.buka { display: flex; }
+  .lb-kotak { background: var(--surface); border-radius: 14px; width: min(940px, 100%);
+              max-height: min(88vh, 720px); display: flex; flex-direction: column;
+              box-shadow: 0 24px 60px rgba(0,0,0,.32); overflow: hidden; }
+  .lb-kepala { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px 10px;
+               border-bottom: 1px solid var(--border); }
+  .lb-judul { font-weight: 700; font-size: 1.06rem; color: var(--hijau-900); }
+  .lb-sub { font-size: .8rem; color: var(--ink-2); margin-top: 2px; }
+  .lb-tutup { margin-left: auto; flex: none; font: inherit; font-size: 1.35rem; line-height: 1;
+              width: 34px; height: 34px; border-radius: 9px; cursor: pointer;
+              border: 1px solid var(--border); background: var(--surface-2); color: var(--ink-2); }
+  .lb-tutup:hover { background: var(--bahaya-bg); color: var(--bahaya); border-color: var(--bahaya-bd); }
+  .lb-tutup:focus-visible { outline: 3px solid var(--hijau); outline-offset: 2px; }
+  .lb-isi { padding: 14px 18px 18px; overflow-y: auto; }
+  .lb-chart { position: relative; height: min(46vh, 380px); }
+  .lb-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .lb-ket { font-size: .82rem; color: var(--ink-2); margin-top: 10px; line-height: 1.6; }
+  .kk-spark { cursor: zoom-in; border-radius: 6px; }
+  .kk-spark:hover { background: var(--surface-2); }
+  .kk-spark:focus-visible { outline: 3px solid var(--hijau); outline-offset: 2px; }
+  @media (max-width: 600px) { .lb-tirai { padding: 10px; } .lb-chart { height: 44vh; } }
+
+  .kartu-kom { background: var(--surface); border: 1px solid var(--border); border-left-width: 4px;
+               border-radius: 10px; box-shadow: var(--shadow); padding: 12px 14px 10px; }
+  .kartu-kom.bahaya { border-left-color: var(--bahaya); } .kartu-kom.anomali { border-left-color: var(--anomali); }
+  .kartu-kom.waspada { border-left-color: var(--waspada); } .kartu-kom.aman { border-left-color: var(--aman); }
+  .kk-atas { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 6px; }
+  .kk-nama { font-weight: 650; font-size: .84rem; }
+  .kk-harga { font-family: var(--font-judul); font-size: .98rem; font-weight: 750; color: var(--hijau-900); white-space: nowrap; }
+  .kk-spark { height: 44px; position: relative; margin: 2px 0 3px; }
+  .kk-rentang { display: flex; justify-content: space-between; font-size: .62rem; color: var(--ink-3);
+                letter-spacing: .01em; margin: 0 1px 7px; }
+
+  /* ===== Panel "cara membaca" ===== */
+  .baca { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 11px;
+          padding: 13px 16px 15px; margin: 12px 0 18px; }
+  .baca > h3 { font-family: var(--font-judul); font-size: .88rem; font-weight: 750; color: var(--hijau-900);
+               margin: 0 0 9px; }
+  .baca dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; align-items: baseline; }
+  .baca dt { font-size: .74rem; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .baca dd { margin: 0; font-size: .78rem; color: var(--ink-2); line-height: 1.55; }
+  .baca dd strong { color: var(--ink); }
+  .baca .tips { font-size: .76rem; color: var(--ink-2); line-height: 1.6; margin: 11px 0 0;
+                padding-top: 10px; border-top: 1px dashed var(--border-2); }
+  @media (max-width: 620px) { .baca dl { grid-template-columns: 1fr; gap: 2px; }
+                              .baca dd { margin-bottom: 7px; } }
+  .kk-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .mchip { display: inline-flex; align-items: center; gap: 3px; font-size: .68rem; font-weight: 600;
+           padding: 2px 8px; border-radius: 999px; background: var(--surface-2);
+           border: 1px solid var(--border); color: var(--ink-2); cursor: default; }
+  .mchip.merah { color: var(--naik); background: var(--bahaya-bg); border-color: var(--bahaya-bd); }
+  .mchip.hijau { color: var(--turun); background: var(--aman-bg); border-color: var(--aman-bd); }
+  .mchip.oranye { color: var(--anomali); background: var(--anomali-bg); border-color: var(--anomali-bd); }
+  .mchip.biru { color: #1f5673; background: #e8f1f6; border-color: #b6d2e0; }
+  .mchip a { color: inherit; text-decoration: none; }
+  .mchip a:hover { text-decoration: underline; }
+
+  /* ===== Peta koroplet ===== */
+  .peta-wrap { position: relative; }
+  .peta-svg { width: 100%; height: auto; display: block; }
+  .peta-svg path { stroke: #fff; stroke-width: .5; cursor: pointer; transition: opacity .12s; }
+  .peta-svg path:hover { opacity: .78; stroke: #14331f; stroke-width: 1.1; }
+  .peta-tip { position: absolute; pointer-events: none; background: #14331f; color: #fff;
+              border-radius: 7px; padding: 7px 10px; font-size: .74rem; line-height: 1.5;
+              opacity: 0; transition: opacity .12s; white-space: nowrap; z-index: 5;
+              box-shadow: 0 4px 14px rgba(0,0,0,.22); }
+  .peta-tip b { font-size: .8rem; }
+  .peta-svg path.terpilih { stroke: #14331f; stroke-width: 1.8; opacity: 1; }
+  .detail-kec { margin-top: 14px; border-top: 2px solid var(--border); padding-top: 14px; }
+  .dk-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .dk-nama { font-family: var(--font-judul); font-size: 1.05rem; font-weight: 750; color: var(--hijau-900); }
+  .dk-sub { font-size: .76rem; color: var(--ink-2); }
+  .dk-tutup { appearance: none; border: 1px solid var(--border); background: var(--surface-2); cursor: pointer;
+              border-radius: 7px; padding: 4px 11px; font: 600 .74rem var(--font-isi); color: var(--ink-2); }
+  .dk-tutup:hover { background: #efece2; }
+  .dk-stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 9px; margin: 11px 0; }
+  .dk-kotak { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 9px; padding: 9px 11px; }
+  .dk-kotak .n { font-family: var(--font-judul); font-size: 1.02rem; font-weight: 750; color: var(--hijau-900); }
+  .dk-kotak .l { font-size: .68rem; color: var(--ink-2); margin-top: 1px; line-height: 1.35; }
+  .peta-petunjuk { font-size: .72rem; color: var(--ink-3); margin-top: 6px; }
+  .peta-legenda { display: flex; align-items: center; gap: 9px; margin-top: 10px; font-size: .72rem; color: var(--ink-2); flex-wrap: wrap; }
+  .legenda-skala { display: flex; height: 11px; border-radius: 3px; overflow: hidden; width: 190px; }
+  .legenda-skala i { flex: 1; }
+
+  /* ===== Bar probabilitas ===== */
+  .pbar { display: flex; align-items: center; gap: 7px; min-width: 118px; }
+  .pbar-track { display: block; flex: 1; height: 7px; background: #eeeade; border-radius: 4px; overflow: hidden; }
+  .pbar-fill { display: block; height: 100%; border-radius: 4px; min-width: 2px; }
+  .pbar-val { font-size: .75rem; font-weight: 650; min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+  .rentang { font-size: .78rem; white-space: nowrap; }
+  .rentang .rp { font-weight: 600; }
+
+  /* ===== Panel & grid ===== */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 14px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+           box-shadow: var(--shadow); padding: 16px 18px; }
+  .panel .sumber { font-size: .7rem; color: var(--ink-3); margin: 0 0 10px; }
+  .angka-hero { font-size: 1.65rem; font-weight: 800; color: var(--hijau-900); line-height: 1.1; }
+  .angka-ket { font-size: .76rem; color: var(--ink-2); margin-top: 2px; }
+  .baris { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0;
+           border-bottom: 1px solid var(--border-2); font-size: .8rem; align-items: center; }
+  .baris:last-child { border-bottom: none; }
+  .baris .v { font-weight: 650; white-space: nowrap; }
+  .insight { margin-top: 12px; font-size: .78rem; color: var(--ink-2); background: var(--surface-2);
+             border: 1px solid var(--border-2); border-radius: 9px; padding: 9px 12px; line-height: 1.55; }
+  .insight strong { color: var(--ink); }
+  .wadah-chart { position: relative; }
+
+  /* ===== Kliping berita ===== */
+  .kliping { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .artikel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+             box-shadow: var(--shadow); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .art-meta { display: flex; gap: 8px; align-items: center; font-size: .7rem; color: var(--ink-3); flex-wrap: wrap; }
+  .art-media { font-weight: 700; color: var(--hijau-700); text-transform: uppercase; letter-spacing: .4px; }
+  .art-judul { font-weight: 650; font-size: .86rem; line-height: 1.4; }
+  .art-judul a { color: var(--ink); text-decoration: none; }
+  .art-judul a:hover { color: var(--hijau-700); text-decoration: underline; }
+  .art-ringkas { font-size: .77rem; color: var(--ink-2); line-height: 1.5; }
+  .art-kom { margin-top: auto; padding-top: 6px; }
+
+  /* ===== Tabel ===== */
+  table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: .8rem; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-2); }
+  th { background: var(--surface-2); color: var(--hijau-900); font-weight: 650; font-size: .74rem;
+       text-transform: uppercase; letter-spacing: .4px; position: sticky; top: 0; }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; }
+  .tabel-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border);
+                box-shadow: var(--shadow); max-height: 520px; overflow-y: auto; background: var(--surface); }
+  .naik { color: var(--naik); font-weight: 650; } .turun { color: var(--turun); font-weight: 650; }
+
+  /* ===== Tren ===== */
+  .grid-mini { display: grid; grid-template-columns: repeat(auto-fill, minmax(208px, 1fr)); gap: 11px; }
+  .kartu-mini { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+                box-shadow: var(--shadow); padding: 10px 12px 8px; }
+  .kartu-mini .jm { font-size: .73rem; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kartu-mini .hm { font-family: var(--font-judul); font-size: .9rem; font-weight: 750; color: var(--hijau-900); margin-bottom: 4px; }
+  .kartu-mini .cw { height: 44px; position: relative; }
+  .kontrol { display: flex; gap: 10px; align-items: center; margin: 10px 0 12px; flex-wrap: wrap; }
+  select { padding: 8px 12px; border-radius: 9px; border: 1px solid var(--border); background: #fff;
+           font: 500 .85rem var(--font-isi); color: var(--ink); }
+  .kartu-grafik { padding: 16px 18px; }
+
+  .kosong { background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius);
+            padding: 20px; text-align: center; color: var(--ink-2); font-size: .84rem; }
+  .gagal { background: #fdf3f3; border: 1px solid #eccaca; border-radius: 10px;
+           padding: 12px 14px; color: #8a3030; font-size: .8rem; }
+  .loading { text-align: center; padding: 52px 20px; color: var(--ink-2); }
+
+  .aturan p { margin: 10px 0; font-size: .84rem; }
+  .aturan .catatan { font-size: .78rem; color: var(--ink-2); }
+
+  footer { border-top: 1px solid var(--border); background: var(--surface); margin-top: 20px; }
+  footer .wrap { max-width: 1180px; margin: 0 auto; padding: 22px; font-size: .74rem; color: var(--ink-2);
+                 display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  footer b { color: var(--ink); }
+
+  @media (max-width: 620px) {
+    body { font-size: 13.5px; }
+    header h1 { font-size: 1.15rem; }
+    .chip .n { font-size: 1.35rem; }
+    th, td { padding: 7px 8px; font-size: .73rem; }
+    main { padding: 16px 14px 44px; }
+  }
+</style>
+</head>
+<script>
+/* Ditaruh SEBELUM <body> supaya kelas .anim sudah ada saat lukisan pertama.
+   Kalau skrip ini tidak jalan, kelasnya tidak pernah ada dan seluruh isi tampil
+   normal tanpa animasi. Animasi tidak boleh jadi syarat keterbacaan. */
+document.documentElement.classList.add("anim");
+</script>
+<body>
+
+<div class="bilah" id="navbar">
+  <div class="wrap">
+    <div class="merek masuk" style="--tunda:0ms">
+      <div class="logo">🌾</div>
+      <span>SIGAP Pangan DIY</span>
+    </div>
+    <nav class="tabs masuk" style="--tunda:80ms"><div id="navtabs">
+      <button class="tabbtn" data-tab="ringkasan">Ringkasan</button>
+      <button class="tabbtn" data-tab="status">Status Komoditas <span class="bulat" id="nb-status"></span></button>
+      <button class="tabbtn" data-tab="prakiraan">Prakiraan Risiko</button>
+      <button class="tabbtn" data-tab="konteks">Konteks &amp; Pasokan</button>
+      <button class="tabbtn" data-tab="data">Data &amp; Tren</button>
+      <button class="tabbtn" data-tab="metodologi">Metodologi</button>
+    </div></nav>
+  </div>
+</div>
+
+<div class="sampul">
+<div class="sampul-klip" aria-hidden="true"><div class="sampul-foto"></div></div>
+<div class="hero">
+  <!-- Pil ini TIDAK statis: isinya diisi ulang dari status komoditas terkini,
+       sehingga sampul ikut memberi informasi, bukan sekadar hiasan. -->
+  <span class="hero-pil masuk" style="--tunda:200ms" id="hero-pil"><span class="titik"></span><span id="hero-pil-teks">Memuat kondisi terkini…</span></span>
+  <h2 class="masuk" style="--tunda:300ms">Peringatan Dini<span class="baris2">Harga Pangan DIY</span></h2>
+  <p class="hero-sub masuk" style="--tunda:420ms">Sistem ini menghimpun sembilan sumber data resmi secara real-time, disertai forecasting (peramalan) untuk satu minggu dan satu bulan ke depan.</p>
+  <div class="hero-aksi masuk" style="--tunda:530ms">
+    <button class="utama" data-lompat="ringkasan">Lihat kondisi hari ini</button>
+    <button class="kedua" data-lompat="prakiraan">Prakiraan risiko harga</button>
+  </div>
+  <div class="hero-meta masuk" style="--tunda:640ms">
+    <span><b>Dirancang untuk:</b> TPID (Tim Pengendalian Inflasi Daerah) DIY · Bank Indonesia · DPKP · Bulog</span>
+    <span><b>9 pilar data</b> · 7 diperbarui otomatis</span>
+    <span id="badge-update">Memuat…</span>
+  </div>
+</div>
+
+<svg class="sampul-lengkung" viewBox="0 0 1440 52" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0,52 C260,4 560,0 760,14 C980,29 1220,50 1440,30 L1440,52 Z" fill="var(--bg)"/>
+</svg>
+</div>
+
+
+<main>
+  <div id="muat" class="loading">Memuat 9 sumber data…</div>
+  <div class="tabpane" id="tab-ringkasan" hidden></div>
+  <div class="tabpane" id="tab-status" hidden></div>
+  <div class="tabpane" id="tab-prakiraan" hidden></div>
+  <div class="tabpane" id="tab-konteks" hidden></div>
+  <div class="tabpane" id="tab-data" hidden></div>
+  <div class="tabpane" id="tab-metodologi" hidden></div>
+</main>
+
+<div class="lb-tirai" id="lb" role="dialog" aria-modal="true" aria-labelledby="lb-judul">
+  <div class="lb-kotak">
+    <div class="lb-kepala">
+      <div><div class="lb-judul" id="lb-judul"></div><div class="lb-sub" id="lb-sub"></div></div>
+      <button class="lb-tutup" id="lb-tutup" aria-label="Tutup grafik">&times;</button>
+    </div>
+    <div class="lb-isi">
+      <div class="lb-chart"><canvas id="lb-canvas"></canvas></div>
+      <div class="lb-chips" id="lb-chips"></div>
+      <div class="lb-ket" id="lb-ket"></div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div><b>SIGAP Pangan DIY</b><br>Purwarupa riset untuk <em>Yogyakarta Economics Symposium (YES) 2026</em>. Bukan produk resmi pemerintah; angka mengikuti sumber aslinya.</div>
+  <div><b>Sumber data</b><br>PIHPS Bank Indonesia · SP2KP Kementerian Perdagangan · DPKP DIY · SIMOTANDI Kementan · Cadangan Pangan Pemda DIY · BMKG · NOAA · Google Trends · pencarian berita otomatis.</div>
+</div></footer>
+
+<script>
+"use strict";
+/* ================= pemuatan data ================= */
+const REPO_RAW = "https://raw.githubusercontent.com/mrafiraamadhan/sigap-pangan-diy/main/data/";
+const SUMBER_DATA = ["data/", REPO_RAW];
+const tunggu = ms => new Promise(r => setTimeout(r, ms));
+
+async function ambilCsv(file) {
+  if (!window.Papa) return null;
+  for (const basis of SUMBER_DATA) {
+    for (let p = 0; p < 2; p++) {
+      try {
+        const res = await fetch(basis + file + "?t=" + Date.now(), { cache: "no-store" });
+        if (res.status === 404) break;
+        if (!res.ok) { await tunggu(700); continue; }
+        const teks = await res.text();
+        if (!teks || !teks.trim() || /^\s*404:/i.test(teks)) break;
+        const hasil = Papa.parse(teks, { header: true, dynamicTyping: true, skipEmptyLines: true });
+        const baris = hasil.data.filter(r => Object.values(r).some(v => v !== null && v !== ""));
+        if (baris.length) return baris;
+        break;
+      } catch (e) { console.warn("gagal", basis + file, e); await tunggu(700); }
+    }
+  }
+  return null;
+}
+
+async function ambilJson(file) {
+  for (const basis of ["data/", REPO_RAW]) {
+    for (let p = 0; p < 2; p++) {
+      try {
+        const res = await fetch(basis + file + "?t=" + Date.now(), { cache: "no-store" });
+        if (res.status === 404) break;
+        if (!res.ok) { await tunggu(700); continue; }
+        return await res.json();
+      } catch (e) { console.warn("gagal", basis + file, e); await tunggu(700); }
+    }
+  }
+  return null;
+}
+
+/* ================= util ================= */
+const fmtRp = n => "Rp " + Math.round(Number(n)).toLocaleString("id-ID");
+const fmtN = (n, d = 0) => Number(n).toLocaleString("id-ID", { maximumFractionDigits: d });
+const fmtTgl = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }); };
+const fmtTglPdk = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toLocaleDateString("id-ID", { day: "numeric", month: "short" }); };
+const fmtBlnThn = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toLocaleDateString("id-ID", { month: "short", year: "numeric" }); };
+const isTrue = v => v === true || v === "True" || v === "TRUE" || v === "true";
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; }
+function ubahHtml(p) {
+  if (p === null || p === undefined || isNaN(p)) return "<span>–</span>";
+  const k = p > 0.05 ? "naik" : p < -0.05 ? "turun" : "";
+  const t = p > 0.05 ? "▲" : p < -0.05 ? "▼" : "＝";
+  return `<span class="${k} tnum">${t} ${Math.abs(p).toFixed(1)}%</span>`;
+}
+// DATA bukan tingkat risiko, melainkan pernyataan bahwa pilarnya TIDAK DAPAT dinilai.
+// Memakai merah untuk basis data yang rusak mencampur dua hal berbeda: kondisi pangan
+// dan kesehatan datanya. Warnanya sengaja netral supaya merah tetap berarti "ada yang
+// harus segera dikerjakan".
+const IKON = { BAHAYA: "🔴", ANOMALI: "🟠", WASPADA: "🟡", AMAN: "🟢", DATA: "⚪" };
+const KELAS = { BAHAYA: "bahaya", ANOMALI: "anomali", WASPADA: "waspada", AMAN: "aman", DATA: "netral" };
+const NAMA_ST = { DATA: "TIDAK DAPAT DINILAI" };
+const tagStatus = (st, teks) => `<span class="tag ${KELAS[st] || "netral"}">${IKON[st] || ""} ${teks || NAMA_ST[st] || st}</span>`;
+const domainDari = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
+
+/* ===== grafik: registry lazy per tab (chart di tab tersembunyi berukuran 0) ===== */
+const antreanChart = {};
+const daftarChart = (tab, fn) => (antreanChart[tab] ||= []).push(fn);
+function jalankanChart(tab) {
+  const q = antreanChart[tab] || [];
+  antreanChart[tab] = [];
+  q.forEach(fn => { try { fn(); } catch (e) { console.error(e); } });
+}
+function pesanTanpaChart(wadah) {
+  wadah.innerHTML = '<div class="gagal">Grafik tidak bisa ditampilkan di browser ini (kemungkinan diblokir ekstensi/jaringan). Data tetap tersedia dalam bentuk tabel.</div>';
+}
+function buatSpark(canvas, labels, nilai, mask) {
+  if (!window.Chart) { pesanTanpaChart(canvas.parentElement); return; }
+  new Chart(canvas.getContext("2d"), {
+    type: "line",
+    data: { labels, datasets: [{ data: nilai, borderColor: "#2f7a4c", borderWidth: 1.6, tension: .25, fill: false,
+      pointRadius: nilai.map((_, i) => mask && mask[i] ? 2 : 0), pointHoverRadius: 4, pointBackgroundColor: "#a11c1c" }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: {
+        title: it => it[0] ? fmtTglPdk(it[0].label) : "",
+        label: it => fmtRp(it.raw) + (mask && mask[it.dataIndex] ? " ⚠ anomali statistik" : "") } } },
+      scales: { x: { display: false }, y: { display: false } } },
+  });
+}
+
+/* ================= jendela grafik besar ================= */
+let lbChart = null, lbPemicu = null;
+
+function tutupGrafik() {
+  const lb = document.getElementById("lb");
+  if (!lb || !lb.classList.contains("buka")) return;
+  lb.classList.remove("buka");
+  if (lbChart) { lbChart.destroy(); lbChart = null; }
+  if (lbPemicu) { lbPemicu.focus(); lbPemicu = null; }   // kembalikan fokus ke kartu asal
+}
+
+function bukaGrafik(d, pemicu) {
+  const lb = document.getElementById("lb");
+  if (!lb || !window.Chart) return;
+  lbPemicu = pemicu || null;
+
+  const tgl = d.seri.map(r => r.tanggal);
+  const nilai = d.seri.map(r => Number(r.harga));
+  const anom = d.seri.map(r => isTrue(r.anomali_harga));
+  const nAnom = anom.filter(Boolean).length;
+
+  document.getElementById("lb-judul").textContent = d.kom;
+  document.getElementById("lb-sub").textContent =
+    `${fmtRp(d.h)} · riwayat ${fmtBlnThn(tgl[0])} sampai ${fmtBlnThn(tgl[tgl.length - 1])} · ${nilai.length} pengamatan`;
+
+  // salin chip dari kartunya supaya konteksnya ikut terbawa
+  const kk = pemicu && pemicu.closest(".kartu-kom");
+  const chips = kk ? kk.querySelector(".kk-chips") : null;
+  document.getElementById("lb-chips").innerHTML = chips ? chips.innerHTML : "";
+
+  document.getElementById("lb-ket").innerHTML = nAnom
+    ? `<strong>${nAnom} titik merah</strong> menandai hari yang terdeteksi anomali statistik. Arahkan kursor atau sentuh garisnya untuk melihat harga per tanggal. Sumbu tegak dimulai dari angka terdekat, bukan dari nol, supaya perubahan kecil tetap terbaca.`
+    : `Tidak ada anomali statistik pada rentang ini. Arahkan kursor atau sentuh garisnya untuk melihat harga per tanggal. Sumbu tegak dimulai dari angka terdekat, bukan dari nol.`;
+
+  lb.classList.add("buka");
+  if (lbChart) lbChart.destroy();
+  lbChart = new Chart(document.getElementById("lb-canvas").getContext("2d"), {
+    type: "line",
+    data: { labels: tgl, datasets: [{
+      data: nilai, borderColor: "#2f7a4c", borderWidth: 2, tension: .2, fill: true,
+      backgroundColor: "rgba(47,122,76,.09)",
+      pointRadius: anom.map(a => a ? 3.5 : 0), pointHoverRadius: 6,
+      pointBackgroundColor: "#a11c1c", pointBorderColor: "#fff", pointBorderWidth: 1 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: { legend: { display: false }, tooltip: { callbacks: {
+        title: it => it[0] ? fmtTgl(it[0].label) : "",
+        label: it => fmtRp(it.raw) + (anom[it.dataIndex] ? "  ⚠ anomali statistik" : "") } } },
+      scales: {
+        x: { ticks: { maxTicksLimit: 8, autoSkip: true, callback(v) { return fmtBlnThn(this.getLabelForValue(v)); } },
+             grid: { display: false } },
+        y: { ticks: { callback: v => fmtRp(v) }, grid: { color: "rgba(0,0,0,.06)" } } },
+    },
+  });
+  document.getElementById("lb-tutup").focus();
+}
+
+document.addEventListener("keydown", e => { if (e.key === "Escape") tutupGrafik(); });
+queueMicrotask(() => {
+  const lb = document.getElementById("lb");
+  if (!lb) return;
+  lb.addEventListener("click", e => { if (e.target === lb) tutupGrafik(); });   // klik latar
+  const b = document.getElementById("lb-tutup");
+  if (b) b.addEventListener("click", tutupGrafik);
+});
+
+/* ================= tipologi ================= */
+function analisisTipologi(gab, berita) {
+  const perKom = {};
+  gab.forEach(r => { if (r.komoditas) (perKom[r.komoditas] ||= []).push(r); });
+  for (const k in perKom) perKom[k].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+  const tMaks = Math.max(...gab.map(r => +new Date(r.tanggal)).filter(v => !isNaN(v)));
+
+  const anomPerTgl = {};
+  gab.forEach(r => { if (isTrue(r.anomali_harga)) anomPerTgl[r.tanggal] = (anomPerTgl[r.tanggal] || 0) + 1; });
+  const tglMassal = new Set(Object.entries(anomPerTgl).filter(([, n]) => n >= 8).map(([t]) => t));
+
+  const beritaPerKom = {};
+  (berita || []).forEach(b => {
+    if (isTrue(b.tervalidasi) && b.komoditas) {
+      const ada = beritaPerKom[b.komoditas];
+      if (!ada || new Date(b.tanggal) > new Date(ada.tanggal)) beritaPerKom[b.komoditas] = b;
+    }
+  });
+
+  const hasil = [];
+  for (const [kom, seri] of Object.entries(perKom)) {
+    const akhir = seri[seri.length - 1];
+    const h = Number(akhir.harga), tAkhir = new Date(akhir.tanggal);
+    let h7 = null;
+    for (let i = seri.length - 1; i >= 0; i--)
+      if (+new Date(seri[i].tanggal) <= +tAkhir - 7 * 864e5) { h7 = Number(seri[i].harga); break; }
+    const ubah7 = h7 ? (h - h7) / h7 * 100 : 0;
+    let h30 = null;
+    for (let i = seri.length - 1; i >= 0; i--)
+      if (+new Date(seri[i].tanggal) <= +tAkhir - 30 * 864e5) { h30 = Number(seri[i].harga); break; }
+    const ubah30 = h30 ? (h - h30) / h30 * 100 : null;
+    const z = Number(akhir.z_score) || 0;
+    const anom7 = seri.filter(r => isTrue(r.anomali_harga) && +new Date(r.tanggal) >= tMaks - 7 * 864e5);
+    const anom7Murni = anom7.filter(r => !tglMassal.has(r.tanggal));
+    const zMaks7 = anom7.length ? Math.max(...anom7.map(r => Math.abs(Number(r.z_score) || 0))) : Math.abs(z);
+    const maks30 = Math.max(...seri.filter(r => +new Date(r.tanggal) >= +tAkhir - 30 * 864e5).map(r => Number(r.harga)));
+    const serentak = anom7.length ? Math.max(...anom7.map(r => anomPerTgl[r.tanggal] || 1)) : 0;
+
+    let status;
+    if (anom7Murni.length && ubah7 >= 5) status = "BAHAYA";
+    else if (anom7.length || Math.abs(z) > 2) status = "ANOMALI";
+    else if (ubah7 >= 5 || ubah7 <= -10 || Math.abs(z) >= 1.5 || (h >= maks30 && ubah7 > 0.5)) status = "WASPADA";
+    else status = "AMAN";
+
+    hasil.push({ kom, seri, h, ubah7, ubah30, z, zMaks7, status, serentak,
+                 tglAnom: anom7.length ? anom7[anom7.length - 1].tanggal : null,
+                 massal: anom7.length > 0 && tglMassal.has(anom7[anom7.length - 1].tanggal),
+                 berita: beritaPerKom[kom] || null });
+  }
+  hasil.sort((a, b) => Math.abs(b.ubah7) - Math.abs(a.ubah7));
+  return { hasil, tglMassal, tMaks, anomPerTgl };
+}
+
+/* ================= kondisi 9 pilar (substantif) ================= */
+function kondisiPilar(ctx) {
+  const { tip, sp2kpInfo, dpkpInfo, simoInfo, cadInfo, cuacaInfo, ensoInfo, trendsInfo, beritaInfo } = ctx;
+  const K = [];
+  // 1. Harga (PIHPS + tipologi)
+  if (tip) {
+    const n = st => tip.hasil.filter(x => x.status === st).length;
+    let lv = "AMAN", ket = "Seluruh komoditas stabil.";
+    if (n("BAHAYA")) { lv = "BAHAYA"; ket = `${n("BAHAYA")} komoditas berstatus Bahaya dan perlu segera ditindaklanjuti.`; }
+    else if (n("ANOMALI")) { lv = "ANOMALI"; ket = `Lonjakan angka pada ${n("ANOMALI")} komoditas bertepatan dengan pembaruan data acuan PIHPS. Sebaiknya dicek dulu ke lapangan sebelum diambil tindakan.`; }
+    else if (n("WASPADA")) { lv = "WASPADA"; ket = `${n("WASPADA")} komoditas dalam tren yang perlu dipantau.`; }
+    K.push({ nama: "Harga Pangan (PIHPS BI)", sumber: "Panel Harga Bank Indonesia", tgl: tip.tMaks, lv,
+             // Empat angka telanjang memaksa pembaca mencocokkannya dengan empat kata
+             // di baris lain. Yang nol dibuang; yang tersisa langsung berlabel.
+             baca: [["BAHAYA","bahaya"],["ANOMALI","anomali"],["WASPADA","waspada"],["AMAN","aman"]]
+                     .filter(([k]) => n(k) > 0).map(([k,l]) => n(k) + " " + l).join(" · ") || "belum ada data",
+             bacaKet: "", ket, tab: "status" });
+  } else K.push({ nama: "Harga Pangan (PIHPS BI)", sumber: "Panel Harga Bank Indonesia", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "status" });
+  // 2. SP2KP Kemendag
+  K.push(sp2kpInfo || { nama: "Harga Pasar (SP2KP Kemendag)", sumber: "Dasar penghitungan IPH (Indeks Perkembangan Harga)", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "data" });
+  // 3. DPKP
+  K.push(dpkpInfo || { nama: "Harga Rujukan DPKP DIY", sumber: "Dinas Pertanian & KP DIY", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "data" });
+  // 3. Pasokan SIMOTANDI
+  K.push(simoInfo || { nama: "Pasokan Padi (SIMOTANDI)", sumber: "Citra satelit Kementan", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "konteks" });
+  // 4. Cadangan
+  K.push(cadInfo || { nama: "Cadangan Pangan Pemerintah", sumber: "DPKP DIY", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "konteks" });
+  // 5. Cuaca
+  K.push(cuacaInfo || { nama: "Cuaca (BMKG)", sumber: "Prakiraan per kab/kota", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "konteks" });
+  // 6. Iklim ENSO
+  K.push(ensoInfo || { nama: "Iklim (ENSO/El Niño)", sumber: "NOAA (indeks ONI)", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "konteks" });
+  // 7. Trends
+  K.push(trendsInfo || { nama: "Perhatian Publik (Google Trends)", sumber: "Google Trends DIY", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "konteks" });
+  // 8. Berita
+  K.push(beritaInfo || { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi", lv: null, baca: "–", ket: "Belum ada hasil.", tab: "konteks" });
+  return K;
+}
+
+/* ================= render utama ================= */
+async function render() {
+  const [gab, pihps, dpkp, sp2kp, simo, simoBln, cad, cuaca, enso, trends, berita] = await Promise.all([
+    ambilCsv("gabungan_anomali.csv"), ambilCsv("harga_pangan_diy.csv"), ambilCsv("harga_pangan_dpkp_diy.csv"),
+    ambilCsv("harga_sp2kp_diy.csv"),
+    ambilCsv("simotandi_fase_tanam_diy.csv"), ambilCsv("simotandi_bulanan_diy.csv"),
+    ambilCsv("cadangan_pangan_diy.csv"), ambilCsv("cuaca_diy.csv"),
+    ambilCsv("enso_oni.csv"), ambilCsv("google_trends_panik.csv"), ambilCsv("validasi_berita.csv"),
+  ]);
+  const prakiraan = await ambilCsv("prakiraan_harga.csv");
+  const petaKec = await ambilJson("peta_kecamatan_diy.geojson");
+  document.getElementById("muat").remove();
+  if (!window.Papa) {
+    document.querySelector("main").innerHTML =
+      '<div class="gagal">Komponen pembaca data tidak berhasil dimuat di browser ini. Coba muat ulang halaman, atau nonaktifkan pemblokir skrip untuk situs ini.</div>';
+    return;
+  }
+
+  const sumberHarga = (gab && gab.length) ? gab : pihps;
+  if (sumberHarga && sumberHarga.length && sumberHarga[0].harga === undefined && sumberHarga[0].harga_rp !== undefined)
+    sumberHarga.forEach(r => { r.harga = r.harga_rp; });
+  const tip = (sumberHarga && sumberHarga.length) ? analisisTipologi(sumberHarga, berita) : null;
+
+  // badge waktu
+  let tUpd = null;
+  [gab, cuaca, enso, simo, cad, trends].forEach(d => (d || []).forEach(r => {
+    const v = r.diambil_pada_utc || r.fetched_at_utc;
+    if (v) { const t = new Date(v); if (!isNaN(t) && (!tUpd || t > tUpd)) tUpd = t; }
+  }));
+  document.getElementById("badge-update").innerHTML = tUpd
+    ? "<b>Diperbarui terakhir:</b> " + tUpd.toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" }) + " WIB" : "";
+
+  /* ---------- analisis pendukung utk kondisi pilar ---------- */
+  let dpkpInfo = null, dpkpTabel = null;
+  if (dpkp && dpkp.length) {
+    const kol = Object.keys(dpkp[0]);
+    const cT = kol.find(c => String(c).startsWith("Tanggal")), cK = kol.find(c => String(c).startsWith("Komoditas")), cH = kol.find(c => String(c).startsWith("Harga"));
+    if (cT && cK && cH) {
+      const rows = dpkp.map(r => ({ t: r[cT], k: r[cK], h: Number(r[cH]) })).filter(r => r.t && r.k && r.h > 0);
+      const tMaks = rows.map(r => r.t).sort().pop();
+      const perKom = {};
+      rows.forEach(r => { (perKom[r.k] ||= []).push(r); });
+      const daftar = [];
+      for (const [k, arr] of Object.entries(perKom)) {
+        arr.sort((a, b) => (a.t < b.t ? -1 : 1));
+        const akhir = arr[arr.length - 1];
+        if (akhir.t !== tMaks) continue;
+        let h30 = null;
+        for (let i = arr.length - 1; i >= 0; i--)
+          if (+new Date(arr[i].t) <= +new Date(akhir.t) - 30 * 864e5) { h30 = arr[i].h; break; }
+
+        // --- Volatilitas berlebih: adaptasi metode Excessive Food Price
+        // Variability EWS (IFPRI / Food Security Portal). Ambang = persentil
+        // ke-95 kenaikan harian historis PER KOMODITAS (nonparametrik, tidak
+        // mengasumsikan distribusi normal), lalu HITUNG berapa observasi
+        // "hari ekstrem" dalam jendela 90 hari terakhir. Bila jumlahnya jauh
+        // melampaui harapan statistik (5% observasi), volatilitas dinilai
+        // berlebih. Dipasang pada data DPKP karena bergerak harian; deret
+        // PIHPS provinsi terlalu bertangga untuk metode ini.
+        let vol = null, volDetail = "";
+        if (arr.length >= 120) {
+          const rets = [];
+          for (let i = 1; i < arr.length; i++)
+            rets.push({ t: arr[i].t, r: (arr[i].h - arr[i - 1].h) / arr[i - 1].h * 100 });
+          const pos = rets.map(x => x.r).filter(r => r > 0).sort((a, b) => a - b);
+          if (pos.length >= 30) {
+            const p95 = pos[Math.min(pos.length - 1, Math.floor(0.95 * pos.length))];
+            const win = rets.filter(x => +new Date(x.t) >= +new Date(tMaks) - 90 * 864e5);
+            const ekstrem = win.filter(x => x.r > p95).length;
+            const harap = 0.05 * win.length;
+            vol = ekstrem > Math.max(2 * harap, 3) ? "TINGGI" : ekstrem > harap ? "SEDANG" : "RENDAH";
+            volDetail = `${ekstrem} hari ekstrem dari ${win.length} observasi 90 hari (ambang kenaikan harian: +${p95.toFixed(1)}%)`;
+          }
+        }
+        daftar.push({ k, h: akhir.h, ubah30: h30 ? (akhir.h - h30) / h30 * 100 : null, vol, volDetail });
+      }
+      daftar.sort((a, b) => (b.ubah30 ?? -999) - (a.ubah30 ?? -999));
+      const naik10 = daftar.filter(d => (d.ubah30 ?? 0) > 10);
+      const volTinggi = daftar.filter(d => d.vol === "TINGGI");
+      const volSedang = daftar.filter(d => d.vol === "SEDANG");
+      const nVol = daftar.filter(d => d.vol).length;
+      dpkpTabel = { daftar, tMaks, nBaris: rows.length };
+      dpkpInfo = { nama: "Harga Rujukan DPKP DIY", sumber: "Dinas Pertanian & KP DIY", tgl: tMaks,
+        lv: (naik10.length === 0 && volTinggi.length === 0) ? "AMAN" : "WASPADA",
+        baca: `${naik10.length} dari ${daftar.length}`, bacaKet: "komoditas naik >10% / 30 hari",
+        ket: (naik10.length ? `Kenaikan tertinggi: ${naik10.slice(0, 3).map(d => d.k).join(", ")} (kebanyakan sayuran, dan mutu pencatatan di sumbernya tidak selalu seragam). ` :
+              "Tidak ada komoditas yang naik lebih dari 10% dalam 30 hari. ") +
+             (volTinggi.length ? `Gejolak harganya berlebih di: ${volTinggi.map(d => d.k).slice(0, 3).join(", ")}.` :
+              `Dari ${nVol} komoditas yang riwayatnya cukup panjang untuk diuji dengan metode IFPRI, ${volSedang.length ? volSedang.length + " tergolong sedang dan sisanya rendah" : "semuanya tergolong rendah"}.`), tab: "data" };
+    }
+  }
+
+  /* ---------- SP2KP Kemendag: sumber harga terpadat & dasar penghitungan IPH ---------- */
+  let sp2kpInfo = null, sp2kpData = null;
+  if (sp2kp && sp2kp.length) {
+    try {
+      const per = {};
+      sp2kp.forEach(r => {
+        const t = String(r.tanggal || ""), k = String(r.varian || ""), h = Number(r.harga);
+        if (!t || !k || !(h > 0)) return;
+        (per[k] ||= []).push({ t, h, seb: Number(r.sebaran_pasar) || 0, n: Number(r.n_pasar) || 1 });
+      });
+      const daftar = [];
+      let tMaks = "";
+      for (const k in per) {
+        const a = per[k].sort((x, y) => (x.t < y.t ? -1 : 1));
+        if (a.length < 60) continue;
+        if (a[a.length - 1].t > tMaks) tMaks = a[a.length - 1].t;
+        const akhir = a[a.length - 1];
+        const cari = d => { const b = new Date(akhir.t); b.setDate(b.getDate() - d);
+                            const s2 = b.toISOString().slice(0, 10);
+                            for (let i = a.length - 1; i >= 0; i--) if (a[i].t <= s2) return a[i].h; return null; };
+        const h7 = cari(7), h30 = cari(30);
+        daftar.push({ k, h: akhir.h, seb: akhir.seb, nPasar: akhir.n, tgl: akhir.t,
+                      u7: h7 ? (akhir.h - h7) / h7 * 100 : null,
+                      u30: h30 ? (akhir.h - h30) / h30 * 100 : null, seri: a });
+      }
+      daftar.sort((x, y) => Math.abs(y.u30 ?? 0) - Math.abs(x.u30 ?? 0));
+      const naik10 = daftar.filter(d => (d.u30 ?? 0) > 10);
+      sp2kpData = { daftar, tMaks, nPasar: Math.max(...daftar.map(d => d.nPasar || 1)) };
+      sp2kpInfo = { nama: "Harga Pasar (SP2KP Kemendag)", sumber: "Dasar penghitungan IPH (Indeks Perkembangan Harga) · " + sp2kpData.nPasar + " pasar melapor", tgl: sp2kpData.tMaks,
+        lv: naik10.length === 0 ? "AMAN" : "WASPADA",
+        baca: `${naik10.length} dari ${daftar.length}`, bacaKet: "varian naik >10% / 30 hari",
+        ket: (naik10.length
+               ? `Kenaikan tertinggi: ${naik10.slice(0, 3).map(d => d.k).join(", ")}. `
+               : "Tidak ada varian yang naik lebih dari 10% dalam 30 hari. ") +
+             `Dari ketiga sumber harga, ini yang datanya paling rapat dan dicatat sampai tingkat pasar. Karena itu prakiraan kami sandarkan ke sini.`,
+        tab: "data" };
+    } catch (e) { console.warn("SP2KP:", e); }
+  }
+
+  let simoInfo = null, simoData = null;
+  if (simo && simo.length) {
+    // Urutkan periode pakai kode YYYYNN bila tersedia (data lengkap 2024-2026),
+    // fallback ke tanggal mulai untuk berkas versi lama.
+    const kunciP = r => (r.periode_kode !== undefined && r.periode_kode !== null) ? String(r.periode_kode) : String(r.periode_mulai || "");
+    const periodeUrut = [...new Set(simo.map(kunciP).filter(Boolean))].sort();
+    const pMax = periodeUrut[periodeUrut.length - 1];
+    const st = simo.filter(r => kunciP(r) === pMax);
+    const F = ["bera_ha", "persiapan_lahan_ha", "tanam_ha", "vegetatif_1_ha", "vegetatif_2_ha", "generatif_1_ha", "generatif_2_ha", "panen_ha"];
+    const perKab = {};
+    st.forEach(r => {
+      const k = r.kabupaten_kota; if (!k) return;
+      perKab[k] ||= Object.fromEntries(F.map(f => [f, 0]));
+      F.forEach(f => perKab[k][f] += Number(r[f]) || 0);
+    });
+    const tot = f => Object.values(perKab).reduce((a, x) => a + x[f], 0);
+    const totSemua = F.reduce((a, f) => a + tot(f), 0);
+    const dekatPanen = tot("generatif_1_ha") + tot("generatif_2_ha") + tot("panen_ha");
+    // Penyebut terbaik = luas baku sawah resmi bila kolomnya tersedia;
+    // kalau tidak, pakai jumlah seluruh fase terpantau.
+    const luasBaku = st.reduce((a, r) => a + (Number(r.luas_baku_sawah_ha) || 0), 0);
+    const penyebut = luasBaku > 0 ? luasBaku : totSemua;
+    const rasio = penyebut ? dekatPanen / penyebut * 100 : 0;
+    const standing = st.reduce((a, r) => a + (Number(r.standing_crop_ha) || 0), 0);
+    const trenPeriode = periodeUrut.map(p => {
+      const rr = simo.filter(r => kunciP(r) === p);
+      return { p, label: rr[0] ? rr[0].periode : p,
+        tanam: rr.reduce((a, r) => a + (Number(r.tanam_ha) || 0) + (Number(r.persiapan_lahan_ha) || 0), 0),
+        panen: rr.reduce((a, r) => a + (Number(r.generatif_1_ha) || 0) + (Number(r.generatif_2_ha) || 0) + (Number(r.panen_ha) || 0), 0) };
+    });
+    const kabTop = Object.entries(perKab).map(([k, x]) => [k, x.generatif_1_ha + x.generatif_2_ha + x.panen_ha]).sort((a, b) => b[1] - a[1])[0];
+
+    // --- Pola musiman dari data bulanan (31 bulan, Jan 2024 - Jul 2026) ---
+    let musim = null;
+    if (simoBln && simoBln.length) {
+      const prov = simoBln.filter(r => String(r.level) === "provinsi");
+      if (prov.length) {
+        const perBulan = {};
+        prov.forEach(r => {
+          const b = Number(r.bulan); if (!b) return;
+          (perBulan[b] ||= { nama: r.nama_bulan, tanam: [], panen: [] });
+          perBulan[b].tanam.push(Number(r.tanam_ha) || 0);
+          perBulan[b].panen.push(Number(r.panen_ha) || 0);
+        });
+        const rata = o => o.length ? o.reduce((a, x) => a + x, 0) / o.length : 0;
+        const seri = Object.entries(perBulan).map(([b, o]) => ({
+          bulan: Number(b), nama: o.nama, tanam: rata(o.tanam), panen: rata(o.panen) })).sort((a, b) => a.bulan - b.bulan);
+        const puncak = seri.slice().sort((a, b) => b.panen - a.panen)[0];
+        const lembah = seri.slice().sort((a, b) => a.panen - b.panen)[0];
+        // Bulan berjalan diambil dari PERIODE 12-HARIAN TERBARU (lebih mutakhir
+        // daripada data bulanan yang rilisnya tertinggal ~1 bulan), bukan dari
+        // jam peramban -- supaya label musim selalu konsisten dengan data.
+        const tglTerbaru = st.map(r => r.periode_mulai).filter(Boolean).sort().pop();
+        const blnIdx = tglTerbaru ? Number(String(tglTerbaru).slice(5, 7)) : null;
+        const bulanKini = seri.find(s => s.bulan === blnIdx) || seri[seri.length - 1];
+        const posisi = puncak.panen ? bulanKini.panen / puncak.panen * 100 : 0;
+        // bulan puncak berikutnya (untuk pesan "sampai kapan bertahan")
+        const kedepan = [...seri.slice(bulanKini.bulan), ...seri.slice(0, bulanKini.bulan)];
+        const puncakDepan = kedepan.reduce((a, s) => (s.panen > a.panen ? s : a), kedepan[0]);
+        musim = { seri, puncak, lembah, bulanKini, posisi, nBulan: prov.length,
+                  blnKiniIdx: bulanKini.bulan, puncakDepan };
+      }
+    }
+    simoData = { perKab, F, periode: st[0] ? st[0].periode : "", trenPeriode, dekatPanen, rasio,
+                 kabTop, luasBaku, standing, musim, nPeriode: periodeUrut.length };
+    let ketS = rasio >= 12 ? `Gelombang panen berikutnya sudah dekat. Penyumbang terbesar: ${kabTop ? kabTop[0] : "-"}.` :
+               rasio >= 6 ? "Luas lahan yang menuju panen sedang menipis. Stok perlu dijaga sampai gelombang panen berikutnya tiba." : "Lahan yang menuju panen sangat sedikit, sehingga pasokan beras lokal berisiko seret.";
+    if (musim) ketS += ` Panen bulan ${musim.bulanKini.nama} biasanya hanya sekitar ${musim.posisi.toFixed(0)}% dari bulan puncaknya, yaitu ${musim.puncak.nama}.`;
+    simoInfo = { nama: "Pasokan Padi (SIMOTANDI)", sumber: "Citra satelit Kementan · periode " + (simoData.periode || "-"),
+      lv: rasio >= 12 ? "AMAN" : rasio >= 6 ? "WASPADA" : "BAHAYA",
+      baca: fmtN(dekatPanen) + " ha", bacaKet: "fase generatif + panen (" + rasio.toFixed(0) + "% luas baku sawah)",
+      ket: ketS, tab: "konteks" };
+  }
+
+  let cadInfo = null, cadData = null;
+  if (cad && cad.length) {
+    const thn = Math.max(...cad.map(r => Number(r.tahun_filter) || 0));
+    const ct = cad.filter(r => Number(r.tahun_filter) === thn);
+    const kolS = Object.keys(ct[0] || {}).find(c => /stok/i.test(c)) || "Jumlah Stok (Kg)";
+    const totRow = ct.find(r => String(r.Wilayah || "").trim() === "Total");
+    const total = totRow ? Number(totRow[kolS]) : ct.filter(r => r.Wilayah && r.Wilayah !== "Total").reduce((a, r) => a + (Number(r[kolS]) || 0), 0);
+    // PENTING: kolom sumber bersatuan KILOGRAM, bukan ton. Versi sebelumnya
+    // menampilkannya sebagai ton sehingga 283,7 kg terbaca 283,7 ton dan pilar
+    // yang sebenarnya bermasalah justru tampak sehat.
+    const totalTon = total / 1000;
+
+    // Audit: portal ini menampilkan angka yang identik untuk SETIAP tahun
+    // anggaran. Bila demikian, datanya tidak terpelihara dan tidak boleh
+    // dibaca sebagai kondisi stok yang sebenarnya.
+    // Pakai BARIS "Total" tiap tahun. Menjumlahkan baris lain akan menghitung
+    // ganda, karena berkas memuat rincian per wilayah DAN per jenis komoditas
+    // yang sama-sama menyusun total yang sama.
+    const perTahun = {};
+    cad.forEach(r => {
+      const th = Number(r.tahun_filter) || 0;
+      if (th && String(r.Wilayah || "").trim() === "Total") perTahun[th] = Number(r[kolS]) || 0;
+    });
+    const nilaiTahun = Object.values(perTahun);
+    const takTerpelihara = nilaiTahun.length >= 3 &&
+      new Set(nilaiTahun.map(v => Math.round(v * 100))).size === 1;
+
+    cadData = { thn, ct, kolS, total, totalTon, takTerpelihara, nTahun: nilaiTahun.length };
+    cadInfo = takTerpelihara
+      ? { nama: "Cadangan Pangan Pemerintah", sumber: "DPKP DIY · " + thn,
+          // Statusnya BUKAN merah. Yang bermasalah adalah basis datanya, bukan cadangannya
+          // terbukti gawat. Menandainya BAHAYA akan membuat papan pantau seolah menyatakan
+          // krisis padahal kondisinya justru tidak diketahui.
+          lv: "DATA", baca: "tidak dapat dinilai", bacaKet: "portal sumber tidak diperbarui",
+          ket: `Portal cadangan pangan menampilkan angka yang persis sama untuk ${nilaiTahun.length} tahun anggaran berturut-turut, dengan total hanya ${fmtN(total, 1)} kg se-DIY. Angka sebesar itu tidak masuk akal untuk cadangan provinsi. Karena itu pilar ini <strong>tidak kami masukkan ke skala Aman sampai Bahaya</strong>: kondisi cadangan pangan DIY saat ini tidak diketahui, bukan diketahui buruk. Selama data di portal sumbernya belum diperbarui, tidak ada sistem peringatan dini yang bisa menilai kondisi cadangan ini.`,
+          tab: "konteks" }
+      : { nama: "Cadangan Pangan Pemerintah", sumber: "DPKP DIY · " + thn,
+          lv: totalTon >= 200 ? "AMAN" : totalTon >= 100 ? "WASPADA" : "BAHAYA",
+          baca: fmtN(totalTon, 1) + " ton", bacaKet: "beras/gabah pemerintah se-DIY",
+          ket: totalTon >= 200 ? "Stok untuk operasi pasar masih cukup bila sewaktu-waktu harga bergejolak." :
+               totalTon >= 100 ? "Cadangan menipis. Sebaiknya pengadaan mulai disiapkan." :
+               "Cadangan tercatat sangat kecil. Perlu dipastikan apakah ini kondisi sebenarnya atau persoalan pencatatan.", tab: "konteks" };
+  }
+
+  let cuacaInfo = null, cuacaData = null;
+  if (cuaca && cuaca.length) {
+    const perKab = {};
+    cuaca.forEach(r => {
+      if (!r.kabupaten_kota) return;
+      const w = new Date(r.waktu_lokal || r.fetched_at_utc || 0);
+      if (!perKab[r.kabupaten_kota] || w > perKab[r.kabupaten_kota]._w) perKab[r.kabupaten_kota] = { ...r, _w: w };
+    });
+    const daftarKab = Object.values(perKab).sort((a, b) => a.kabupaten_kota.localeCompare(b.kabupaten_kota));
+    const hujanMaks = Math.max(...daftarKab.map(r => Number(r.curah_hujan_mm) || 0));
+    const ekstrem = daftarKab.filter(r => (Number(r.curah_hujan_mm) || 0) >= 50 || /lebat|petir|ekstrem/i.test(String(r.cuaca_desc || "")));
+    cuacaData = { daftarKab };
+    cuacaInfo = { nama: "Cuaca (BMKG)", sumber: "Prakiraan terkini per kab/kota",
+      lv: ekstrem.length >= 3 ? "BAHAYA" : ekstrem.length ? "WASPADA" : "AMAN",
+      baca: ekstrem.length ? `${ekstrem.length} wilayah` : "Kondusif", bacaKet: ekstrem.length ? "berpotensi cuaca ekstrem" : `curah hujan tertinggi ${hujanMaks} mm, masih dalam batas normal`,
+      ket: ekstrem.length ? "Waspadai gangguan panen/distribusi di: " + ekstrem.map(r => r.kabupaten_kota).join(", ") : "Cuaca sedang tidak mengganggu produksi maupun distribusi.", tab: "konteks" };
+  }
+
+  let ensoInfo = null, ensoAkhir = null;
+  if (enso && enso.length) {
+    ensoAkhir = enso[enso.length - 1];
+    const stt = String(ensoAkhir.status_enso || "");
+    const low = stt.toLowerCase();
+    const lv = /kuat/.test(low) ? "BAHAYA" : /moderat|lemah/.test(low) && /nino|nina/.test(low) ? "WASPADA" : "AMAN";
+    ensoInfo = { nama: "Iklim (ENSO/El Niño)", sumber: "NOAA · periode " + (ensoAkhir.musim || "") + " " + (ensoAkhir.tahun || ""),
+      lv, baca: stt || "–", bacaKet: "anomali suhu laut " + (Number(ensoAkhir.anomali_nino34_c) > 0 ? "+" : "") + ensoAkhir.anomali_nino34_c + "°C",
+      ket: lv === "AMAN" ? "Iklim sedang tidak menekan produksi." :
+           "Dalam catatan sejarah, El Niño membuat kemarau di Jawa lebih panjang. Musim tanam berikutnya perlu diwaspadai dan harga beras dipantau lebih ketat.", tab: "konteks" };
+  }
+
+  let trendsInfo = null;
+  if (trends && trends.length) {
+    const lonjakan = trends.filter(r => isTrue(r.lonjakan_minat)).length;
+    trendsInfo = { nama: "Perhatian Publik (Google Trends)", sumber: "Google Trends DIY · " + trends.length + " hari",
+      lv: lonjakan === 0 ? "AMAN" : "WASPADA",
+      baca: lonjakan === 0 ? "Tidak ada" : lonjakan + " hari", bacaKet: "hari dengan lonjakan pencarian soal pangan",
+      ket: lonjakan === 0 ? "Publik tenang. Tidak ada lonjakan pencarian soal kelangkaan atau kenaikan harga." : "Ada lonjakan pencarian. Sentimen publik perlu dipantau.", tab: "konteks" };
+  }
+
+  let beritaInfo = null;
+  if (berita && berita.length) {
+    const val = berita.filter(b => isTrue(b.tervalidasi));
+    beritaInfo = { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi",
+      lv: "AMAN", baca: val.length + " kliping", bacaKet: "liputan media untuk lonjakan terbaru",
+      ket: "Pencarian berita otomatis untuk tiap lonjakan, sebagai bukti pendukung yang <strong>belum dikurasi manusia</strong>. Kliping yang cocok memperkuat sinyal, tetapi jumlah kliping saja belum berarti lonjakannya sudah terverifikasi.", tab: "konteks" };
+  }
+
+  const pilar = kondisiPilar({ tip, sp2kpInfo, dpkpInfo, simoInfo, cadInfo, cuacaInfo, ensoInfo, trendsInfo, beritaInfo });
+  const seksiGagal = (nama, e) => { const s = el("section", "blok"); s.appendChild(el("div", "gagal", `Bagian "${nama}" gagal dimuat: ${String(e).slice(0, 120)}`)); return s; };
+
+  /* ================= TAB 1: RINGKASAN ================= */
+  const T1 = document.getElementById("tab-ringkasan");
+  try {
+    if (tip) {
+      const n = st => tip.hasil.filter(x => x.status === st).length;
+      const nB = n("BAHAYA"), nA = n("ANOMALI"), nW = n("WASPADA"), nS = n("AMAN");
+      document.getElementById("nb-status").textContent = nB + nA + nW || "✓";
+
+      // Pil di sampul mengikuti keadaan sebenarnya, bukan slogan tetap.
+      if (window.setPilSampul) {
+        if (nB > 0) setPilSampul(`${nB} komoditas bergejolak · perlu tindakan`, "#e0644f");
+        else if (nA > 0) setPilSampul("Tidak ada tanda krisis pangan · perlu pengecekan harga", "#7ee2a4");
+        else if (nW > 0) setPilSampul("Terkendali · sebagian komoditas dalam pengawasan", "#f0c454");
+        else setPilSampul("Harga pangan DIY terkendali", "#7ee2a4");
+      }
+
+      const s = el("section", "blok");
+      const banner = el("div", "kartu banner");
+      // PIHPS menerbitkan beberapa seri untuk barang yang sama, mis. "Daging Ayam" dan
+      // "Daging Ayam Ras Segar". Menghitungnya sebagai komoditas terpisah membuat angka
+      // anomali terbaca lebih dramatis daripada keadaannya. Di sini seri dipetakan dulu ke
+      // kelompok induknya, lalu KEDUANYA dilaporkan supaya tidak ada yang disembunyikan.
+      const indukKom = nm => String(nm)
+        .replace(/\s*\((.*?)\)/g, "")
+        .replace(/\b(Ras|Segar|Broiler|Ukuran|Sedang|Besar|Kecil|Kualitas|Premium|Medium|Super|Bawah|Atas|I{1,3}|Lokal|Impor|Merah|Putih|Hijau|Keriting|Rawit|Biji|Kering|Kemasan|Curah|Pipilan|Murni|Konsumsi|Halus)\b/gi, "")
+        .replace(/\s+/g, " ").trim() || String(nm);
+      const nKelompok = st => new Set(tip.hasil.filter(x => x.status === st).map(x => indukKom(x.kom))).size;
+      const totKelompok = new Set(tip.hasil.map(x => indukKom(x.kom))).size;
+
+      banner.appendChild(el("div", "tgl", `<strong>Kondisi Harga Pangan DIY</strong> · data s.d. ${fmtTgl(new Date(tip.tMaks))} · ${tip.hasil.length} seri harga dari ${totKelompok} kelompok komoditas · 9 pilar data`));
+      const chips = el("div", "chips");
+      [["bahaya", nB, "BAHAYA", "gejolak harga nyata"], ["anomali", nA, "ANOMALI", "lonjakan data, perlu pengecekan"],
+       ["waspada", nW, "WASPADA", "dalam pengawasan"], ["aman", nS, "AMAN", "stabil"]].forEach(([k, j, l, d]) => {
+        const kel = nKelompok(l);
+        const rinci = j ? `<div class="d" style="opacity:.85">${j} seri · ${kel} kelompok</div>` : "";
+        chips.appendChild(el("div", "chip " + k,
+          `<div class="n tnum">${j}</div><div class="l">${IKON[l]} ${l}</div><div class="d">${d}</div>${rinci}`));
+       });
+      banner.appendChild(chips);
+
+      let rek;
+      const daftar = st => tip.hasil.filter(x => x.status === st).slice(0, 4).map(x => x.kom).join(", ");
+      if (nB > 0) rek = `<strong>Perlu segera ditangani:</strong> cek kondisi pasokan dan siapkan operasi pasar untuk <strong>${daftar("BAHAYA")}</strong>${nB > 4 ? " dkk." : ""}.`;
+      else if (nA > 0) rek = `<strong>Saat ini tidak ada tanda krisis pangan.</strong> Lonjakan angka pada ${nA} seri harga terjadi serentak dan pas bertepatan dengan jadwal pembaruan data acuan PIHPS di akhir bulan, jadi <strong>kemungkinan besar itu bukan gejolak pasar</strong>. Yang perlu dilakukan cukup <strong>mengecek harga di beberapa pasar</strong>. Operasi pasar belum perlu digelar.`;
+      else if (nW > 0) rek = `<strong>Kondisi terkendali, tapi ada catatan.</strong> Yang perlu dipantau ketat: <strong>${daftar("WASPADA")}</strong>.`;
+      else rek = `<strong>Kondisi harga pangan DIY terkendali.</strong>`;
+      if (simoInfo && simoInfo.lv === "AMAN") rek += ` Dari sisi pasokan, sekitar <strong>${simoInfo.baca}</strong> lahan padi sedang menuju panen atau sudah panen menurut SIMOTANDI. Perlu dicatat, luas itu tidak berarti sedang panen raya: secara musiman bulan ini bukan puncak panen DIY, sehingga prospek pasokan jangka pendek relatif terjaga tetapi tetap bergantung pada stok dan kiriman antardaerah.`;
+      if (ensoInfo && ensoInfo.lv !== "AMAN") rek += ` Catatan iklim: sedang berlangsung <strong>${ensoAkhir.status_enso}</strong>, jadi kemarau panjang pada musim tanam berikutnya perlu diwaspadai.`;
+      banner.appendChild(el("div", "rekomendasi", rek));
+      s.appendChild(banner);
+      T1.appendChild(s);
+    } else T1.appendChild(el("div", "kosong", "Data harga belum tersedia."));
+
+    const s2 = el("section", "blok");
+    s2.innerHTML = `<h2>Kondisi Terkini per Pilar</h2><p class="sub">Sembilan sumber data yang dikumpulkan lembaga berbeda, tiga di antaranya sumber harga. Aturan penilaian tiap pilar kami buka di tab Metodologi. Klik ikon untuk melihat rincian.</p>`;
+    const gp = el("div", "grid-pilar");
+    pilar.forEach(p => {
+      const k = el("div", "kartu-pilar");
+      k.style.cursor = "pointer";
+      // Judul halaman menyebut satu tanggal, padahal tiap pilar punya tanggal datanya
+      // sendiri. Tanpa penanda ini pembaca mudah mengira semua angka sekondisi.
+      const hariLalu = p.tgl ? Math.floor((Date.now() - +new Date(p.tgl)) / 864e5) : null;
+      const segar = hariLalu === null ? "" :
+        `<span class="lencana-segar ${hariLalu <= 2 ? "baru" : hariLalu <= 10 ? "sedang" : "lama"}"
+           title="Data terakhir pilar ini: ${fmtTgl(new Date(p.tgl))}">${
+           hariLalu <= 0 ? "hari ini" : hariLalu === 1 ? "kemarin" : hariLalu + " hari lalu"}</span>`;
+      k.innerHTML = `
+        <div class="kp-head"><div><div class="kp-nama">${p.nama}</div><div class="kp-sumber">${p.sumber} ${segar}</div></div>
+          ${p.lv ? tagStatus(p.lv) : '<span class="tag netral">belum ada data</span>'}</div>
+        <div class="kp-baca tnum">${p.baca}${p.bacaKet ? ` <span style="font-size:.7rem;font-weight:500;color:var(--ink-2)">${p.bacaKet}</span>` : ""}</div>
+        <div class="kp-ket">${p.ket}</div>`;
+      k.addEventListener("click", () => bukaTab(p.tab));
+      gp.appendChild(k);
+    });
+    s2.appendChild(gp);
+    T1.appendChild(s2);
+  } catch (e) { T1.appendChild(seksiGagal("Ringkasan", e)); }
+
+  /* ================= TAB 2: STATUS KOMODITAS ================= */
+  const T2 = document.getElementById("tab-status");
+  try {
+    const s = el("section", "blok");
+    s.innerHTML = `<h2>Papan Status Komoditas</h2>
+      <p class="sub">Angka pada halaman ini adalah <strong>harga di tingkat produsen</strong>, yaitu harga yang diterima petani, bukan harga eceran yang dibayar konsumen di pasar. Sumbernya PIHPS Bank Indonesia tabel <em>Produsen Daerah</em> untuk satu tahun terakhir. Untuk harga eceran, silakan buka tab Prakiraan Risiko dan Data &amp; Tren yang memakai data DPKP DIY.</p>
+      <div class="baca">
+        <h3>Cara membaca papan ini</h3>
+        <dl>
+          <dt>AMAN</dt><dd>Sebuah komoditas kami sebut <strong>aman</strong> kalau empat syarat ini terpenuhi sekaligus dalam sepekan terakhir. Pertama, tidak ada lonjakan yang tercatat. Kedua, perubahan harganya sepekan masih di antara <strong>−10% dan +5%</strong>. Ketiga, naik-turunnya masih sesuai kebiasaan komoditas itu sendiri, yaitu di bawah 1,5 kali simpangan normalnya. Keempat, harganya tidak sedang menyentuh titik tertinggi 30 hari. Jadi <em>aman</em> di sini artinya “bergerak wajar”, bukan “harganya diam”.</dd>
+          <dt>WASPADA</dt><dd>Salah satu syarat di atas tidak terpenuhi, tapi belum sampai tergolong lonjakan. Misalnya naik 5% atau lebih dalam sepekan, turun 10% atau lebih dalam sepekan (penurunan tajam menekan pendapatan petani), atau harganya menyentuh titik tertinggi 30 hari.</dd>
+          <dt>ANOMALI</dt><dd>Ada lonjakan angka yang tajam secara statistik, tapi belum tentu benar terjadi di pasar. Perlu dicek dulu ke lapangan.</dd>
+          <dt>BAHAYA</dt><dd>Lonjakan tajam yang terjadi di luar jadwal pembaruan data, <em>dan</em> harganya masih terus menanjak 5% atau lebih dalam sepekan. Pola seperti ini mengindikasikan risiko gangguan pasar yang perlu diverifikasi ke lapangan.</dd>
+        </dl>
+        <p class="tips"><strong>Soal grafik kecil di tiap komoditas.</strong> Garis itu memuat riwayat setahun penuh, bukan sebulan; rentang tanggalnya tertulis persis di bawahnya. Tingginya diatur otomatis agar bentuk naik-turunnya terlihat, dan akibatnya <em>selisih kecil pun bisa tampak curam</em>. Jadi jangan menilai besarnya perubahan dari curamnya garis. Lihat angka pada lencana di bawah grafik, atau sentuh grafiknya (di ponsel) atau arahkan kursor ke situ (di komputer) untuk melihat nilai aslinya. Titik merah menandai hari yang terdeteksi anomali.</p>
+      </div>`;
+    if (!tip) { s.appendChild(el("div", "kosong", "Data harga belum tersedia.")); T2.appendChild(s); }
+    else {
+      const NOTA = {
+        BAHAYA: "Lonjakan harga terjadi di luar jadwal pembaruan data, <strong>dan</strong> harga masih menanjak 5% atau lebih dalam sepekan. Kondisi ini mengindikasikan risiko gangguan pasar yang perlu segera diverifikasi. Yang perlu dilakukan: memeriksa kondisi pasokan di lapangan, lalu menyiapkan intervensi berupa operasi pasar atau penyaluran cadangan pemerintah bila hasil verifikasi mengukuhkannya.",
+        ANOMALI: `Ada lonjakan angka yang tajam, tapi lonjakannya terjadi <strong>serentak di banyak komoditas dan bertepatan dengan pembaruan data acuan PIHPS di akhir bulan</strong>. Besar kemungkinan yang terekam adalah pembaruan datanya, bukan harga di pasar yang benar-benar bergejolak. Sebaiknya harga dicek dulu di beberapa pasar sebelum tindakan diambil.`,
+        WASPADA: "Pergerakan harganya belum tergolong lonjakan, tapi sudah perlu diawasi. Bisa karena naik 5% atau lebih dalam sepekan, turun tajam 10% atau lebih dalam sepekan (karena ini harga di tingkat petani, penurunan tajam berarti pendapatan petani tertekan), atau sudah mendekati batas tidak wajar.",
+        AMAN: "Harga bergerak wajar dan tidak ada sinyal yang perlu ditindaklanjuti.",
+      };
+      const DESKR = { BAHAYA: "perlu tindakan segera", ANOMALI: "perlu pengecekan lapangan", WASPADA: "dalam pengawasan", AMAN: "stabil" };
+      ["BAHAYA", "ANOMALI", "WASPADA", "AMAN"].forEach(st => {
+        const item = tip.hasil.filter(x => x.status === st);
+        const g = el("div", "grup");
+        g.appendChild(el("div", "grup-head " + KELAS[st], `<span>${IKON[st]}</span><span>${st}</span><span class="jml tnum">${item.length}</span><span style="font-weight:500;font-size:.78rem">komoditas, ${DESKR[st]}</span>`));
+        if (!item.length) { g.appendChild(el("div", "grup-kosong", "Tidak ada komoditas pada status ini.")); s.appendChild(g); return; }
+        g.appendChild(el("p", "grup-nota", NOTA[st]));
+        const grid = el("div", "grid-kom");
+        item.forEach((d, i) => {
+          const kartu = el("div", "kartu-kom " + KELAS[st]);
+          const idc = `sp-${KELAS[st]}-${i}`;
+          const chips = [];
+          if (d.ubah7 !== null && Math.abs(d.ubah7) >= 0.05)
+            chips.push(`<span class="mchip ${d.ubah7 > 0 ? "merah" : "hijau"}" title="Perubahan harga selama 7 hari terakhir">${d.ubah7 > 0 ? "▲" : "▼"} ${Math.abs(d.ubah7).toFixed(1)}% /7 hr</span>`);
+          if (d.zMaks7 >= 1.5)
+            chips.push(`<span class="mchip ${d.zMaks7 > 2 ? "oranye" : ""}" title="Harga menyimpang ${d.zMaks7.toFixed(1)} kali lipat dari naik-turun normalnya selama 14 hari terakhir">simpangan ${d.zMaks7.toFixed(1)}×</span>`);
+          if (d.serentak >= 8)
+            chips.push(`<span class="mchip" title="Lonjakan ${fmtTglPdk(d.tglAnom)} terjadi bersamaan di ${d.serentak} komoditas sekaligus. Ini ciri khas pembaruan data acuan PIHPS, bukan gejolak pasar">serentak ${d.serentak} kom.</span>`);
+          if (d.berita && d.berita.url_teratas)
+            chips.push(`<span class="mchip" title="${String(d.berita.judul_teratas || "").replace(/"/g, "&quot;")}">📰 <a href="${d.berita.url_teratas}" target="_blank" rel="noopener">liputan media</a></span>`);
+          if (d.ubah7 !== null && Math.abs(d.ubah7) < 0.05)
+            chips.push(`<span class="mchip" title="Angka harga tidak berubah sama sekali selama sepekan terakhir">harga tetap /7 hr</span>`);
+          if (d.ubah30 !== null && Math.abs(d.ubah30) >= 0.05 && Math.abs(d.ubah30 - (d.ubah7 || 0)) >= 0.5)
+            chips.push(`<span class="mchip ${d.ubah30 > 0 ? "merah" : "hijau"}" title="Perubahan harga selama 30 hari terakhir">${d.ubah30 > 0 ? "▲" : "▼"} ${Math.abs(d.ubah30).toFixed(1)}% /30 hr</span>`);
+          if (!chips.length)
+            chips.push(`<span class="mchip" title="Perubahan sepekan masih di rentang wajar, yaitu antara −10% dan +5%, dan tidak ada lonjakan yang tercatat">pergerakan wajar</span>`);
+          const tgl0 = d.seri[0] && d.seri[0].tanggal, tgl1 = d.seri[d.seri.length - 1] && d.seri[d.seri.length - 1].tanggal;
+          kartu.innerHTML = `
+            <div class="kk-atas"><span class="kk-nama">${d.kom}</span><span class="kk-harga tnum">${fmtRp(d.h)}</span></div>
+            <div class="kk-spark" role="button" tabindex="0" title="Klik untuk memperbesar grafik ${d.kom}"
+                 aria-label="Perbesar grafik ${d.kom}"><canvas id="${idc}"></canvas></div>
+            <div class="kk-rentang"><span>${fmtBlnThn(tgl0)}</span><span>← riwayat harian →</span><span>${fmtBlnThn(tgl1)}</span></div>
+            <div class="kk-chips">${chips.join("")}</div>`;
+          const sp = kartu.querySelector(".kk-spark");
+          if (sp) {
+            sp.addEventListener("click", () => bukaGrafik(d, sp));
+            sp.addEventListener("keydown", e => {
+              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); bukaGrafik(d, sp); }
+            });
+          }
+          grid.appendChild(kartu);
+          daftarChart("status", () => {
+            const c = document.getElementById(idc);
+            if (c) buatSpark(c, d.seri.map(r => r.tanggal), d.seri.map(r => Number(r.harga)), d.seri.map(r => isTrue(r.anomali_harga)));
+          });
+        });
+        g.appendChild(grid);
+        s.appendChild(g);
+      });
+      T2.appendChild(s);
+    }
+  } catch (e) { T2.appendChild(seksiGagal("Papan status", e)); }
+
+  /* ================= TAB 2b: PRAKIRAAN RISIKO ================= */
+  const TP = document.getElementById("tab-prakiraan");
+  try {
+    const s = el("section", "blok");
+    s.innerHTML = `<h2>Prakiraan Risiko Harga</h2>
+      <p class="sub">Sistem ini tidak meramal dengan <em>point estimate</em>, melainkan dengan <strong>estimasi interval</strong> pada tingkat kepercayaan tertentu. Yang disajikan ada dua: <strong>rentang harga</strong> beserta tingkat kepercayaannya, dan <strong>peluang terjadinya lonjakan</strong>.</p>
+      <div class="baca">
+        <h3>Model yang dipakai dan alasan memilihnya</h3>
+        <dl>
+          <dt>Model terpilih</dt><dd><strong>Model bergerbang (gated): model berbasis lag hanya dipakai bila terbukti unggul pada uji-mundur; bila tidak, penduga naif yang dipakai.</strong> Cara kerjanya begini. Untuk tiap komoditas, sistem menguji dulu di data lamanya sendiri apakah pola harga minggu-minggu sebelumnya benar-benar lebih akurat daripada sekadar memakai harga hari ini. Kalau menang cukup meyakinkan, model itu dipakai; kalau tidak, tebakannya kembali ke harga hari ini. Lalu di sekeliling tebakan itu dipasang rentang, yang lebarnya diambil dari seberapa jauh harga komoditas tersebut biasanya bergeser sepanjang riwayatnya, kemudian disesuaikan dengan seberapa bergejolak harganya empat minggu terakhir. Penyesuaian terakhir itu membuat rentangnya lebih pas, sekitar 2% sampai 4% lebih baik.</dd>
+          <dt>Lawan yang diadu</dt><dd>Pengujian dilakukan tiga tahap. Tahap pertama membandingkan delapan penduga univariat, mulai dari penduga naif hingga ARIMA. Tahap kedua menambahkan model dengan peubah eksogen (ARIMAX dan ARDL), yaitu harga dari sumber lain, sebaran harga antarpasar, indeks El Niño, dan luas panen padi. Rincian tiap model ada di tab Metodologi. Tahap ketiga tidak lagi mematok bentuk modelnya, melainkan mencari sendiri berapa banyak lag yang dipakai tiap komoditas.</dd>
+          <dt>Cara mengujinya</dt><dd>Memakai uji-mundur (<em>rolling-origin backtest</em>). Tiap model hanya menerima data sampai satu titik waktu, lalu diminta meramal, dan ramalannya dibandingkan dengan harga yang benar-benar terjadi sesudahnya. Proses ini diulang di sepanjang 228 minggu (Apr 2022 sampai Agu 2026) untuk 14 komoditas.</dd>
+          <dt>Hasilnya</dt><dd>Harga pangan ternyata bukan sepenuhnya acak. Dari 50 komoditas yang <em>diuji polanya</em>, 23 di antaranya pergerakan mingguannya masih menyimpan pola yang bisa dipelajari. Meski begitu, tidak ada model yang menang pada rata-rata seluruh komoditas; “harga besok sama dengan harga hari ini” tetap sulit dikalahkan. Pengecualiannya justru pada komoditas yang paling merepotkan: cabai rawit merah bisa diramalkan 12% sampai 16% lebih baik daripada tebakan sederhana itu. Sebaliknya pada beras, gula, dan minyak goreng yang harganya banyak dipengaruhi kebijakan, model malah memperburuk. Hasil ini menunjukkan pentingnya membandingkan model kompleks dengan tolok ukur sederhana sebelum dipakai mengambil keputusan. Pada sebagian seri, perubahan harga jangka pendek belum menunjukkan pola yang cukup stabil untuk diramalkan secara konsisten, sehingga menambah kerumitan model justru menambah kesalahan.</dd>
+          <dt>Apakah rentangnya jujur</dt><dd>Sudah diperiksa. Rentang yang kami beri label “80%” ternyata benar-benar memuat harga yang terjadi pada 76% kasus untuk horizon 1 minggu, dan 83% untuk 1 bulan. Rentang berlabel “95%” tercapai di kisaran 94 sampai 95%. Artinya, kalau di tabel tertulis peluang naik lebih dari 10% adalah 20%, angka 20% itu memang berarti kira-kira 1 dari 5 kali.</dd>
+        </dl>
+        <p class="tips">Prakiraan ini memakai <strong>SP2KP Kemendag</strong> sebagai sumber utama, karena setelah diuji, sumber inilah yang paling banyak komoditasnya <em>lolos uji kelayakan</em> untuk diramalkan: 24 dari 52, dibanding DPKP 10 dari 19 dan PIHPS <strong>nol dari 20</strong>. Angka ini beda dengan “23 dari 50” di atas karena ujinya berbeda: yang itu memeriksa ada-tidaknya pola, yang ini memeriksa cukup-tidaknya data untuk dipakai meramal. Kolom terakhir menunjukkan hasil hitungan yang sama dari data DPKP yang dikumpulkan lembaga berbeda. Kalau keduanya <em>sepakat</em>, sinyalnya jauh lebih kuat. Kalau <em>berbeda</em>, sebaiknya dicek ke pasar dulu. Perbandingan lengkap model ada di tab <strong>Metodologi</strong>.</p>
+      </div>`;
+    if (!prakiraan || !prakiraan.length) {
+      s.appendChild(el("div", "kosong", "Data prakiraan belum tersedia. Isinya akan muncul otomatis setelah pembaruan data berikutnya."));
+      TP.appendChild(s);
+    } else {
+      const warnaP = p => p >= 35 ? "var(--bahaya)" : p >= 20 ? "var(--anomali)" : p >= 10 ? "var(--waspada)" : "var(--aman)";
+      const barP = p => `<span class="pbar"><span class="pbar-track"><span class="pbar-fill" style="width:${Math.min(100, p)}%;background:${warnaP(p)}"></span></span><span class="pbar-val" style="color:${warnaP(p)}">${p.toFixed(0)}%</span></span>`;
+
+      // pilih horizon
+      const kontrol = el("div", "kontrol");
+      kontrol.innerHTML = `<label for="pilih-h" style="font-size:.84rem">Prakiraan untuk:</label>
+        <select id="pilih-h"><option value="1 bulan">1 bulan ke depan</option><option value="1 minggu">1 minggu ke depan</option></select>`;
+      s.appendChild(kontrol);
+      const wrapTabel = el("div"); s.appendChild(wrapTabel);
+
+      // Padanan komoditas antara SP2KP dan DPKP. Hanya pasangan yang benar-benar
+      // barang yang sama dimasukkan; bawang putih Bonggol dan Honan sengaja TIDAK
+      // dipasangkan karena varietasnya berbeda.
+      const PADANAN_DPKP = {
+        "Cabai Rawit Merah": "Cabe Rawit Merah",
+        "Cabai Merah Besar": "Cabe Merah Besar",
+        "Cabai Merah Keriting": "Cabe Merah Keriting",
+        "Bawang Merah": "Bawang Merah",
+        "Daging Ayam Ras": "Daging Ayam Ras",
+        "Telur Ayam Ras": "Telur Ayam Ras",
+        "Kedelai Impor": "Kedelai Biji Kering (Impor)",
+        "Minyak Goreng Sawit Kemasan Premium": "Minyak Goreng Kemasan",
+      };
+      const punyaSumber = prakiraan.some(r => r.sumber);
+      const adaDpkp = prakiraan.some(r => String(r.sumber || "").startsWith("DPKP"));
+
+      const gambarTabel = (hz) => {
+        const semua = prakiraan.filter(r => String(r.horizon) === hz);
+        const rows = (punyaSumber ? semua.filter(r => String(r.sumber).startsWith("SP2KP")) : semua)
+          .sort((a, b) => Number(b.prob_naik_10) - Number(a.prob_naik_10));
+        if (!rows.length) { wrapTabel.innerHTML = ""; wrapTabel.appendChild(el("div", "kosong", "Tidak ada data untuk horizon ini.")); return; }
+        const dpkpPeta = {};
+        semua.filter(r => String(r.sumber || "").startsWith("DPKP"))
+             .forEach(r => { dpkpPeta[String(r.komoditas)] = Number(r.prob_naik_10); });
+        const tgl = rows[0].tanggal_target;
+        const kolBanding = adaDpkp
+          ? `<th title="Peluang yang sama dihitung dari data DPKP DIY yang dikumpulkan terpisah">Cek silang DPKP</th>` : "";
+        wrapTabel.innerHTML = `<p class="catatan-kecil" style="margin:0 0 8px">Dari harga per ${fmtTgl(rows[0].tanggal_data_terakhir)} untuk target ${fmtTgl(tgl)} · sumber utama SP2KP Kemendag · diurutkan dari risiko lonjakan tertinggi</p>
+          <div class="tabel-wrap"><table><thead><tr>
+            <th>Komoditas</th><th class="num">Harga kini</th><th>Rentang 80% ${hz} lagi</th>
+            <th>Peluang naik &gt;5%</th><th>Peluang naik &gt;10%</th><th>Peluang turun &gt;5%</th>${kolBanding}</tr></thead>
+          <tbody>${rows.map(r => {
+            const lebar = Number(r.lebar80_persen);
+            let banding = "";
+            if (adaDpkp) {
+              const pas = PADANAN_DPKP[String(r.komoditas)];
+              const v = pas !== undefined ? dpkpPeta[pas] : undefined;
+              if (v === undefined) {
+                banding = `<td><span class="catatan-kecil" title="Komoditas ini tidak tersedia atau tidak layak diprakirakan dari DPKP">tidak ada pembanding</span></td>`;
+              } else {
+                const beda = Math.abs(v - Number(r.prob_naik_10));
+                const sepakat = beda <= 5;
+                banding = `<td><span class="mchip ${sepakat ? "hijau" : "oranye"}" title="${sepakat
+                    ? "Dua sumber yang dikumpulkan terpisah memberi angka berdekatan, sehingga sinyalnya kuat."
+                    : "Kedua sumber berbeda cukup jauh. Sebaiknya diverifikasi ke pasar sebelum bertindak."}">${
+                    sepakat ? "sepakat" : "berbeda"} · ${v.toFixed(0)}%</span></td>`;
+              }
+            }
+            const mt = String(r.metode_titik || "").trim();
+            const tandaModel = (mt && mt !== "naif")
+              ? ` <span class="mchip biru" title="Untuk komoditas ini pola harga minggu-minggu sebelumnya terbukti lebih akurat daripada memakai harga hari ini, jadi model itulah yang dipakai. Metode: ${mt}.">ada pola terdeteksi</span>` : "";
+            return `<tr>
+              <td>${r.komoditas}${tandaModel}</td>
+              <td class="num tnum">${fmtRp(r.harga_terkini)}</td>
+              <td class="rentang tnum" title="Rentang prakiraan 80%, selebar ${lebar.toFixed(0)}% dari harga kini">
+                <span class="rp">${fmtRp(r.lo80)}</span> – <span class="rp">${fmtRp(r.hi80)}</span></td>
+              <td>${barP(Number(r.prob_naik_5))}</td>
+              <td>${barP(Number(r.prob_naik_10))}</td>
+              <td>${barP(Number(r.prob_turun_5))}</td>${banding}</tr>`;
+          }).join("")}</tbody></table></div>`;
+        const nLag = rows.filter(r => { const m = String(r.metode_titik || "").trim(); return m && m !== "naif"; }).length;
+        if (nLag) {
+          wrapTabel.insertAdjacentHTML("beforeend", `<p class="catatan-kecil" style="margin:8px 0 0">
+            Tanda <span class="mchip biru">ada pola terdeteksi</span> berarti untuk komoditas itu sistem menemukan pola dari harga minggu-minggu sebelumnya yang terbukti lebih akurat daripada sekadar memakai harga hari ini, jadi pola itulah yang dipakai. Pada horizon ${hz} hal itu berlaku untuk ${nLag} dari ${rows.length} komoditas. Sisanya memakai harga hari ini sebagai tebakan, karena setelah diuji tidak ada pola yang cukup meyakinkan untuk mengalahkannya.</p>`);
+        }
+      };
+      gambarTabel("1 bulan");
+      queueMicrotask(() => {
+        const sel = document.getElementById("pilih-h");
+        if (sel) sel.addEventListener("change", e => gambarTabel(e.target.value));
+      });
+      TP.appendChild(s);
+
+      // --- fan chart: riwayat DPKP + kerucut ketidakpastian ---
+      if (dpkpTabel) {
+        const sf = el("section", "blok");
+        sf.innerHTML = `<h2>Rentang Prakiraan Harga per Komoditas</h2>
+          <p class="sub">Riwayat harga sekitar sembilan bulan terakhir disambung dengan rentang prakiraan 80% dan 95%. Semakin lebar kerucutnya, semakin sulit harga komoditas itu ditebak.</p>`;
+        // Nama komoditas SP2KP dan DPKP berbeda ejaan untuk barang yang sama
+        // (mis. "Cabai" vs "Cabe"), jadi sumbernya ditulis di pilihan agar jelas.
+        const sbrKom = {};
+        prakiraan.forEach(r => { sbrKom[String(r.komoditas)] ||= String(r.sumber || ""); });
+        const komP = [...new Set(prakiraan.map(r => r.komoditas))]
+          .sort((a, b) => { const sa = sbrKom[a] || "", sb = sbrKom[b] || "";
+            return sa === sb ? String(a).localeCompare(b) : (sa.startsWith("SP2KP") ? -1 : 1); });
+        const kf = el("div", "kontrol");
+        const namaSbr = s => s.startsWith("SP2KP") ? "SP2KP" : s.startsWith("DPKP") ? "DPKP" : "";
+        kf.innerHTML = `<label for="pilih-fan" style="font-size:.84rem">Komoditas:</label>
+          <select id="pilih-fan">${komP.map(k => { const s = namaSbr(sbrKom[k] || "");
+            return `<option value="${k}">${k}${s ? ` (${s})` : ""}</option>`; }).join("")}</select>`;
+        sf.appendChild(kf);
+        const kg = el("div", "kartu kartu-grafik");
+        kg.innerHTML = `<div class="wadah-chart" style="height:320px"><canvas id="ch-fan"></canvas></div>`;
+        sf.appendChild(kg);
+        TP.appendChild(sf);
+
+        // Riwayat harga untuk latar kerucut. Modul prakiraan memakai SP2KP bila
+        // tersedia (lebih padat), jadi riwayatnya diambil dari SP2KP lebih dulu
+        // agar nama komoditasnya cocok; DPKP dipakai sebagai cadangan.
+        const riwayat = {};
+        if (sp2kp && sp2kp.length) {
+          const agg = {};
+          sp2kp.forEach(r => {
+            const k = String(r.varian || ""), t = String(r.tanggal || "").slice(0, 10), h = Number(r.harga);
+            if (!k || !t || !(h > 0)) return;
+            ((agg[k] ||= {})[t] ||= []).push(h);
+          });
+          for (const k in agg)
+            riwayat[k] = Object.entries(agg[k]).map(([t, a]) => ({ t, h: a.reduce((x, y2) => x + y2, 0) / a.length }));
+        }
+        const kol = Object.keys(dpkp[0] || {});
+        const cT = kol.find(c => String(c).startsWith("Tanggal")), cK = kol.find(c => String(c).startsWith("Komoditas")), cH = kol.find(c => String(c).startsWith("Harga"));
+        if (cT && cK && cH) dpkp.forEach(r => {
+          const k = r[cK], t = r[cT], h = Number(r[cH]);
+          if (!k || !t || !(h > 0) || riwayat[k]) return;   // jangan timpa deret SP2KP
+          (riwayat[k] ||= []).push({ t: String(t), h });
+        });
+        Object.values(riwayat).forEach(a => a.sort((x, y2) => (x.t < y2.t ? -1 : 1)));
+
+        let fanChart = null;
+        const gambarFan = (kom) => {
+          const cnv = document.getElementById("ch-fan");
+          if (!cnv) return;
+          if (!window.Chart) { pesanTanpaChart(cnv.parentElement); return; }
+          const hist = (riwayat[kom] || []).slice(-40);
+          // Beberapa nama komoditas ada di kedua sumber. Kuncinya dikunci ke satu
+          // sumber saja supaya kerucutnya tidak mencampur SP2KP dengan DPKP.
+          const sbr = sbrKom[kom] || "";
+          const pr = prakiraan.filter(r => r.komoditas === kom && (!sbr || String(r.sumber || "") === sbr));
+          const p1 = pr.find(r => String(r.horizon) === "1 minggu"), p4 = pr.find(r => String(r.horizon) === "1 bulan");
+          if (!hist.length || !p4) return;
+          const labels = hist.map(x => x.t);
+          const tAkhir = new Date(hist[hist.length - 1].t);
+          const tgl = (w) => { const d = new Date(tAkhir); d.setDate(d.getDate() + w * 7); return d.toISOString().slice(0, 10); };
+          if (p1) labels.push(tgl(1));
+          labels.push(tgl(4));
+          const n = hist.length, kosong = new Array(n - 1).fill(null);
+          const hAkhir = hist[n - 1].h;
+          const seri = (a, b) => [...kosong, hAkhir, ...(p1 ? [Number(a)] : []), Number(b)];
+          if (fanChart) fanChart.destroy();
+          fanChart = new Chart(cnv.getContext("2d"), {
+            type: "line",
+            data: { labels, datasets: [
+              { label: "Batas atas 95%", data: seri(p1 && p1.hi95, p4.hi95), borderColor: "rgba(161,28,28,.25)",
+                backgroundColor: "rgba(161,28,28,.07)", borderWidth: 1, borderDash: [4, 3], pointRadius: 0, fill: "+3", tension: .1 },
+              { label: "Batas atas 80%", data: seri(p1 && p1.hi80, p4.hi80), borderColor: "rgba(176,83,10,.45)",
+                backgroundColor: "rgba(176,83,10,.10)", borderWidth: 1, pointRadius: 0, fill: "+1", tension: .1 },
+              { label: "Penduga titik (harga kini)", data: seri(p1 && p1.titik, p4.titik), borderColor: "#1c4a2e",
+                borderWidth: 2, borderDash: [5, 4], pointRadius: 0, fill: false, tension: .1 },
+              { label: "Batas bawah 80%", data: seri(p1 && p1.lo80, p4.lo80), borderColor: "rgba(176,83,10,.45)",
+                borderWidth: 1, pointRadius: 0, fill: false, tension: .1 },
+              { label: "Batas bawah 95%", data: seri(p1 && p1.lo95, p4.lo95), borderColor: "rgba(161,28,28,.25)",
+                borderWidth: 1, borderDash: [4, 3], pointRadius: 0, fill: false, tension: .1 },
+              { label: "Harga tercatat (DPKP)", data: [...hist.map(x => x.h), ...(p1 ? [null] : []), null],
+                borderColor: "#2f7a4c", backgroundColor: "rgba(47,122,76,.06)", borderWidth: 2, pointRadius: 0, tension: .25, fill: false },
+            ] },
+            options: { responsive: true, maintainAspectRatio: false, animation: false,
+              interaction: { mode: "index", intersect: false },
+              plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 9 }, filter: it => !it.text.startsWith("Batas bawah") } },
+                tooltip: { callbacks: { title: it => it[0] ? fmtTgl(it[0].label) : "", label: it => it.raw == null ? null : `${it.dataset.label}: ${fmtRp(it.raw)}` } } },
+              scales: { y: { ticks: { callback: v => "Rp " + fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" } },
+                        x: { ticks: { font: { size: 9 }, maxTicksLimit: 8 }, grid: { display: false } } } },
+          });
+        };
+        daftarChart("prakiraan", () => {
+          const sel = document.getElementById("pilih-fan");
+          const awal = prakiraan.filter(r => String(r.horizon) === "1 bulan")
+            .sort((a, b) => Number(b.prob_naik_10) - Number(a.prob_naik_10))[0];
+          if (sel && awal) sel.value = awal.komoditas;
+          gambarFan(sel ? sel.value : komP[0]);
+          if (sel) sel.addEventListener("change", e => gambarFan(e.target.value));
+        });
+      }
+    }
+  } catch (e) { TP.appendChild(seksiGagal("Prakiraan risiko", e)); }
+
+  /* ================= TAB 3: KONTEKS & PASOKAN ================= */
+  const T3 = document.getElementById("tab-konteks");
+  try {
+    // --- SIMOTANDI panggung utama ---
+    const sS = el("section", "blok");
+    sS.innerHTML = `<h2>Pasokan Padi dari Satelit (SIMOTANDI Kementan)</h2>
+      <p class="sub">Fase pertanaman padi di seluruh 78 kecamatan DIY, hasil klasifikasi citra satelit. Bagian ini menjawab satu pertanyaan: kapan pasokan beras lokal berikutnya masuk.</p>`;
+    if (simoData) {
+      const grid = el("div", "grid-2");
+      const p1 = el("div", "panel");
+      p1.innerHTML = `<h3>Luas per fase &amp; kabupaten</h3><div class="sumber">Periode ${simoData.periode}</div>
+        <div class="angka-hero tnum">${fmtN(simoData.dekatPanen)} ha</div>
+        <div class="angka-ket">fase generatif + panen (${simoData.rasio.toFixed(0)}% lahan terpantau) · gabahnya masuk sekitar 1–2 bulan lagi</div>
+        <div class="wadah-chart" style="height:230px;margin-top:12px"><canvas id="ch-simo-kab"></canvas></div>`;
+      grid.appendChild(p1);
+      const p2 = el("div", "panel");
+      p2.innerHTML = `<h3>Perkembangan dari periode ke periode</h3>
+        <div class="sumber">${simoData.trenPeriode.length} periode 12-harian${simoData.trenPeriode.length > 20 ? " (Jan 2024 – kini)" : ""}</div>
+        <div class="wadah-chart" style="height:230px;margin-top:8px"><canvas id="ch-simo-tren"></canvas></div>`;
+      p2.appendChild(el("div", "insight",
+        `<strong>Bacaan singkat:</strong> gelombang panen berikutnya paling besar di <strong>${simoData.kabTop ? simoData.kabTop[0] : "-"}</strong> (±${fmtN(simoData.kabTop ? simoData.kabTop[1] : 0)} ha menuju/di masa panen). ` +
+        (simoData.rasio >= 12 ? "Luas lahan yang menuju panen masih sehat, sehingga pasokan beras lokal 1–2 bulan ke depan relatif aman." : "Luas lahan yang menuju panen menipis. Perlu ada antisipasi untuk jeda di antara dua gelombang panen.")));
+      grid.appendChild(p2);
+      sS.appendChild(grid);
+
+      // --- PETA KOROPLET per kecamatan ---
+      if (petaKec && petaKec.features && petaKec.features.length) {
+        const pMaxK = [...new Set(simo.map(r => (r.periode_kode ?? r.periode_mulai)))].map(String).sort().pop();
+        const stK = simo.filter(r => String(r.periode_kode ?? r.periode_mulai) === pMaxK);
+        const nilaiKec = {};
+        stK.forEach(r => {
+          const k = String(r.kecamatan || "").trim(); if (!k) return;
+          const gen = (Number(r.generatif_1_ha) || 0) + (Number(r.generatif_2_ha) || 0);
+          nilaiKec[k] = {
+            kab: r.kabupaten_kota,
+            panen: Number(r.panen_ha) || 0,
+            menuju: gen + (Number(r.panen_ha) || 0),
+            tanam: (Number(r.tanam_ha) || 0) + (Number(r.persiapan_lahan_ha) || 0),
+            baku: Number(r.luas_baku_sawah_ha) || 0,
+          };
+          nilaiKec[k].rasio = nilaiKec[k].baku > 0 ? nilaiKec[k].menuju / nilaiKec[k].baku * 100 : null;
+        });
+
+        const METRIK = {
+          menuju: { label: "Luas menuju panen (generatif + panen)", unit: "ha", fmt: v => fmtN(v) + " ha" },
+          rasio:  { label: "Kesiapan panen (% luas baku sawah)",    unit: "%",  fmt: v => v.toFixed(1) + "%" },
+          panen:  { label: "Luas sedang panen",                      unit: "ha", fmt: v => fmtN(v) + " ha" },
+          tanam:  { label: "Luas persiapan & tanam",                 unit: "ha", fmt: v => fmtN(v) + " ha" },
+        };
+        // skala berurutan satu rona (terang -> gelap), sesuai kaidah peta kuantitas
+        const RAMPA = ["#eef5ef", "#d3e7d9", "#a9d1b6", "#7bb890", "#4f9c6b", "#2f7a4c", "#1c4a2e"];
+
+        const sp = el("section", "blok");
+        sp.innerHTML = `<h2>Peta Sebaran Pasokan Padi per Kecamatan</h2>
+          <p class="sub">78 kecamatan DIY, periode ${stK[0] ? stK[0].periode : ""}. Makin pekat warnanya, makin luas lahannya. Arahkan kursor ke sebuah wilayah, atau sentuh kalau memakai ponsel, untuk melihat angkanya.</p>`;
+        const kp2 = el("div", "kontrol");
+        kp2.innerHTML = `<label for="pilih-metrik" style="font-size:.84rem">Tampilkan:</label>
+          <select id="pilih-metrik">${Object.entries(METRIK).map(([k, m], i) => `<option value="${k}"${i === 0 ? " selected" : ""}>${m.label}</option>`).join("")}</select>`;
+        sp.appendChild(kp2);
+        const kartuPeta = el("div", "panel");
+        kartuPeta.innerHTML = `<div class="peta-wrap"><div id="peta-host"></div><div class="peta-tip" id="peta-tip"></div></div>
+          <div class="peta-legenda" id="peta-legenda"></div>
+          <div class="peta-petunjuk">Klik salah satu kecamatan untuk melihat pola musim panennya sendiri.</div>
+          <div id="detail-kec"></div>`;
+        sp.appendChild(kartuPeta);
+        sS.appendChild(sp);
+
+        // --- pola musiman PER KECAMATAN dari seluruh 79 periode 12-harian ---
+        const NAMA_BLN = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+        const musimKec = {};      // kecamatan -> {bulan: {panen:[], tanam:[], gen:[]}}
+        simo.forEach(r => {
+          const k = String(r.kecamatan || "").trim();
+          const tgl = String(r.periode_mulai || "");
+          if (!k || tgl.length < 7) return;
+          const b = Number(tgl.slice(5, 7)) - 1;
+          if (!(b >= 0 && b < 12)) return;
+          (musimKec[k] ||= Array.from({ length: 12 }, () => ({ panen: [], tanam: [], gen: [] })));
+          musimKec[k][b].panen.push(Number(r.panen_ha) || 0);
+          musimKec[k][b].tanam.push((Number(r.tanam_ha) || 0) + (Number(r.persiapan_lahan_ha) || 0));
+          musimKec[k][b].gen.push((Number(r.generatif_1_ha) || 0) + (Number(r.generatif_2_ha) || 0));
+        });
+        const rerata = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
+
+        let chartKec = null, terpilih = null;
+        const tampilkanDetail = (nama) => {
+          const host = document.getElementById("detail-kec");
+          const prof = musimKec[nama];
+          const kini = nilaiKec[nama];
+          if (!host || !prof) return;
+          const panen = prof.map(o => rerata(o.panen));
+          const tanam = prof.map(o => rerata(o.tanam));
+          const nObs = prof.map(o => o.panen.length);
+          const iMaks = panen.indexOf(Math.max(...panen));
+          const iMin = panen.indexOf(Math.min(...panen));
+          // bulan berjalan dari periode terbaru
+          const tglAkhir = stK.map(r => r.periode_mulai).filter(Boolean).sort().pop();
+          const blnKini = tglAkhir ? Number(String(tglAkhir).slice(5, 7)) - 1 : null;
+          const posisi = panen[iMaks] > 0 && blnKini !== null ? panen[blnKini] / panen[iMaks] * 100 : null;
+
+          host.className = "detail-kec";
+          host.innerHTML = `
+            <div class="dk-head">
+              <div><div class="dk-nama">Kecamatan ${nama}</div>
+                <div class="dk-sub">${kini ? kini.kab : ""} · pola dari ${simo.filter(r => String(r.kecamatan).trim() === nama).length} periode pengamatan (Jan 2024–kini)</div></div>
+              <button class="dk-tutup" id="dk-tutup">Tutup ✕</button>
+            </div>
+            <div class="dk-stat">
+              <div class="dk-kotak"><div class="n">${NAMA_BLN[iMaks]}</div><div class="l">bulan panen tertinggi (rata-rata ${fmtN(panen[iMaks])} ha)</div></div>
+              <div class="dk-kotak"><div class="n">${NAMA_BLN[iMin]}</div><div class="l">bulan panen terendah (rata-rata ${fmtN(panen[iMin])} ha)</div></div>
+              ${posisi !== null ? `<div class="dk-kotak"><div class="n">${posisi.toFixed(0)}%</div><div class="l">posisi ${NAMA_BLN[blnKini]} terhadap puncak tahunan</div></div>` : ""}
+              ${kini && kini.baku > 0 ? `<div class="dk-kotak"><div class="n">${fmtN(kini.baku)} ha</div><div class="l">luas baku sawah kecamatan</div></div>` : ""}
+            </div>
+            <div class="wadah-chart" style="height:210px"><canvas id="ch-kec"></canvas></div>
+            <div class="insight" style="margin-top:10px">${
+              posisi !== null && posisi < 40
+                ? `Saat ini <strong>${NAMA_BLN[blnKini]}</strong> sedang sepi panen di kecamatan ini (${posisi.toFixed(0)}% dari puncak <strong>${NAMA_BLN[iMaks]}</strong>). Pasokan gabah dari wilayah ini sedang minimal.`
+                : posisi !== null && posisi > 75
+                ? `Saat ini <strong>${NAMA_BLN[blnKini]}</strong> mendekati puncak panen kecamatan ini, sehingga wilayah ini sedang menjadi penyumbang pasokan utama.`
+                : `Puncak panen kecamatan ini jatuh pada <strong>${NAMA_BLN[iMaks]}</strong>, berbeda dari angka provinsi yang memuncak pada Februari. Perbedaan waktu panen antarkecamatan seperti inilah yang membuat pasokan lebih merata sepanjang tahun.`
+            } <span class="catatan-kecil">Tiap bulan dirata-rata dari ${Math.min(...nObs)}–${Math.max(...nObs)} periode pengamatan.</span></div>`;
+
+          document.getElementById("dk-tutup").addEventListener("click", () => {
+            host.innerHTML = ""; host.className = "";
+            if (chartKec) { chartKec.destroy(); chartKec = null; }
+            if (terpilih) { terpilih.classList.remove("terpilih"); terpilih = null; }
+          });
+
+          const cv = document.getElementById("ch-kec");
+          if (cv && window.Chart) {
+            if (chartKec) chartKec.destroy();
+            chartKec = new Chart(cv.getContext("2d"), {
+              type: "bar",
+              data: { labels: NAMA_BLN, datasets: [
+                { label: "Rata-rata luas panen (ha)", data: panen.map(v => Math.round(v * 10) / 10),
+                  backgroundColor: NAMA_BLN.map((_, i) => i === blnKini ? "#a11c1c" : "#1c4a2e"),
+                  borderRadius: 4, barPercentage: .72, order: 2 },
+                { label: "Rata-rata persiapan & tanam (ha)", data: tanam.map(v => Math.round(v * 10) / 10),
+                  type: "line", borderColor: "#8fc3a0", backgroundColor: "#8fc3a0",
+                  borderWidth: 2, tension: .3, pointRadius: 2.5, fill: false, order: 1 },
+              ] },
+              options: { responsive: true, maintainAspectRatio: false, animation: false,
+                plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 9.5 } } },
+                  tooltip: { callbacks: {
+                    label: it => `${it.dataset.label}: ${fmtN(it.raw)} ha`,
+                    afterLabel: it => it.datasetIndex === 0 ? `dari ${nObs[it.dataIndex]} periode pengamatan` : "" } } },
+                scales: { y: { ticks: { callback: v => fmtN(v), font: { size: 9.5 } }, grid: { color: "#efece2" } },
+                          x: { ticks: { font: { size: 9.5 } }, grid: { display: false } } } },
+            });
+          } else if (cv) pesanTanpaChart(cv.parentElement);
+          host.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        };
+
+        // --- proyeksi & penggambar SVG (tanpa pustaka peta; aman dari pemblokiran) ---
+        const gambarPeta = (metrik) => {
+          const host = document.getElementById("peta-host");
+          const tip = document.getElementById("peta-tip");
+          if (!host) return;
+          const fitur = petaKec.features;
+          let minLon = 1e9, maxLon = -1e9, minLat = 1e9, maxLat = -1e9;
+          const cincin = g => g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+          fitur.forEach(f => cincin(f.geometry).forEach(poly => poly.forEach(r => r.forEach(([x, y]) => {
+            if (x < minLon) minLon = x; if (x > maxLon) maxLon = x;
+            if (y < minLat) minLat = y; if (y > maxLat) maxLat = y;
+          }))));
+          const latTengah = (minLat + maxLat) / 2;
+          const kx = Math.cos(latTengah * Math.PI / 180);   // koreksi aspek bujur
+          const W = 760, pad = 8;
+          const spanX = (maxLon - minLon) * kx, spanY = (maxLat - minLat);
+          const sc = (W - pad * 2) / spanX;
+          const H = spanY * sc + pad * 2;
+          const px = ([x, y]) => [((x - minLon) * kx * sc + pad).toFixed(1), ((maxLat - y) * sc + pad).toFixed(1)];
+          const dOf = g => cincin(g).map(poly => poly.map(r => "M" + r.map(c => px(c).join(",")).join("L") + "Z").join("")).join("");
+
+          const vals = fitur.map(f => {
+            const v = nilaiKec[f.properties.kecamatan];
+            return v ? v[metrik] : null;
+          }).filter(v => v !== null && isFinite(v));
+          const vMin = Math.min(...vals), vMax = Math.max(...vals);
+          const warna = v => {
+            if (v === null || !isFinite(v)) return "#e8e4d8";
+            const t = vMax > vMin ? (v - vMin) / (vMax - vMin) : 0;
+            return RAMPA[Math.min(RAMPA.length - 1, Math.floor(t * RAMPA.length))];
+          };
+          const M = METRIK[metrik];
+          host.innerHTML = `<svg class="peta-svg" viewBox="0 0 ${W} ${H.toFixed(0)}" role="img"
+            aria-label="Peta ${M.label} per kecamatan di DIY">${
+            fitur.map((f, i) => {
+              const nm = f.properties.kecamatan, v = nilaiKec[nm] ? nilaiKec[nm][metrik] : null;
+              const kab = nilaiKec[nm] ? nilaiKec[nm].kab : f.properties.kabupaten;
+              return `<path d="${dOf(f.geometry)}" fill="${warna(v)}" data-i="${i}"
+                data-nm="${nm}" data-kab="${kab}"
+                data-v="${v === null || !isFinite(v) ? "" : M.fmt(v)}"><title>${nm}: ${v === null ? "tidak ada data" : M.fmt(v)}</title></path>`;
+            }).join("")}</svg>`;
+          // legenda
+          const lg = document.getElementById("peta-legenda");
+          if (lg) lg.innerHTML = `<span>${M.label}</span>
+            <span class="tnum">${M.unit === "%" ? vMin.toFixed(1) + "%" : fmtN(vMin)}</span>
+            <span class="legenda-skala">${RAMPA.map(c => `<i style="background:${c}"></i>`).join("")}</span>
+            <span class="tnum">${M.unit === "%" ? vMax.toFixed(1) + "%" : fmtN(vMax)}</span>
+            <span style="margin-left:6px">· sumber: SIMOTANDI Kementan &amp; batas wilayah desa BIG</span>`;
+          // tooltip
+          const svg = host.querySelector("svg");
+          if (svg && tip) {
+            svg.addEventListener("mousemove", ev => {
+              const p = ev.target.closest("path");
+              if (!p) { tip.style.opacity = 0; return; }
+              const r = host.getBoundingClientRect();
+              tip.innerHTML = `<b>${p.dataset.nm}</b><br>${p.dataset.kab}<br>${M.label}: ${p.dataset.v || "tidak ada data"}`;
+              tip.style.opacity = 1;
+              const tw = tip.offsetWidth, x = ev.clientX - r.left, y = ev.clientY - r.top;
+              tip.style.left = Math.max(0, Math.min(r.width - tw, x + 14)) + "px";
+              tip.style.top = Math.max(0, y - 52) + "px";
+            });
+            svg.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+            svg.addEventListener("click", ev => {
+              const p = ev.target.closest("path");
+              if (!p || !p.dataset.nm) return;
+              if (terpilih) terpilih.classList.remove("terpilih");
+              p.classList.add("terpilih"); terpilih = p;
+              tampilkanDetail(p.dataset.nm);
+            });
+          }
+          // pertahankan sorotan bila peta digambar ulang saat ganti metrik
+          if (terpilih) {
+            const nm = terpilih.dataset.nm;
+            const baru = host.querySelector(`path[data-nm="${nm}"]`);
+            if (baru) { baru.classList.add("terpilih"); terpilih = baru; }
+          }
+        };
+        daftarChart("konteks", () => {
+          gambarPeta("menuju");
+          const selM = document.getElementById("pilih-metrik");
+          if (selM) selM.addEventListener("change", e => gambarPeta(e.target.value));
+        });
+      }
+
+      // --- Pola musiman panen (dari 31 bulan data) ---
+      if (simoData.musim) {
+        const M = simoData.musim;
+        const pm = el("div", "panel");
+        pm.style.marginTop = "14px";
+        pm.innerHTML = `<h3>Pola Musiman Panen Padi DIY</h3>
+          <div class="sumber">Rata-rata luas panen per bulan kalender, ${M.nBulan} bulan pengamatan (Jan 2024 – Jul 2026)</div>
+          <div class="wadah-chart" style="height:220px;margin-top:10px"><canvas id="ch-simo-musim"></canvas></div>`;
+        const kondisi = M.posisi < 40 ? "musim paceklik (panen terendah tahunan)" : M.posisi < 75 ? "masa transisi" : "musim panen raya";
+        pm.appendChild(el("div", "insight",
+          `<strong>Posisi musim saat ini.</strong> Rata-rata panen tiap ${M.bulanKini.nama} sekitar ${fmtN(M.bulanKini.panen)} ha, atau <strong>${M.posisi.toFixed(0)}% dari bulan puncaknya</strong> yang jatuh pada ${M.puncak.nama} (±${fmtN(M.puncak.panen)} ha). DIY sedang berada pada <strong>${kondisi}</strong>. ` +
+          `Artinya bagi kebijakan: pada fase ini pasokan beras lokal bersandar pada stok dan kiriman dari daerah lain, sehingga <strong>kenaikan harga beras lebih perlu diwaspadai</strong> sampai gelombang panen ${M.puncakDepan.nama} tiba. Informasi stok dan cadangan pemerintah menjadi penting pada fase ini, namun <strong>kapasitas cadangan DIY belum dapat dinilai</strong> karena data di portal sumbernya belum dimutakhirkan.`));
+        sS.appendChild(pm);
+
+        daftarChart("konteks", () => {
+          const cm = document.getElementById("ch-simo-musim");
+          if (cm && window.Chart) {
+            new Chart(cm.getContext("2d"), {
+              type: "bar",
+              data: { labels: M.seri.map(s => s.nama.slice(0, 3)),
+                datasets: [
+                  { label: "Rata-rata luas panen (ha)", data: M.seri.map(s => Math.round(s.panen)),
+                    backgroundColor: M.seri.map(s => s.bulan === M.blnKiniIdx ? "#a11c1c" : "#1c4a2e"),
+                    borderRadius: 4, barPercentage: .72, order: 2 },
+                  { label: "Rata-rata luas tanam (ha)", data: M.seri.map(s => Math.round(s.tanam)),
+                    type: "line", borderColor: "#8fc3a0", backgroundColor: "#8fc3a0",
+                    borderWidth: 2, tension: .3, pointRadius: 2, fill: false, order: 1 },
+                ] },
+              options: { responsive: true, maintainAspectRatio: false, animation: false,
+                plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 10 } } },
+                  tooltip: { callbacks: { label: it => `${it.dataset.label}: ${fmtN(it.raw)} ha` +
+                    (it.datasetIndex === 0 && M.seri[it.dataIndex].bulan === M.blnKiniIdx ? " ← bulan berjalan" : "") } } },
+                scales: { y: { ticks: { callback: v => fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" } },
+                          x: { ticks: { font: { size: 10 } }, grid: { display: false } } } },
+            });
+          } else if (cm) pesanTanpaChart(cm.parentElement);
+        });
+      }
+
+      daftarChart("konteks", () => {
+        const c1 = document.getElementById("ch-simo-kab");
+        if (c1 && window.Chart) {
+          const kabs = Object.keys(simoData.perKab).filter(k => k !== "Kota Yogyakarta").sort((a, b) =>
+            (simoData.perKab[b].generatif_1_ha + simoData.perKab[b].generatif_2_ha + simoData.perKab[b].panen_ha) -
+            (simoData.perKab[a].generatif_1_ha + simoData.perKab[a].generatif_2_ha + simoData.perKab[a].panen_ha));
+          const seri = [
+            ["Menuju panen (generatif+panen)", k => simoData.perKab[k].generatif_1_ha + simoData.perKab[k].generatif_2_ha + simoData.perKab[k].panen_ha, "#1c4a2e"],
+            ["Vegetatif", k => simoData.perKab[k].vegetatif_1_ha + simoData.perKab[k].vegetatif_2_ha, "#3d8f5c"],
+            ["Persiapan & tanam", k => simoData.perKab[k].persiapan_lahan_ha + simoData.perKab[k].tanam_ha, "#8fc3a0"],
+            ["Bera (tidak ditanami)", k => simoData.perKab[k].bera_ha, "#d8d2c2"],
+          ];
+          new Chart(c1.getContext("2d"), {
+            type: "bar",
+            data: { labels: kabs, datasets: seri.map(([label, f, warna]) => ({
+              label, data: kabs.map(f), backgroundColor: warna, borderColor: "#fff",
+              borderWidth: { top: 0, bottom: 0, left: 1, right: 1 }, borderSkipped: false, barThickness: 22 })) },
+            options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, animation: false,
+              plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 10 } } },
+                tooltip: { callbacks: { label: it => `${it.dataset.label}: ${fmtN(it.raw)} ha` } } },
+              scales: { x: { stacked: true, ticks: { callback: v => fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" } },
+                        y: { stacked: true, ticks: { font: { size: 11 } }, grid: { display: false } } } },
+          });
+        } else if (c1) pesanTanpaChart(c1.parentElement);
+        const c2 = document.getElementById("ch-simo-tren");
+        if (c2 && window.Chart) {
+          // Banyak periode (histori penuh 2024-2026) -> garis; sedikit -> batang.
+          const banyak = simoData.trenPeriode.length > 20;
+          const ds = (label, ambil, warna, isi) => banyak
+            ? { label, data: simoData.trenPeriode.map(ambil), borderColor: warna, backgroundColor: isi,
+                borderWidth: 2, tension: .3, pointRadius: 0, pointHoverRadius: 4, fill: true }
+            : { label, data: simoData.trenPeriode.map(ambil), backgroundColor: warna, borderRadius: 4, barPercentage: .7 };
+          new Chart(c2.getContext("2d"), {
+            type: banyak ? "line" : "bar",
+            data: { labels: simoData.trenPeriode.map(x => x.label),
+              datasets: [
+                ds("Persiapan & tanam (ha)", x => Math.round(x.tanam), "#8fc3a0", "rgba(143,195,160,.25)"),
+                ds("Menuju/di masa panen (ha)", x => Math.round(x.panen), "#1c4a2e", "rgba(28,74,46,.16)"),
+              ] },
+            options: { responsive: true, maintainAspectRatio: false, animation: false,
+              interaction: banyak ? { mode: "index", intersect: false } : {},
+              plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 10 } } },
+                tooltip: { callbacks: { label: it => `${it.dataset.label}: ${fmtN(it.raw)} ha` } } },
+              scales: { y: { ticks: { callback: v => fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" } },
+                        x: { ticks: { font: { size: 9 }, maxTicksLimit: banyak ? 8 : 12, autoSkip: true }, grid: { display: false } } } },
+          });
+        } else if (c2) pesanTanpaChart(c2.parentElement);
+      });
+    } else sS.appendChild(el("div", "kosong", "Data SIMOTANDI belum tersedia."));
+    T3.appendChild(sS);
+
+    // --- cadangan + iklim ---
+    const sK = el("section", "blok");
+    sK.innerHTML = `<h2>Cadangan, Iklim &amp; Sinyal Publik</h2>`;
+    const g2 = el("div", "grid-2");
+    const pC = el("div", "panel");
+    if (cadData) {
+      pC.innerHTML = `<h3>Cadangan Pangan Pemerintah</h3><div class="sumber">DPKP DIY · snapshot ${cadData.thn} (histori 2019–${cadData.thn} di data mentah)</div>
+        <div class="angka-hero tnum">${fmtN(cadData.total, 1)} kg</div><div class="angka-ket">total beras/gabah pemerintah se-DIY menurut portal sumber</div>`;
+      if (cadData.takTerpelihara)
+        pC.appendChild(el("div", "insight",
+          `<strong>Pilar ini tidak dapat dipakai.</strong> Portal cadangan pangan menampilkan angka yang persis sama untuk ${cadData.nTahun} tahun anggaran berturut-turut. Angka ${fmtN(cadData.total, 1)} kg juga tidak masuk akal sebagai cadangan tingkat provinsi. Selama datanya belum diperbarui di sumbernya, kami tidak bisa memberi tahu berapa stok yang siap dipakai kalau harga bergejolak.`));
+      cadData.ct.filter(r => r["Jenis Komoditas"]).forEach(r =>
+        pC.appendChild(el("div", "baris", `<span>${r["Jenis Komoditas"]}</span><span class="v tnum">${fmtN(Number(r[cadData.kolS]), 1)} kg</span>`)));
+      cadData.ct.filter(r => r.Wilayah && r.Wilayah !== "Total" && Number(r[cadData.kolS]) > 0).forEach(r =>
+        pC.appendChild(el("div", "baris", `<span>${r.Wilayah}</span><span class="v tnum">${fmtN(Number(r[cadData.kolS]), 1)} kg</span>`)));
+      pC.appendChild(el("div", "insight", "Cadangan inilah yang dipakai pemerintah untuk menstabilkan harga, lewat operasi pasar atau bantuan pangan, kalau status Bahaya muncul."));
+    } else pC.innerHTML = `<h3>Cadangan Pangan Pemerintah</h3><div class="kosong">Data belum tersedia.</div>`;
+    g2.appendChild(pC);
+
+    const pI = el("div", "panel");
+    pI.innerHTML = `<h3>Iklim &amp; Cuaca</h3><div class="sumber">NOAA (ENSO/ONI) &amp; BMKG (prakiraan per kab/kota)</div>`;
+    if (ensoAkhir) pI.innerHTML += `<div class="angka-hero">${ensoAkhir.status_enso ?? "–"}</div>
+      <div class="angka-ket">ENSO ${ensoAkhir.musim ?? ""} ${ensoAkhir.tahun ?? ""} · anomali suhu laut ${Number(ensoAkhir.anomali_nino34_c) > 0 ? "+" : ""}${ensoAkhir.anomali_nino34_c}°C</div>`;
+    if (cuacaData) cuacaData.daftarKab.forEach(r =>
+      pI.appendChild(el("div", "baris", `<span>${String(r.kabupaten_kota).replace("Kabupaten ", "Kab. ")}</span>
+        <span class="v tnum">${r.suhu_c ?? "-"}°C · ${r.curah_hujan_mm ?? "-"} mm · ${r.cuaca_desc ?? "-"}</span>`)));
+    if (ensoInfo) pI.appendChild(el("div", "insight", ensoInfo.ket));
+    g2.appendChild(pI);
+    sK.appendChild(g2);
+    T3.appendChild(sK);
+
+    // --- kliping berita ---
+    const sB = el("section", "blok");
+    sB.innerHTML = `<h2>Sinyal Media Pendukung</h2>
+      <p class="sub">Untuk tiap lonjakan yang tercatat, sistem otomatis mencari pemberitaannya sebagai lapisan pengecekan kedua. Menggabungkan sinyal harga dengan teks berita terbukti lebih tajam daripada mengandalkan angka harga saja (Bakry dkk., 2025).</p>`;
+    if (berita && berita.length) {
+      const unik = [];
+      const sudah = new Set();
+      berita.slice().sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal)).forEach(b => {
+        if (!b.url_teratas || sudah.has(b.url_teratas)) return;
+        sudah.add(b.url_teratas); unik.push(b);
+      });
+      const grid = el("div", "kliping");
+      unik.slice(0, 9).forEach(b => {
+        const dom = domainDari(b.url_teratas);
+        const ringkas = String(b.ringkasan || "").trim();
+        const art = el("div", "artikel");
+        art.innerHTML = `
+          <div class="art-meta"><span class="art-media">${dom || "media"}</span><span>·</span><span>${fmtTglPdk(b.tanggal)}</span></div>
+          <div class="art-judul"><a href="${b.url_teratas}" target="_blank" rel="noopener">${b.judul_teratas || "(tanpa judul)"}</a></div>
+          ${ringkas ? `<div class="art-ringkas">${ringkas.slice(0, 220)}${ringkas.length > 220 ? "…" : ""}</div>` : ""}
+          <div class="art-kom"><span class="mchip">${b.komoditas || ""}</span></div>`;
+        grid.appendChild(art);
+      });
+      sB.appendChild(grid);
+      if (!unik.some(b => b.ringkasan)) sB.appendChild(el("p", "sub", "Ringkasan artikel akan muncul otomatis pada pembaruan data berikutnya."));
+    } else sB.appendChild(el("div", "kosong", "Belum ada hasil verifikasi berita."));
+    T3.appendChild(sB);
+  } catch (e) { T3.appendChild(seksiGagal("Konteks & pasokan", e)); }
+
+  /* ================= TAB 4: DATA & TREN ================= */
+  const T4 = document.getElementById("tab-data");
+  try {
+    /* ---------- SP2KP: sumber harga terpadat + perbandingan tiga sumber ---------- */
+    if (sp2kpData) {
+      const sS2 = el("section", "blok");
+      sS2.innerHTML = `<h2>Harga Pasar SP2KP Kemendag</h2>
+        <p class="sub">Ini sumber harga ketiga, diterbitkan Kementerian Perdagangan dan menjadi dasar penghitungan Indeks Perkembangan Harga. Dua hal membuatnya berbeda: harganya dicatat sampai tingkat pasar, dan harganya paling sering bergerak: berubah kira-kira 6 dari tiap 100 hari, dibanding DPKP sekitar 5 hari dan PIHPS cuma 3 hari. Kolom sebaran menunjukkan seberapa jauh harga berbeda antarpasar pada hari yang sama; sebaran yang lebar berarti pasar belum sepakat soal harga.</p>`;
+      const w2 = el("div", "tabel-wrap");
+      w2.innerHTML = `<table><thead><tr><th>Varian</th><th class="num">Harga per ${fmtTglPdk(sp2kpData.tMaks)}</th>
+          <th class="num">Perubahan 7 hari</th><th class="num">Perubahan 30 hari</th><th class="num">Sebaran antarpasar</th></tr></thead>
+        <tbody>${sp2kpData.daftar.slice(0, 30).map(d => `<tr><td>${d.k}</td>
+          <td class="num tnum">${fmtRp(d.h)}</td><td class="num">${ubahHtml(d.u7)}</td><td class="num">${ubahHtml(d.u30)}</td>
+          <td class="num tnum" title="Simpangan baku harga antarpasar pada tanggal terakhir">${d.seb > 0 ? fmtRp(d.seb) : "–"}</td></tr>`).join("")}</tbody></table>`;
+      sS2.appendChild(w2);
+      sS2.appendChild(el("div", "catatan-kecil", `Menampilkan 30 varian dengan perubahan 30 hari terbesar dari ${sp2kpData.daftar.length} varian yang dipantau.`));
+      T4.appendChild(sS2);
+
+      /* --- grafik perbandingan tiga sumber untuk satu komoditas --- */
+      const PADAN = {
+        "Cabai Rawit Merah": ["Cabai Rawit Merah", "Cabe Rawit Merah", "Cabai Rawit Merah"],
+        "Cabai Merah Besar": ["Cabai Merah Besar", "Cabe Merah Besar", "Cabai Merah Besar"],
+        "Cabai Merah Keriting": ["Cabai Merah Keriting ", "Cabe Merah Keriting", "Cabai Merah Keriting"],
+        "Bawang Merah": ["Bawang Merah", "Bawang Merah", "Bawang Merah"],
+        "Daging Ayam Ras": ["Daging Ayam Ras Segar", "Daging Ayam Ras", "Daging Ayam Ras"],
+        "Telur Ayam Ras": ["Telur Ayam Ras Segar", "Telur Ayam Ras", "Telur Ayam Ras"],
+        "Beras Medium": ["Beras Kualitas Medium I", "Beras Medium", "Beras Medium"],
+      };
+      const sB = el("section", "blok");
+      sB.innerHTML = `<h2>Membandingkan Tiga Sumber Harga Resmi</h2>
+        <p class="sub">Ketiganya mengukur pasar yang sama tetapi dengan cara dan kecepatan berbeda. SP2KP dan DPKP bergerak hampir serentak. PIHPS berbentuk tangga karena angkanya hanya diperbarui pada tanggal 25 sampai 28, sehingga gejolak yang terjadi awal bulan baru terlihat di PIHPS pada akhir bulan. Ini bukan kekurangan PIHPS, karena PIHPS memang dirancang sebagai harga acuan, bukan pemantau harian.</p>`;
+      const kb = el("div", "kontrol");
+      kb.innerHTML = `<label for="pilih-band" style="font-size:.84rem">Komoditas:</label>
+        <select id="pilih-band">${Object.keys(PADAN).map(k => `<option>${k}</option>`).join("")}</select>`;
+      sB.appendChild(kb);
+      const kg2 = el("div", "kartu kartu-grafik");
+      kg2.innerHTML = `<div class="wadah-chart" style="height:300px"><canvas id="ch-band"></canvas></div>`;
+      sB.appendChild(kg2);
+      T4.appendChild(sB);
+
+      let bandChart = null;
+      const deretDari = (arr, kolT, kolK, kolH, nama) => {
+        const o = {};
+        (arr || []).forEach(r => {
+          if (String(r[kolK]) !== nama) return;
+          const t = String(r[kolT] || "").slice(0, 10), h = Number(r[kolH]);
+          if (t && h > 0) o[t] = h;
+        });
+        return o;
+      };
+      const gambarBand = (kan) => {
+        const cv = document.getElementById("ch-band");
+        if (!cv) return;
+        if (!window.Chart) { pesanTanpaChart(cv.parentElement); return; }
+        const [nPi, nDp, nSp] = PADAN[kan];
+        const kolD = Object.keys(dpkp[0] || {});
+        const cT = kolD.find(c => String(c).startsWith("Tanggal")), cK = kolD.find(c => String(c).startsWith("Komoditas")), cH = kolD.find(c => String(c).startsWith("Harga"));
+        const A = deretDari(sp2kp, "tanggal", "varian", "harga", nSp);
+        const B = deretDari(dpkp, cT, cK, cH, nDp);
+        const C = deretDari(gab, "tanggal", "komoditas", "harga", nPi);
+        const tgl = [...new Set([...Object.keys(A), ...Object.keys(B), ...Object.keys(C)])].sort().filter(t => t >= "2025-08-01");
+        if (!tgl.length) return;
+        if (bandChart) bandChart.destroy();
+        const seri = (o) => tgl.map(t => o[t] ?? null);
+        bandChart = new Chart(cv.getContext("2d"), {
+          type: "line",
+          data: { labels: tgl, datasets: [
+            { label: "SP2KP Kemendag (dasar IPH)", data: seri(A), borderColor: "#1c4a2e", borderWidth: 2, pointRadius: 0, tension: .2, spanGaps: true },
+            { label: "DPKP DIY", data: seri(B), borderColor: "#b0530a", borderWidth: 2, pointRadius: 0, tension: .2, spanGaps: true },
+            { label: "PIHPS Bank Indonesia", data: seri(C), borderColor: "#a11c1c", borderWidth: 2, borderDash: [6, 3], pointRadius: 0, stepped: true, spanGaps: true },
+          ] },
+          options: { responsive: true, maintainAspectRatio: false, animation: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: { legend: { labels: { font: { size: 11 }, usePointStyle: true } },
+                       tooltip: { callbacks: { title: it => it[0] ? fmtTgl(it[0].label) : "", label: it => `${it.dataset.label}: ${fmtRp(it.raw)}` } } },
+            scales: { y: { ticks: { callback: v => "Rp " + fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" } },
+                      x: { title: { display: true, text: "Tanggal pencatatan", font: { size: 10 }, color: "#6b6f68" },
+                           ticks: { font: { size: 9 }, maxTicksLimit: 10, autoSkip: true,
+                                    callback: function (v) { return fmtTglPdk(this.getLabelForValue(v)); } },
+                           grid: { display: false } } } },
+        });
+      };
+      daftarChart("data", () => {
+        gambarBand(Object.keys(PADAN)[0]);
+        const sel = document.getElementById("pilih-band");
+        if (sel) sel.addEventListener("change", e => gambarBand(e.target.value));
+      });
+    }
+
+    const sD = el("section", "blok");
+    sD.innerHTML = `<h2>Harga Rujukan DPKP DIY</h2>
+      <p class="sub">Ini sumber kedua yang berdiri sendiri, yaitu pencatatan harian Dinas Pertanian dan Ketahanan Pangan DIY. Cakupannya lebih luas karena memuat komoditas yang tidak ada di PIHPS, seperti minyak goreng, beras SPHP, dan kedelai. Kolom volatilitas memakai adaptasi metode <em>Excessive Food Price Variability EWS</em> dari IFPRI, yaitu menghitung berapa hari dalam 90 hari terakhir yang kenaikan harganya ekstrem, dengan ukuran “ekstrem” diambil dari persentil ke-95 riwayat komoditas itu sendiri. Tabel diurutkan dari kenaikan 30 hari terbesar. Perlu diingat, mutu pencatatan di sumbernya tidak selalu seragam, terutama untuk sayuran.</p>`;
+    if (dpkpTabel) {
+      const VTAG = { TINGGI: '<span class="tag bahaya">tinggi</span>', SEDANG: '<span class="tag waspada">sedang</span>', RENDAH: '<span class="tag aman">rendah</span>' };
+      const w = el("div", "tabel-wrap");
+      w.innerHTML = `<table><thead><tr><th>Komoditas</th><th class="num">Harga per ${fmtTglPdk(dpkpTabel.tMaks)}</th><th class="num">Perubahan 30 hari</th><th>Volatilitas 90 hari</th></tr></thead>
+        <tbody>${dpkpTabel.daftar.map(d => `<tr><td>${d.k}</td><td class="num tnum">${fmtRp(d.h)}</td><td class="num">${ubahHtml(d.ubah30)}</td>
+          <td>${d.vol ? `<span title="${d.volDetail}">${VTAG[d.vol]}</span>` : '<span class="catatan-kecil" title="Riwayat harga komoditas ini belum cukup panjang untuk diuji volatilitasnya">–</span>'}</td></tr>`).join("")}</tbody></table>`;
+      sD.appendChild(w);
+    } else sD.appendChild(el("div", "kosong", "Data DPKP belum tersedia."));
+    T4.appendChild(sD);
+
+    const sM = el("section", "blok");
+    sM.innerHTML = `<h2>Tren Setahun Semua Komoditas (PIHPS)</h2><p class="sub">Titik merah menandai anomali statistik yang tercatat pada tanggal itu.</p>`;
+    if (tip) {
+      const grid = el("div", "grid-mini");
+      tip.hasil.slice().sort((a, b) => a.kom.localeCompare(b.kom)).forEach((d, i) => {
+        const kartu = el("div", "kartu-mini");
+        const idc = "mn-" + i;
+        kartu.innerHTML = `<div class="jm" title="${d.kom}">${IKON[d.status]} ${d.kom}</div>
+          <div class="hm tnum">${fmtRp(d.h)} <span style="font-size:.7rem;font-weight:400">${ubahHtml(d.ubah7)} /7 hari</span></div>
+          <div class="cw"><canvas id="${idc}"></canvas></div>`;
+        grid.appendChild(kartu);
+        daftarChart("data", () => {
+          const c = document.getElementById(idc);
+          if (c) buatSpark(c, d.seri.map(r => r.tanggal), d.seri.map(r => Number(r.harga)), d.seri.map(r => isTrue(r.anomali_harga)));
+        });
+      });
+      sM.appendChild(grid);
+    } else sM.appendChild(el("div", "kosong", "Data harga belum tersedia."));
+    T4.appendChild(sM);
+
+    const sG = el("section", "blok");
+    sG.innerHTML = `<h2>Grafik Detail per Komoditas</h2>
+      <p class="sub">Riwayat harga harian di tingkat petani dari PIHPS Bank Indonesia, untuk setahun terakhir. Titik merah menandai hari yang terdeteksi anomali. Perhatikan bentuk “tangga” pada banyak komoditas: angka acuan PIHPS memang hanya diperbarui berkala, jadi garisnya datar cukup lama lalu meloncat. Itu bukan berarti harga di pasar benar-benar diam lalu tiba-tiba melompat.</p>`;
+    if (tip) {
+      const daftarKom = tip.hasil.slice().sort((a, b) => a.kom.localeCompare(b.kom)).map(d => d.kom);
+      const kontrol = el("div", "kontrol");
+      kontrol.innerHTML = `<label for="pilih-kom" style="font-size:.84rem">Komoditas:</label>
+        <select id="pilih-kom">${daftarKom.map(k => `<option>${k}</option>`).join("")}</select>`;
+      sG.appendChild(kontrol);
+      const kg = el("div", "kartu kartu-grafik");
+      kg.innerHTML = `<div class="wadah-chart" style="height:320px"><canvas id="grafik-detail"></canvas></div>`;
+      sG.appendChild(kg);
+      let chart = null;
+      const gambar = kom => {
+        const d = tip.hasil.find(x => x.kom === kom);
+        const cnv = document.getElementById("grafik-detail");
+        if (!d || !cnv) return;
+        if (!window.Chart) { pesanTanpaChart(cnv.parentElement); return; }
+        const mask = d.seri.map(r => isTrue(r.anomali_harga));
+        if (chart) chart.destroy();
+        chart = new Chart(cnv.getContext("2d"), {
+          type: "line",
+          data: { labels: d.seri.map(r => r.tanggal), datasets: [{
+            label: `Harga di tingkat petani (Rp): ${kom}`, data: d.seri.map(r => Number(r.harga)),
+            borderColor: "#2f7a4c", backgroundColor: "rgba(47,122,76,.07)", borderWidth: 2, tension: .25, fill: true,
+            pointRadius: d.seri.map((_, i) => mask[i] ? 5 : 0), pointHoverRadius: 7, pointBackgroundColor: "#a11c1c" }] },
+          options: { responsive: true, maintainAspectRatio: false, animation: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: { legend: { display: true, labels: { font: { size: 11 } } },
+              tooltip: { callbacks: { afterLabel: it => mask[it.dataIndex] ? "⚠ Anomali statistik terdeteksi" : "" } } },
+            scales: { y: { ticks: { callback: v => "Rp " + fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" } },
+                      x: { title: { display: true, text: "Tanggal pencatatan (harian)", font: { size: 10 }, color: "#6b6f68" },
+                           ticks: { font: { size: 9 }, maxTicksLimit: 12, autoSkip: true,
+                                    callback: function (v) { return fmtTglPdk(this.getLabelForValue(v)); } },
+                           grid: { display: false } } } },
+        });
+      };
+      daftarChart("data", () => {
+        gambar(daftarKom[0]);
+        document.getElementById("pilih-kom").addEventListener("change", e => gambar(e.target.value));
+      });
+    } else sG.appendChild(el("div", "kosong", "Data harga belum tersedia."));
+    T4.appendChild(sG);
+  } catch (e) { T4.appendChild(seksiGagal("Data & tren", e)); }
+
+  /* ================= TAB 5: METODOLOGI ================= */
+  const T5 = document.getElementById("tab-metodologi");
+  try {
+    const s = el("section", "blok");
+    s.innerHTML = `<h2>Metodologi</h2>
+      <p class="sub">Berisi aturan klasifikasi, angka ambang, hasil uji model, dan daftar rujukan. Semua status dihitung langsung di peramban Anda dari data mentahnya. Siapa pun bisa memeriksa ulang dan menghitung sendiri.</p>`;
+    const at = el("div", "kartu aturan");
+    at.style.padding = "6px 18px 14px";
+    at.innerHTML = `
+      <p>${tagStatus("BAHAYA")} Ada anomali statistik (|z| &gt; 2 terhadap tren 14 hari) dalam 7 hari terakhir yang jatuh <em>di luar</em> tanggal pembaruan massal, <strong>dan</strong> harga masih naik 5% atau lebih per minggu. Artinya risiko tekanan pasokan yang perlu segera diverifikasi sebelum intervensi disiapkan.</p>
+      <p>${tagStatus("ANOMALI")} Ada lonjakan statistik yang belum terkonfirmasi, termasuk lonjakan yang serentak di 8 komoditas atau lebih pada tanggal yang sama. <strong>Temuan riset kami:</strong> pola berulang di akhir bulan itu adalah siklus pembaruan data acuan PIHPS, bukan gejolak pasar. Yang dibutuhkan di sini verifikasi lapangan, bukan kepanikan.</p>
+      <p>${tagStatus("WASPADA")} Naik 5% atau lebih per minggu, turun 10% atau lebih per minggu (karena ini harga di tingkat petani, penurunan tajam berarti pendapatan petani tertekan), |z| ≥ 1,5, atau harga sedang berada di titik tertinggi 30 hari.</p>
+      <p>${tagStatus("AMAN")} Semua keadaan selain ketiga hal di atas.</p>
+      <p class="catatan"><strong>Ambang tiap pilar.</strong> <em>Cuaca:</em> ada wilayah dengan hujan ≥50&nbsp;mm atau berlabel ekstrem menjadi Waspada; tiga wilayah atau lebih menjadi Bahaya. <em>ENSO:</em> El&nbsp;Niño atau La&nbsp;Niña lemah sampai moderat menjadi Waspada, yang kuat menjadi Bahaya. <em>Cadangan:</em> 200&nbsp;ton ke atas Aman, 100 sampai 200 ton Waspada, di bawah 100 ton Bahaya (ambang indikatif). Kalau portal sumbernya menampilkan angka yang sama persis untuk tiga tahun anggaran atau lebih, kami tandai datanya tidak terpelihara dan tidak kami pakai menilai stok. <em>Pasokan SIMOTANDI:</em> rasio lahan generatif ditambah panen 12% ke atas Aman, 6 sampai 12% Waspada, di bawah 6% Bahaya. <em>Trends:</em> ada lonjakan pencarian menjadi Waspada. <em>SP2KP:</em> ada varian naik lebih dari 10% dalam 30 hari menjadi Waspada. <em>DPKP:</em> ada komoditas naik lebih dari 10% dalam 30 hari menjadi Waspada, dan Waspada adalah level tertinggi yang kami berikan untuk pilar ini karena mutu pencatatan di sumbernya tidak selalu seragam.</p>
+      <p class="catatan"><strong>Prakiraan risiko harga (tab Prakiraan):</strong> uji-mundur <em>rolling-origin</em> atas 14 komoditas DPKP, 228 minggu (Apr 2022–Agu 2026), membandingkan delapan pendekatan: naif atau <em>random walk</em>, drift, SES, Theta, Holt teredam, ARIMA(1,1,1), naif musiman, dan regresi Ridge lag+musim. Hasil: <strong>tidak ada model yang mengalahkan penduga naif</strong> pada horizon 1 minggu (MASE terbaik = 1,000), dan pada horizon 1 bulan naif tetap unggul rata-rata (SES menang di 5 dari 14 komoditas dan ARIMA di 7 dari 14, tetapi keduanya kalah pada rerata lintas komoditas). Hasil ini sejalan dengan sifat harga komoditas jangka pendek yang mendekati <em>martingale</em>. Karena itu penduga titik dipertahankan sebagai harga terkini, dan yang diprakirakan adalah <strong>ketidakpastiannya</strong>: interval dari kuantil empiris nonparametrik perubahan h-langkah tiap komoditas. Kalibrasi teruji: cakupan interval 80% tercapai 76,0% (h=1 minggu) dan 82,7% (h=1 bulan); interval 95% tercapai 94,5% dan 94,1%. Prakiraan peluang menembus ambang memiliki <em>Brier skill</em> +10,3% terhadap acuan iklim. Pengondisian pada bulan kalender diuji dan <strong>dilaporkan tidak membantu</strong> (skill turun ke +4,8%) sehingga tidak dipakai. Deret PIHPS tidak dipakai untuk prakiraan karena berbentuk fungsi tangga (9 nilai unik dalam 260 hari).</p>
+      <p class="catatan"><strong>Uji volatilitas berlebih (data DPKP):</strong> adaptasi metode <em>Excessive Food Price Variability Early Warning System</em> (IFPRI / Food Security Portal), dengan ambang nonparametrik pada persentil ke-95 kenaikan harian historis tiap komoditas, lalu jumlah hari ekstrem dalam jendela 90 hari dibandingkan dengan harapan statistiknya (5% observasi): melebihi dua kali lipat → tinggi, melebihi harapan → sedang. Diterapkan pada deret DPKP yang bergerak harian; deret PIHPS provinsi terlalu bertangga untuk uji ini. Kesesuaian hasil kedua metode (tipologi &amp; volatilitas) menjadi validasi silang.</p>
+      <p class="catatan"><strong>Metode &amp; rujukan:</strong> deteksi anomali z-score bergulir 14 hari; pengayaan konteks cuaca/iklim/sinyal publik; verifikasi tekstual otomatis mengikuti bukti fusi sinyal harga+berita (Bakry dkk., 2025, AUC 0,94 vs 0,46); klasifikasi volatilitas mengikuti kerangka IFPRI di atas. <strong>Yang kami akui belum beres:</strong> harga PIHPS masih rata-rata provinsi, bukan per pasar. Pilar SIMOTANDI baru setengah otomatis karena server sumbernya menolak akses dari layanan cloud yang kami pakai. Kliping berita masih indikatif, sebab berasal dari pencarian otomatis dan belum disaring manusia. Dan ini purwarupa riset, bukan produk resmi pemerintah.</p>`;
+    s.appendChild(at);
+    T5.appendChild(s);
+
+    const s2 = el("section", "blok");
+    s2.innerHTML = `<h2>Riwayat Pembaruan Data</h2><p class="sub">Waktu pembaruan terakhir tiap sumber. Seluruh angka di situs ini ditarik otomatis dari sumber resminya, tanpa satu pun yang diketik manual.</p>`;
+    const DAFTAR = [
+      ["PIHPS Bank Indonesia", gab || pihps, r => r.diambil_pada_utc],
+      ["SP2KP Kemendag", sp2kp, null], ["DPKP DIY", dpkp, null],
+      ["SIMOTANDI Kementan", simo, r => r.diambil_pada_utc], ["Cadangan Pangan DIY", cad, r => r.diambil_pada_utc],
+      ["BMKG", cuaca, r => r.fetched_at_utc], ["NOAA (ENSO/ONI)", enso, r => r.diambil_pada_utc],
+      ["Google Trends", trends, r => r.diambil_pada_utc], ["Sinyal Media", berita, null],
+    ];
+    const w = el("div", "tabel-wrap");
+    w.style.maxHeight = "none";
+    w.innerHTML = `<table><thead><tr><th>Pilar</th><th>Status</th><th class="num">Baris data</th><th>Terakhir diambil</th></tr></thead><tbody>${
+      DAFTAR.map(([nama, data, ts]) => {
+        const ada = data && data.length;
+        let waktu = "–";
+        if (ada && ts) {
+          let t = null;
+          data.forEach(r => { const v = ts(r); if (v) { const d = new Date(v); if (!isNaN(d) && (!t || d > t)) t = d; } });
+          if (t) waktu = t.toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" }) + " WIB";
+        }
+        return `<tr><td>${nama}</td><td>${ada ? '<span class="tag aman">aktif</span>' : '<span class="tag netral">kosong</span>'}</td>
+          <td class="num tnum">${ada ? fmtN(data.length) : "0"}</td><td>${waktu}</td></tr>`;
+      }).join("")}</tbody></table>`;
+    s2.appendChild(w);
+    T5.appendChild(s2);
+  } catch (e) { T5.appendChild(seksiGagal("Metodologi", e)); }
+
+  /* ---------- aktifkan tab awal ---------- */
+  const awal = (location.hash || "#ringkasan").slice(1);
+  bukaTab(["ringkasan", "status", "prakiraan", "konteks", "data", "metodologi"].includes(awal) ? awal : "ringkasan", true);
+}
+
+/* ================= animasi masuk =================
+   Dua bagian: urutan sampul saat halaman dibuka, dan penyingkapan tiap blok
+   ketika masuk layar. Keduanya memakai IntersectionObserver bawaan peramban,
+   bukan pustaka luar, supaya papan pantau tetap utuh tanpa akses jaringan. */
+const kurangiGerak = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Nav berlatar hanya SETELAH menempel. Dipantau lewat elemen penanda setinggi
+   1px di atasnya; lebih hemat daripada mendengarkan setiap peristiwa gulir. */
+(function pantauNav() {
+  const nav = document.getElementById("navbar");
+  if (!nav || !("IntersectionObserver" in window)) return;
+  const tanda = document.createElement("div");
+  tanda.style.cssText = "position:absolute;top:0;height:1px;width:1px;";
+  document.body.insertBefore(tanda, nav);
+  new IntersectionObserver(([e]) => nav.classList.toggle("nempel", !e.isIntersecting),
+    { threshold: 0 }).observe(tanda);
+})();
+
+function nyalakanSampul() {
+  document.documentElement.classList.add("siap");
+  document.querySelectorAll(".bilah .masuk, .sampul .masuk").forEach(el => el.classList.add("tampil"));
+}
+if (document.readyState === "loading")
+  document.addEventListener("DOMContentLoaded", () => requestAnimationFrame(nyalakanSampul));
+else requestAnimationFrame(nyalakanSampul);
+
+// Penyingkapan saat blok masuk layar. Sekali saja: begitu tampil, tidak diamati lagi.
+const pengamat = ("IntersectionObserver" in window) && !kurangiGerak
+  ? new IntersectionObserver((entri, ob) => {
+      entri.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("tampil");
+        ob.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.04 })
+  : null;
+
+/* Dipanggil setiap kali isi baru selesai digambar. Elemen di tab tersembunyi
+   memang belum pernah memotong layar, jadi animasinya baru berjalan saat
+   tabnya dibuka -- dan itu justru memberi transisi antar-tab secara gratis. */
+function pasangReveal(akar) {
+  const calon = (akar || document).querySelectorAll("main .blok:not(.masuk), main .kartu-pilar:not(.masuk)");
+  calon.forEach((el, i) => {
+    el.classList.add("masuk");
+    el.style.setProperty("--tunda", Math.min(i, 6) * 55 + "ms");
+    if (pengamat) pengamat.observe(el); else el.classList.add("tampil");
+  });
+}
+window.pasangReveal = pasangReveal;
+
+/* ================= sampul: tombol & pil status hidup ================= */
+document.querySelectorAll(".hero-aksi button[data-lompat]").forEach(b =>
+  b.addEventListener("click", () => bukaTab(b.dataset.lompat)));
+
+// Diisi oleh render ringkasan supaya pil sampul menampilkan keadaan sebenarnya.
+window.setPilSampul = (teks, warna) => {
+  const s = document.getElementById("hero-pil-teks");
+  const d = document.querySelector("#hero-pil .titik");
+  if (s) s.textContent = teks;
+  if (d && warna) { d.style.background = warna; d.style.boxShadow = "0 0 0 3px " + warna + "38"; }
+};
+
+/* ================= navigasi tab ================= */
+function bukaTab(id, ganti) {
+  document.querySelectorAll(".tabpane").forEach(p => { p.hidden = p.id !== "tab-" + id; });
+  document.querySelectorAll(".tabbtn").forEach(b => b.classList.toggle("aktif", b.dataset.tab === id));
+  if (ganti) history.replaceState(null, "", "#" + id); else if (location.hash !== "#" + id) history.pushState(null, "", "#" + id);
+  requestAnimationFrame(() => { jalankanChart(id); pasangReveal(document.getElementById("tab-" + id)); });
+
+  /* Sebelum ada sampul foto, kembali ke puncak halaman sudah benar karena kepala
+     hanya setinggi beberapa baris. Sekarang puncak halaman berisi foto setinggi
+     62vh, sehingga menggulir ke sana setelah ganti tab justru MENYEMBUNYIKAN isi
+     yang barusan diminta. Maka: berhenti tepat di bawah navigasi.
+     Pemuatan pertama (ganti=true) dikecualikan supaya sampulnya tetap terlihat. */
+  if (!ganti) {
+    const nav = document.querySelector("nav.tabs");
+    const y = nav ? nav.getBoundingClientRect().top + window.scrollY : 0;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }
+}
+document.getElementById("navtabs").addEventListener("click", e => {
+  const b = e.target.closest(".tabbtn");
+  if (b) bukaTab(b.dataset.tab);
+});
+window.addEventListener("popstate", () => {
+  const id = (location.hash || "#ringkasan").slice(1);
+  if (document.getElementById("tab-" + id)) bukaTab(id, true);
+});
+
+render().then(() => {
+  // Isi papan pantau digambar secara asinkron, jadi pemasangan pengamat harus
+  // menunggu sampai elemennya benar-benar ada di DOM.
+  requestAnimationFrame(() => pasangReveal());
+}).catch(e => {
+  console.error(e);
+  const m = document.getElementById("muat");
+  if (m) m.outerHTML = '<div class="gagal">Gagal memuat dashboard: ' + String(e).slice(0, 200) + "</div>";
+});
+</script>
+</body>
+</html>
