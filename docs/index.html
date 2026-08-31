@@ -46,16 +46,22 @@
      Tingginya dibatasi 62vh (bukan 100vh seperti laman wisata) supaya tab navigasi
      dan angka keputusan tetap terjangkau tanpa banyak menggulir. Foto perbukitan
      Menoreh dipilih karena lanskap itulah tempat pangan DIY ditanam. */
-  .sampul { position: relative; color: #fff; isolation: isolate; background: #12301d; overflow: hidden; }
+  /* overflow:hidden DIPINDAH ke .sampul-klip. Kalau dipasang di .sampul, nav yang
+     position:sticky di dalamnya berhenti lengket -- leluhur ber-overflow memotong
+     konteks sticky. Ini jebakan CSS yang mudah terlewat. */
+  .sampul { position: relative; color: #fff; isolation: isolate; background: #0d2416;
+            margin-top: calc(-1 * var(--tinggi-bilah)); }
+  .sampul-klip { position: absolute; inset: 0; overflow: hidden; z-index: -2; }
   .sampul::before {                       /* gelapkan supaya teks putih tetap terbaca */
     content: ""; position: absolute; inset: 0; z-index: -1;
     background:
-      linear-gradient(180deg, rgba(11,32,19,.80) 0%, rgba(13,38,23,.34) 40%, rgba(15,45,27,.62) 100%),
-      linear-gradient(100deg, rgba(11,32,19,.66) 0%, rgba(11,32,19,.08) 66%, rgba(11,32,19,.22) 100%);
+      linear-gradient(180deg, rgba(10,30,18,.58) 0%, rgba(12,36,22,.16) 44%, rgba(14,42,26,.52) 100%),
+      linear-gradient(100deg, rgba(10,30,18,.52) 0%, rgba(10,30,18,.03) 62%, rgba(10,30,18,.10) 100%);
   }
   header { position: relative; background: transparent; color: #fff; }
 
-  .hero { max-width: 1180px; margin: 0 auto; padding: 30px 22px 74px; }
+  .hero { max-width: 1180px; margin: 0 auto;
+          padding: calc(var(--tinggi-bilah) + 34px) 22px 74px; }
   .hero-pil {
     display: inline-flex; align-items: center; gap: 8px; padding: 7px 17px 7px 14px;
     border-radius: 999px; font-size: .74rem; font-weight: 700; letter-spacing: .09em;
@@ -87,12 +93,7 @@
                        border-color: rgba(255,255,255,.34); }
   .hero-aksi .kedua:hover  { background: rgba(255,255,255,.19); transform: translateY(-1px); }
   .hero-aksi button:focus-visible { outline: 3px solid #8fe3ad; outline-offset: 3px; }
-  .hero-gulir { margin-top: 34px; font-size: .72rem; letter-spacing: .17em;
-                text-transform: uppercase; color: rgba(255,255,255,.72);
-                display: inline-flex; align-items: center; gap: 9px; }
-  .hero-gulir svg { animation: turunNaik 2.1s ease-in-out infinite; }
   @keyframes turunNaik { 0%,100% { transform: translateY(0) } 50% { transform: translateY(4px) } }
-  @media (prefers-reduced-motion: reduce) { .hero-gulir svg { animation: none } }
 
   /* Lengkung putih yang menyambung sampul ke isi, seperti pada rujukan */
   .sampul-lengkung { display: block; width: 100%; height: 52px; margin-bottom: -1px; }
@@ -103,8 +104,8 @@
      ada satu pun elemen yang tersembunyi. Isi papan pantau tidak boleh bergantung
      pada animasi untuk bisa dibaca. */
   .sampul-foto {
-    position: absolute; inset: 0; z-index: -2;
-    background: #12301d url("img/hero-menoreh.jpg") center 58% / cover no-repeat;
+    position: absolute; inset: 0;
+    background: #12301d url("img/hero-tugu.jpg") center 26% / cover no-repeat;
     will-change: transform;
   }
   .anim .sampul-foto { transform: scale(1.06); }
@@ -129,12 +130,12 @@
   @media (max-width: 700px) {
     .sampul::before {
       background:
-        linear-gradient(180deg, rgba(11,32,19,.88) 0%, rgba(13,38,23,.68) 40%, rgba(15,45,27,.80) 100%),
-        linear-gradient(100deg, rgba(11,32,19,.76) 0%, rgba(11,32,19,.48) 66%, rgba(11,32,19,.56) 100%);
+        linear-gradient(180deg, rgba(10,30,18,.74) 0%, rgba(12,36,22,.52) 42%, rgba(14,42,26,.70) 100%),
+        linear-gradient(100deg, rgba(10,30,18,.66) 0%, rgba(10,30,18,.34) 66%, rgba(10,30,18,.44) 100%);
     }
   }
   @media (max-width: 680px) {
-    .hero { padding: 22px 16px 54px; }
+    .hero { padding: calc(var(--tinggi-bilah) + 22px) 16px 54px; }
     .hero-aksi button { flex: 1 1 100%; }
     .sampul-lengkung { height: 32px; }
   }
@@ -148,21 +149,54 @@
   .metahead { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: .74rem; opacity: .85; }
   .metahead b { font-weight: 600; }
 
-  /* ===== Nav tab sticky ===== */
-  nav.tabs { position: sticky; top: 0; z-index: 50; background: #fff;
-             border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(25,40,30,.06); }
-  nav.tabs .wrap { max-width: 1180px; margin: 0 auto; display: flex; gap: 2px;
-                   overflow-x: auto; scrollbar-width: none; padding: 0 14px; }
-  nav.tabs .wrap::-webkit-scrollbar { display: none; }
-  .tabbtn { appearance: none; background: none; border: none; cursor: pointer;
-            font: 600 .86rem var(--font-isi); color: var(--ink-2);
-            padding: 13px 15px 11px; border-bottom: 2.5px solid transparent;
-            white-space: nowrap; transition: color .15s; }
-  .tabbtn:hover { color: var(--hijau-700); }
-  .tabbtn.aktif { color: var(--hijau-800); border-bottom-color: var(--hijau-600); }
-  .tabbtn .bulat { display: inline-block; min-width: 17px; padding: 0 4px; margin-left: 5px;
-                   border-radius: 999px; font-size: .68rem; line-height: 17px; text-align: center;
-                   background: var(--hijau-100); color: var(--hijau-800); }
+  /* ===== Bilah atas =====
+     Diletakkan SEBAGAI SAUDARA sampul, bukan anaknya. Elemen position:sticky tidak
+     bisa keluar dari induknya; ketika nav masih di dalam sampul yang tingginya 62vh,
+     ia ikut hilang begitu sampul tergulir habis. Di sini tingginya dipatok tetap
+     (--tinggi-bilah) supaya sampul bisa ditarik naik tepat sebanyak itu, dan
+     fotonya mengalir di belakang bilah tanpa pergeseran tata letak. */
+  :root { --tinggi-bilah: 62px; }
+  .bilah { position: sticky; top: 0; z-index: 60; height: var(--tinggi-bilah);
+           background: transparent; border-bottom: 1px solid transparent;
+           transition: background .22s ease, border-color .22s ease, box-shadow .22s ease; }
+  .bilah.nempel { background: rgba(10,30,18,.95); backdrop-filter: blur(10px);
+                  border-bottom-color: rgba(255,255,255,.13); box-shadow: 0 6px 22px rgba(0,0,0,.28); }
+  .bilah > .wrap { max-width: 1180px; height: 100%; margin: 0 auto; padding: 0 22px;
+                   display: flex; align-items: center; gap: 18px; }
+  .merek { display: flex; align-items: center; gap: 10px; flex: none; color: #fff;
+           font-weight: 700; font-size: 1.02rem; letter-spacing: -.01em; }
+  .merek .logo { width: 32px; height: 32px; display: grid; place-items: center; font-size: 1.05rem;
+                 border-radius: 9px; background: rgba(255,255,255,.14);
+                 border: 1px solid rgba(255,255,255,.22); }
+  nav.tabs { flex: 1; min-width: 0; }
+  nav.tabs > div { display: flex; justify-content: flex-end; gap: 3px;
+                   overflow-x: auto; scrollbar-width: none; }
+  nav.tabs > div::-webkit-scrollbar { display: none; }
+  .tabbtn { font: inherit; font-weight: 600; font-size: .88rem; white-space: nowrap;
+            padding: 8px 15px; border-radius: 999px; border: 1px solid transparent;
+            background: transparent; color: rgba(255,255,255,.84); cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: background .16s ease, color .16s ease; }
+  .tabbtn:hover { background: rgba(255,255,255,.14); color: #fff; }
+  .tabbtn.aktif { background: #fff; color: var(--hijau-900); font-weight: 700; }
+  .tabbtn:focus-visible { outline: 3px solid #8fe3ad; outline-offset: 2px; }
+  .tabbtn .bulat { display: inline-flex; align-items: center; justify-content: center;
+                   min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+                   font-size: .68rem; font-weight: 700;
+                   background: rgba(255,255,255,.22); color: #fff; }
+  .tabbtn.aktif .bulat { background: var(--aman-bg); color: var(--aman); }
+
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 30px;
+               font-size: .8rem; color: rgba(233,243,237,.82); }
+  .hero-meta b { color: #fff; font-weight: 600; }
+
+  @media (max-width: 860px) {
+    :root { --tinggi-bilah: 56px; }
+    .merek span { display: none; }
+    nav.tabs > div { justify-content: flex-start; }
+    .bilah > .wrap { padding: 0 14px; gap: 10px; }
+    .tabbtn { font-size: .83rem; padding: 7px 12px; }
+  }
 
   main { max-width: 1180px; margin: 0 auto; padding: 24px 22px 56px; }
   .tabpane[hidden] { display: none; }
@@ -381,38 +415,39 @@ document.documentElement.classList.add("anim");
 </script>
 <body>
 
-<div class="sampul">
-<div class="sampul-foto" aria-hidden="true"></div>
-<header>
+<div class="bilah" id="navbar">
   <div class="wrap">
-    <div class="brand masuk" style="--tunda:0ms">
+    <div class="merek masuk" style="--tunda:0ms">
       <div class="logo">🌾</div>
-      <div>
-        <h1>SIGAP Pangan DIY</h1>
-        <p class="tagline">Sistem Peringatan Dini Ketahanan Pangan Multi-Sumber untuk Daerah Istimewa Yogyakarta</p>
-      </div>
+      <span>SIGAP Pangan DIY</span>
     </div>
-    <div class="metahead masuk" style="--tunda:120ms">
-      <span><b>Pengguna:</b> TPID DIY · Bank Indonesia · DPKP · Bulog</span>
-      <span><b>9 pilar data</b> · 7 diperbarui otomatis (GitHub Actions)</span>
-      <span id="badge-update">Memuat…</span>
-    </div>
+    <nav class="tabs masuk" style="--tunda:80ms"><div id="navtabs">
+      <button class="tabbtn" data-tab="ringkasan">Ringkasan</button>
+      <button class="tabbtn" data-tab="status">Status Komoditas <span class="bulat" id="nb-status"></span></button>
+      <button class="tabbtn" data-tab="prakiraan">Prakiraan Risiko</button>
+      <button class="tabbtn" data-tab="konteks">Konteks &amp; Pasokan</button>
+      <button class="tabbtn" data-tab="data">Data &amp; Tren</button>
+      <button class="tabbtn" data-tab="metodologi">Metodologi</button>
+    </div></nav>
   </div>
-</header>
+</div>
 
+<div class="sampul">
+<div class="sampul-klip" aria-hidden="true"><div class="sampul-foto"></div></div>
 <div class="hero">
   <!-- Pil ini TIDAK statis: isinya diisi ulang dari status komoditas terkini,
        sehingga sampul ikut memberi informasi, bukan sekadar hiasan. -->
-  <span class="hero-pil masuk" style="--tunda:80ms" id="hero-pil"><span class="titik"></span><span id="hero-pil-teks">Memuat kondisi terkini…</span></span>
-  <h2 class="masuk" style="--tunda:180ms">Peringatan Dini<span class="baris2">Harga Pangan DIY</span></h2>
-  <p class="hero-sub masuk" style="--tunda:300ms">Sembilan pilar data resmi dihimpun otomatis, tiga sumber harga saling diaudit, dan risiko lonjakan disajikan sebagai rentang beserta peluangnya, bukan tebakan satu angka.</p>
-  <div class="hero-aksi masuk" style="--tunda:400ms">
+  <span class="hero-pil masuk" style="--tunda:200ms" id="hero-pil"><span class="titik"></span><span id="hero-pil-teks">Memuat kondisi terkini…</span></span>
+  <h2 class="masuk" style="--tunda:300ms">Peringatan Dini<span class="baris2">Harga Pangan DIY</span></h2>
+  <p class="hero-sub masuk" style="--tunda:420ms">Sembilan pilar data resmi dihimpun otomatis, tiga sumber harga saling diaudit, dan risiko lonjakan disajikan sebagai rentang beserta peluangnya, bukan tebakan satu angka.</p>
+  <div class="hero-aksi masuk" style="--tunda:530ms">
     <button class="utama" data-lompat="ringkasan">Lihat kondisi hari ini</button>
     <button class="kedua" data-lompat="prakiraan">Prakiraan risiko harga</button>
   </div>
-  <div class="hero-gulir masuk" style="--tunda:520ms">Gulir ke bawah
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+  <div class="hero-meta masuk" style="--tunda:640ms">
+    <span><b>Pengguna:</b> TPID DIY · Bank Indonesia · DPKP · Bulog</span>
+    <span><b>9 pilar data</b> · 7 diperbarui otomatis</span>
+    <span id="badge-update">Memuat…</span>
   </div>
 </div>
 
@@ -421,14 +456,6 @@ document.documentElement.classList.add("anim");
 </svg>
 </div>
 
-<nav class="tabs"><div class="wrap" id="navtabs">
-  <button class="tabbtn" data-tab="ringkasan">Ringkasan</button>
-  <button class="tabbtn" data-tab="status">Status Komoditas <span class="bulat" id="nb-status"></span></button>
-  <button class="tabbtn" data-tab="prakiraan">Prakiraan Risiko</button>
-  <button class="tabbtn" data-tab="konteks">Konteks &amp; Pasokan</button>
-  <button class="tabbtn" data-tab="data">Data &amp; Tren</button>
-  <button class="tabbtn" data-tab="metodologi">Metodologi</button>
-</div></nav>
 
 <main>
   <div id="muat" class="loading">Memuat 9 sumber data…</div>
@@ -1898,9 +1925,21 @@ async function render() {
    bukan pustaka luar, supaya papan pantau tetap utuh tanpa akses jaringan. */
 const kurangiGerak = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* Nav berlatar hanya SETELAH menempel. Dipantau lewat elemen penanda setinggi
+   1px di atasnya; lebih hemat daripada mendengarkan setiap peristiwa gulir. */
+(function pantauNav() {
+  const nav = document.getElementById("navbar");
+  if (!nav || !("IntersectionObserver" in window)) return;
+  const tanda = document.createElement("div");
+  tanda.style.cssText = "position:absolute;top:0;height:1px;width:1px;";
+  document.body.insertBefore(tanda, nav);
+  new IntersectionObserver(([e]) => nav.classList.toggle("nempel", !e.isIntersecting),
+    { threshold: 0 }).observe(tanda);
+})();
+
 function nyalakanSampul() {
   document.documentElement.classList.add("siap");
-  document.querySelectorAll(".sampul .masuk").forEach(el => el.classList.add("tampil"));
+  document.querySelectorAll(".bilah .masuk, .sampul .masuk").forEach(el => el.classList.add("tampil"));
 }
 if (document.readyState === "loading")
   document.addEventListener("DOMContentLoaded", () => requestAnimationFrame(nyalakanSampul));
