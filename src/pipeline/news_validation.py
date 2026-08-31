@@ -161,17 +161,20 @@ def main():
         print("\nTidak ada kliping baru pada run ini; berkas lama dibiarkan apa adanya.")
         return
 
-    # Gabung lama + baru, buang kembar berdasarkan komoditas + bulan, urutkan
-    # dari yang terbaru supaya papan pantau menampilkan kliping paling relevan.
+    # Arsip lama dipertahankan APA ADANYA; hasil baru hanya ditambahkan.
+    #
+    # Versi sebelumnya menyaring gabungan lama+baru dengan kunci komoditas+bulan,
+    # sehingga baris lama yang kebetulan sekunci ikut terbuang. Akibatnya arsip
+    # MENYUSUT: 20 baris jadi 17 pada run 31 Agt, karena run itu cuma berhasil
+    # menambah sedikit (kuota Firecrawl gratis membatasi) tetapi membuang lebih
+    # banyak. Arsip kliping tidak boleh mengecil karena alasan apa pun.
     kolom = list(hasil_semua[0].keys())
-    gabung, terpakai = [], set()
-    for r in hasil_semua + lama:
-        k = f"{r.get('komoditas')}|{str(r.get('tanggal'))[:7]}"
-        if k in terpakai:
-            continue
-        terpakai.add(k)
-        gabung.append({c: r.get(c, "") for c in kolom})
+    kunci_lama = {f"{r.get('komoditas')}|{str(r.get('tanggal'))[:7]}" for r in lama}
+    tambahan = [r for r in hasil_semua
+                if f"{r.get('komoditas')}|{str(r.get('tanggal'))[:7]}" not in kunci_lama]
+    gabung = [{c: r.get(c, "") for c in kolom} for r in (tambahan + lama)]
     gabung.sort(key=lambda r: str(r.get("tanggal", "")), reverse=True)
+    assert len(gabung) >= len(lama), "arsip kliping tidak boleh menyusut"
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:
@@ -181,7 +184,8 @@ def main():
 
     tervalidasi = sum(1 for h in hasil_semua if h["tervalidasi"])
     print(f"\n{tervalidasi}/{len(hasil_semua)} anomali baru menemukan berita pendukung.")
-    print(f"Arsip kliping: {len(lama)} -> {len(gabung)} baris, disimpan ke {OUTPUT_PATH}")
+    print(f"Arsip kliping: {len(lama)} + {len(tambahan)} baru = {len(gabung)} baris, "
+          f"disimpan ke {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":
