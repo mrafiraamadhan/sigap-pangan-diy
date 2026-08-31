@@ -153,6 +153,19 @@
               opacity: 0; transition: opacity .12s; white-space: nowrap; z-index: 5;
               box-shadow: 0 4px 14px rgba(0,0,0,.22); }
   .peta-tip b { font-size: .8rem; }
+  .peta-svg path.terpilih { stroke: #14331f; stroke-width: 1.8; opacity: 1; }
+  .detail-kec { margin-top: 14px; border-top: 2px solid var(--border); padding-top: 14px; }
+  .dk-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .dk-nama { font-family: var(--font-judul); font-size: 1.05rem; font-weight: 750; color: var(--hijau-900); }
+  .dk-sub { font-size: .76rem; color: var(--ink-2); }
+  .dk-tutup { appearance: none; border: 1px solid var(--border); background: var(--surface-2); cursor: pointer;
+              border-radius: 7px; padding: 4px 11px; font: 600 .74rem var(--font-isi); color: var(--ink-2); }
+  .dk-tutup:hover { background: #efece2; }
+  .dk-stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 9px; margin: 11px 0; }
+  .dk-kotak { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 9px; padding: 9px 11px; }
+  .dk-kotak .n { font-family: var(--font-judul); font-size: 1.02rem; font-weight: 750; color: var(--hijau-900); }
+  .dk-kotak .l { font-size: .68rem; color: var(--ink-2); margin-top: 1px; line-height: 1.35; }
+  .peta-petunjuk { font-size: .72rem; color: var(--ink-3); margin-top: 6px; }
   .peta-legenda { display: flex; align-items: center; gap: 9px; margin-top: 10px; font-size: .72rem; color: var(--ink-2); flex-wrap: wrap; }
   .legenda-skala { display: flex; height: 11px; border-radius: 3px; overflow: hidden; width: 190px; }
   .legenda-skala i { flex: 1; }
@@ -965,9 +978,96 @@ async function render() {
         sp.appendChild(kp2);
         const kartuPeta = el("div", "panel");
         kartuPeta.innerHTML = `<div class="peta-wrap"><div id="peta-host"></div><div class="peta-tip" id="peta-tip"></div></div>
-          <div class="peta-legenda" id="peta-legenda"></div>`;
+          <div class="peta-legenda" id="peta-legenda"></div>
+          <div class="peta-petunjuk">Klik satu kecamatan untuk melihat pola musiman panennya.</div>
+          <div id="detail-kec"></div>`;
         sp.appendChild(kartuPeta);
         sS.appendChild(sp);
+
+        // --- pola musiman PER KECAMATAN dari seluruh 79 periode 12-harian ---
+        const NAMA_BLN = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+        const musimKec = {};      // kecamatan -> {bulan: {panen:[], tanam:[], gen:[]}}
+        simo.forEach(r => {
+          const k = String(r.kecamatan || "").trim();
+          const tgl = String(r.periode_mulai || "");
+          if (!k || tgl.length < 7) return;
+          const b = Number(tgl.slice(5, 7)) - 1;
+          if (!(b >= 0 && b < 12)) return;
+          (musimKec[k] ||= Array.from({ length: 12 }, () => ({ panen: [], tanam: [], gen: [] })));
+          musimKec[k][b].panen.push(Number(r.panen_ha) || 0);
+          musimKec[k][b].tanam.push((Number(r.tanam_ha) || 0) + (Number(r.persiapan_lahan_ha) || 0));
+          musimKec[k][b].gen.push((Number(r.generatif_1_ha) || 0) + (Number(r.generatif_2_ha) || 0));
+        });
+        const rerata = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
+
+        let chartKec = null, terpilih = null;
+        const tampilkanDetail = (nama) => {
+          const host = document.getElementById("detail-kec");
+          const prof = musimKec[nama];
+          const kini = nilaiKec[nama];
+          if (!host || !prof) return;
+          const panen = prof.map(o => rerata(o.panen));
+          const tanam = prof.map(o => rerata(o.tanam));
+          const nObs = prof.map(o => o.panen.length);
+          const iMaks = panen.indexOf(Math.max(...panen));
+          const iMin = panen.indexOf(Math.min(...panen));
+          // bulan berjalan dari periode terbaru
+          const tglAkhir = stK.map(r => r.periode_mulai).filter(Boolean).sort().pop();
+          const blnKini = tglAkhir ? Number(String(tglAkhir).slice(5, 7)) - 1 : null;
+          const posisi = panen[iMaks] > 0 && blnKini !== null ? panen[blnKini] / panen[iMaks] * 100 : null;
+
+          host.className = "detail-kec";
+          host.innerHTML = `
+            <div class="dk-head">
+              <div><div class="dk-nama">Kecamatan ${nama}</div>
+                <div class="dk-sub">${kini ? kini.kab : ""} · pola dari ${simo.filter(r => String(r.kecamatan).trim() === nama).length} periode pengamatan (Jan 2024–kini)</div></div>
+              <button class="dk-tutup" id="dk-tutup">Tutup ✕</button>
+            </div>
+            <div class="dk-stat">
+              <div class="dk-kotak"><div class="n">${NAMA_BLN[iMaks]}</div><div class="l">bulan panen tertinggi (rata-rata ${fmtN(panen[iMaks])} ha)</div></div>
+              <div class="dk-kotak"><div class="n">${NAMA_BLN[iMin]}</div><div class="l">bulan panen terendah (rata-rata ${fmtN(panen[iMin])} ha)</div></div>
+              ${posisi !== null ? `<div class="dk-kotak"><div class="n">${posisi.toFixed(0)}%</div><div class="l">posisi ${NAMA_BLN[blnKini]} terhadap puncak tahunan</div></div>` : ""}
+              ${kini && kini.baku > 0 ? `<div class="dk-kotak"><div class="n">${fmtN(kini.baku)} ha</div><div class="l">luas baku sawah kecamatan</div></div>` : ""}
+            </div>
+            <div class="wadah-chart" style="height:210px"><canvas id="ch-kec"></canvas></div>
+            <div class="insight" style="margin-top:10px">${
+              posisi !== null && posisi < 40
+                ? `Saat ini <strong>${NAMA_BLN[blnKini]}</strong> merupakan periode sepi panen bagi kecamatan ini (${posisi.toFixed(0)}% dari puncak <strong>${NAMA_BLN[iMaks]}</strong>). Pasokan gabah dari wilayah ini sedang minimal.`
+                : posisi !== null && posisi > 75
+                ? `Saat ini <strong>${NAMA_BLN[blnKini]}</strong> mendekati puncak panen kecamatan ini — wilayah ini menjadi penyumbang pasokan utama pada periode berjalan.`
+                : `Puncak panen kecamatan ini jatuh pada <strong>${NAMA_BLN[iMaks]}</strong>, berbeda dari agregat provinsi yang memuncak pada Februari — perbedaan waktu panen antarkecamatan inilah yang meratakan pasokan sepanjang tahun.`
+            } <span class="catatan-kecil">Tiap bulan dirata-rata dari ${Math.min(...nObs)}–${Math.max(...nObs)} periode pengamatan.</span></div>`;
+
+          document.getElementById("dk-tutup").addEventListener("click", () => {
+            host.innerHTML = ""; host.className = "";
+            if (chartKec) { chartKec.destroy(); chartKec = null; }
+            if (terpilih) { terpilih.classList.remove("terpilih"); terpilih = null; }
+          });
+
+          const cv = document.getElementById("ch-kec");
+          if (cv && window.Chart) {
+            if (chartKec) chartKec.destroy();
+            chartKec = new Chart(cv.getContext("2d"), {
+              type: "bar",
+              data: { labels: NAMA_BLN, datasets: [
+                { label: "Rata-rata luas panen (ha)", data: panen.map(v => Math.round(v * 10) / 10),
+                  backgroundColor: NAMA_BLN.map((_, i) => i === blnKini ? "#a11c1c" : "#1c4a2e"),
+                  borderRadius: 4, barPercentage: .72, order: 2 },
+                { label: "Rata-rata persiapan & tanam (ha)", data: tanam.map(v => Math.round(v * 10) / 10),
+                  type: "line", borderColor: "#8fc3a0", backgroundColor: "#8fc3a0",
+                  borderWidth: 2, tension: .3, pointRadius: 2.5, fill: false, order: 1 },
+              ] },
+              options: { responsive: true, maintainAspectRatio: false, animation: false,
+                plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 9.5 } } },
+                  tooltip: { callbacks: {
+                    label: it => `${it.dataset.label}: ${fmtN(it.raw)} ha`,
+                    afterLabel: it => it.datasetIndex === 0 ? `dari ${nObs[it.dataIndex]} periode pengamatan` : "" } } },
+                scales: { y: { ticks: { callback: v => fmtN(v), font: { size: 9.5 } }, grid: { color: "#efece2" } },
+                          x: { ticks: { font: { size: 9.5 } }, grid: { display: false } } } },
+            });
+          } else if (cv) pesanTanpaChart(cv.parentElement);
+          host.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        };
 
         // --- proyeksi & penggambar SVG (tanpa pustaka peta; aman dari pemblokiran) ---
         const gambarPeta = (metrik) => {
@@ -1031,6 +1131,19 @@ async function render() {
               tip.style.top = Math.max(0, y - 52) + "px";
             });
             svg.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+            svg.addEventListener("click", ev => {
+              const p = ev.target.closest("path");
+              if (!p || !p.dataset.nm) return;
+              if (terpilih) terpilih.classList.remove("terpilih");
+              p.classList.add("terpilih"); terpilih = p;
+              tampilkanDetail(p.dataset.nm);
+            });
+          }
+          // pertahankan sorotan bila peta digambar ulang saat ganti metrik
+          if (terpilih) {
+            const nm = terpilih.dataset.nm;
+            const baru = host.querySelector(`path[data-nm="${nm}"]`);
+            if (baru) { baru.classList.add("terpilih"); terpilih = baru; }
           }
         };
         daftarChart("konteks", () => {
