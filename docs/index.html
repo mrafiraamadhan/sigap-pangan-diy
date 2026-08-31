@@ -42,21 +42,79 @@
   .num, .tnum { font-variant-numeric: tabular-nums; }
 
   /* ===== Header ===== */
-  /* Pita kepala: foto perbukitan Menoreh berkabut dipasang SEBAGAI TEKSTUR, bukan
-     sebagai sampul. Gradien hijau tetap dilukis di atasnya dengan pekat, sehingga
-     kontras teks putih tidak berkurang sedikit pun dan tinggi kepala tidak
-     bertambah. Papan pantau ini dipakai mengambil keputusan; fotonya memberi
-     identitas tempat, bukan mendorong isi turun ke bawah layar. */
-  header {
-    position: relative; color: #fff;
-    background: #12301d url("img/pita-menoreh.jpg") center 62% / cover no-repeat;
+  /* ===== Sampul: satu blok foto yang memuat identitas + judul + dua tindakan =====
+     Tingginya dibatasi 62vh (bukan 100vh seperti laman wisata) supaya tab navigasi
+     dan angka keputusan tetap terjangkau tanpa banyak menggulir. Foto perbukitan
+     Menoreh dipilih karena lanskap itulah tempat pangan DIY ditanam. */
+  .sampul {
+    position: relative; color: #fff; isolation: isolate;
+    background: #12301d url("img/hero-menoreh.jpg") center 58% / cover no-repeat;
   }
-  header::before {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(118deg, rgba(18,48,29,.965) 0%, rgba(28,74,46,.925) 55%, rgba(36,96,60,.82) 100%);
+  .sampul::before {                       /* gelapkan supaya teks putih tetap terbaca */
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background:
+      linear-gradient(180deg, rgba(11,32,19,.80) 0%, rgba(13,38,23,.34) 40%, rgba(15,45,27,.62) 100%),
+      linear-gradient(100deg, rgba(11,32,19,.66) 0%, rgba(11,32,19,.08) 66%, rgba(11,32,19,.22) 100%);
   }
-  header > .wrap { position: relative; }
-  @media (prefers-reduced-motion: no-preference) { header { background-attachment: scroll; } }
+  header { position: relative; background: transparent; color: #fff; }
+
+  .hero { max-width: 1180px; margin: 0 auto; padding: 30px 22px 74px; }
+  .hero-pil {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 17px 7px 14px;
+    border-radius: 999px; font-size: .74rem; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: #eafaf0;
+    background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.26);
+    backdrop-filter: blur(3px);
+  }
+  .hero-pil .titik { width: 8px; height: 8px; border-radius: 50%; background: #7ee2a4;
+                     box-shadow: 0 0 0 3px rgba(126,226,164,.22); flex: none; }
+  .hero h2 {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-weight: 700; font-size: clamp(2.1rem, 6.2vw, 4.05rem); line-height: 1.03;
+    letter-spacing: -.022em; margin: 20px 0 0; text-wrap: balance;
+    color: #fff;                    /* wajib tegas: aturan h2 global memasang warna hijau tua */
+    text-shadow: 0 2px 22px rgba(6,20,12,.44);
+  }
+  .hero h2 .baris2 { display: block; color: #8fe3ad; }
+  .hero-sub { max-width: 45ch; margin: 17px 0 0; font-size: 1.03rem; line-height: 1.62;
+              color: #e9f3ed; text-shadow: 0 1px 12px rgba(6,20,12,.45); }
+  .hero-aksi { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 27px; }
+  .hero-aksi button {
+    font: inherit; font-weight: 700; font-size: .95rem; cursor: pointer;
+    padding: 14px 27px; border-radius: 999px; border: 1px solid transparent;
+    transition: transform .14s ease, background .14s ease, border-color .14s ease;
+  }
+  .hero-aksi .utama  { background: #1f9d55; color: #fff; }
+  .hero-aksi .utama:hover  { background: #23af5f; transform: translateY(-1px); }
+  .hero-aksi .kedua  { background: rgba(255,255,255,.10); color: #fff;
+                       border-color: rgba(255,255,255,.34); }
+  .hero-aksi .kedua:hover  { background: rgba(255,255,255,.19); transform: translateY(-1px); }
+  .hero-aksi button:focus-visible { outline: 3px solid #8fe3ad; outline-offset: 3px; }
+  .hero-gulir { margin-top: 34px; font-size: .72rem; letter-spacing: .17em;
+                text-transform: uppercase; color: rgba(255,255,255,.72);
+                display: inline-flex; align-items: center; gap: 9px; }
+  .hero-gulir svg { animation: turunNaik 2.1s ease-in-out infinite; }
+  @keyframes turunNaik { 0%,100% { transform: translateY(0) } 50% { transform: translateY(4px) } }
+  @media (prefers-reduced-motion: reduce) { .hero-gulir svg { animation: none } }
+
+  /* Lengkung putih yang menyambung sampul ke isi, seperti pada rujukan */
+  .sampul-lengkung { display: block; width: 100%; height: 52px; margin-bottom: -1px; }
+
+  /* Di layar sempit foto terpotong ke bagian kabut yang lebih terang, sehingga
+     kontras subjudul turun di bawah ambang WCAG AA. Selubungnya dipekatkan khusus
+     di sini, diukur ulang setelahnya. */
+  @media (max-width: 700px) {
+    .sampul::before {
+      background:
+        linear-gradient(180deg, rgba(11,32,19,.88) 0%, rgba(13,38,23,.68) 40%, rgba(15,45,27,.80) 100%),
+        linear-gradient(100deg, rgba(11,32,19,.76) 0%, rgba(11,32,19,.48) 66%, rgba(11,32,19,.56) 100%);
+    }
+  }
+  @media (max-width: 680px) {
+    .hero { padding: 22px 16px 54px; }
+    .hero-aksi button { flex: 1 1 100%; }
+    .sampul-lengkung { height: 32px; }
+  }
   header .wrap { max-width: 1180px; margin: 0 auto; padding: 26px 22px 18px; }
   .brand { display: flex; align-items: center; gap: 13px; }
   .logo { width: 44px; height: 44px; border-radius: 11px; background: rgba(255,255,255,.12);
@@ -294,6 +352,7 @@
 </head>
 <body>
 
+<div class="sampul">
 <header>
   <div class="wrap">
     <div class="brand">
@@ -310,6 +369,27 @@
     </div>
   </div>
 </header>
+
+<div class="hero">
+  <!-- Pil ini TIDAK statis: isinya diisi ulang dari status komoditas terkini,
+       sehingga sampul ikut memberi informasi, bukan sekadar hiasan. -->
+  <span class="hero-pil" id="hero-pil"><span class="titik"></span><span id="hero-pil-teks">Memuat kondisi terkini…</span></span>
+  <h2>Peringatan Dini<span class="baris2">Harga Pangan DIY</span></h2>
+  <p class="hero-sub">Sembilan pilar data resmi dihimpun otomatis, tiga sumber harga saling diaudit, dan risiko lonjakan disajikan sebagai rentang beserta peluangnya, bukan tebakan satu angka.</p>
+  <div class="hero-aksi">
+    <button class="utama" data-lompat="ringkasan">Lihat kondisi hari ini</button>
+    <button class="kedua" data-lompat="prakiraan">Prakiraan risiko harga</button>
+  </div>
+  <div class="hero-gulir">Gulir ke bawah
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+</div>
+
+<svg class="sampul-lengkung" viewBox="0 0 1440 52" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0,52 C260,4 560,0 760,14 C980,29 1220,50 1440,30 L1440,52 Z" fill="var(--bg)"/>
+</svg>
+</div>
 
 <nav class="tabs"><div class="wrap" id="navtabs">
   <button class="tabbtn" data-tab="ringkasan">Ringkasan</button>
@@ -818,6 +898,14 @@ async function render() {
       const n = st => tip.hasil.filter(x => x.status === st).length;
       const nB = n("BAHAYA"), nA = n("ANOMALI"), nW = n("WASPADA"), nS = n("AMAN");
       document.getElementById("nb-status").textContent = nB + nA + nW || "✓";
+
+      // Pil di sampul mengikuti keadaan sebenarnya, bukan slogan tetap.
+      if (window.setPilSampul) {
+        if (nB > 0) setPilSampul(`${nB} komoditas bergejolak · perlu tindakan`, "#e0644f");
+        else if (nA > 0) setPilSampul("Tidak ada tanda krisis pangan · perlu pengecekan harga", "#7ee2a4");
+        else if (nW > 0) setPilSampul("Terkendali · sebagian komoditas dalam pengawasan", "#f0c454");
+        else setPilSampul("Harga pangan DIY terkendali", "#7ee2a4");
+      }
 
       const s = el("section", "blok");
       const banner = el("div", "kartu banner");
@@ -1773,6 +1861,21 @@ async function render() {
   const awal = (location.hash || "#ringkasan").slice(1);
   bukaTab(["ringkasan", "status", "prakiraan", "konteks", "data", "metodologi"].includes(awal) ? awal : "ringkasan", true);
 }
+
+/* ================= sampul: tombol & pil status hidup ================= */
+document.querySelectorAll(".hero-aksi button[data-lompat]").forEach(b =>
+  b.addEventListener("click", () => {
+    bukaTab(b.dataset.lompat);
+    document.querySelector("nav.tabs").scrollIntoView({ behavior: "smooth", block: "start" });
+  }));
+
+// Diisi oleh render ringkasan supaya pil sampul menampilkan keadaan sebenarnya.
+window.setPilSampul = (teks, warna) => {
+  const s = document.getElementById("hero-pil-teks");
+  const d = document.querySelector("#hero-pil .titik");
+  if (s) s.textContent = teks;
+  if (d && warna) { d.style.background = warna; d.style.boxShadow = "0 0 0 3px " + warna + "38"; }
+};
 
 /* ================= navigasi tab ================= */
 function bukaTab(id, ganti) {
