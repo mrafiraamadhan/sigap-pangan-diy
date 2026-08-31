@@ -46,10 +46,7 @@
      Tingginya dibatasi 62vh (bukan 100vh seperti laman wisata) supaya tab navigasi
      dan angka keputusan tetap terjangkau tanpa banyak menggulir. Foto perbukitan
      Menoreh dipilih karena lanskap itulah tempat pangan DIY ditanam. */
-  .sampul {
-    position: relative; color: #fff; isolation: isolate;
-    background: #12301d url("img/hero-menoreh.jpg") center 58% / cover no-repeat;
-  }
+  .sampul { position: relative; color: #fff; isolation: isolate; background: #12301d; overflow: hidden; }
   .sampul::before {                       /* gelapkan supaya teks putih tetap terbaca */
     content: ""; position: absolute; inset: 0; z-index: -1;
     background:
@@ -99,6 +96,32 @@
 
   /* Lengkung putih yang menyambung sampul ke isi, seperti pada rujukan */
   .sampul-lengkung { display: block; width: 100%; height: 52px; margin-bottom: -1px; }
+
+  /* ===== Animasi masuk =====
+     Dipasang lewat kelas .anim yang ditambahkan JavaScript pada <html>. Kalau
+     JavaScript gagal atau dimatikan, kelas itu tidak pernah ada, sehingga tidak
+     ada satu pun elemen yang tersembunyi. Isi papan pantau tidak boleh bergantung
+     pada animasi untuk bisa dibaca. */
+  .sampul-foto {
+    position: absolute; inset: 0; z-index: -2;
+    background: #12301d url("img/hero-menoreh.jpg") center 58% / cover no-repeat;
+    will-change: transform;
+  }
+  .anim .sampul-foto { transform: scale(1.06); }
+  .anim.siap .sampul-foto { transform: scale(1); transition: transform 1600ms cubic-bezier(.22,.61,.36,1); }
+
+  .anim .masuk { opacity: 0; transform: translateY(15px); }
+  .anim .masuk.tampil {
+    opacity: 1; transform: none;
+    transition: opacity 620ms cubic-bezier(.22,.61,.36,1) var(--tunda, 0ms),
+                transform 620ms cubic-bezier(.22,.61,.36,1) var(--tunda, 0ms);
+  }
+
+  /* Bagi yang memilih mengurangi gerak: semuanya langsung tampil, tanpa transisi. */
+  @media (prefers-reduced-motion: reduce) {
+    .anim .masuk, .anim .masuk.tampil { opacity: 1; transform: none; transition: none; }
+    .anim .sampul-foto, .anim.siap .sampul-foto { transform: none; transition: none; }
+  }
 
   /* Di layar sempit foto terpotong ke bagian kabut yang lebih terang, sehingga
      kontras subjudul turun di bawah ambang WCAG AA. Selubungnya dipekatkan khusus
@@ -350,19 +373,26 @@
   }
 </style>
 </head>
+<script>
+/* Ditaruh SEBELUM <body> supaya kelas .anim sudah ada saat lukisan pertama.
+   Kalau skrip ini tidak jalan, kelasnya tidak pernah ada dan seluruh isi tampil
+   normal tanpa animasi. Animasi tidak boleh jadi syarat keterbacaan. */
+document.documentElement.classList.add("anim");
+</script>
 <body>
 
 <div class="sampul">
+<div class="sampul-foto" aria-hidden="true"></div>
 <header>
   <div class="wrap">
-    <div class="brand">
+    <div class="brand masuk" style="--tunda:0ms">
       <div class="logo">🌾</div>
       <div>
         <h1>SIGAP Pangan DIY</h1>
         <p class="tagline">Sistem Peringatan Dini Ketahanan Pangan Multi-Sumber untuk Daerah Istimewa Yogyakarta</p>
       </div>
     </div>
-    <div class="metahead">
+    <div class="metahead masuk" style="--tunda:120ms">
       <span><b>Pengguna:</b> TPID DIY · Bank Indonesia · DPKP · Bulog</span>
       <span><b>9 pilar data</b> · 7 diperbarui otomatis (GitHub Actions)</span>
       <span id="badge-update">Memuat…</span>
@@ -373,14 +403,14 @@
 <div class="hero">
   <!-- Pil ini TIDAK statis: isinya diisi ulang dari status komoditas terkini,
        sehingga sampul ikut memberi informasi, bukan sekadar hiasan. -->
-  <span class="hero-pil" id="hero-pil"><span class="titik"></span><span id="hero-pil-teks">Memuat kondisi terkini…</span></span>
-  <h2>Peringatan Dini<span class="baris2">Harga Pangan DIY</span></h2>
-  <p class="hero-sub">Sembilan pilar data resmi dihimpun otomatis, tiga sumber harga saling diaudit, dan risiko lonjakan disajikan sebagai rentang beserta peluangnya, bukan tebakan satu angka.</p>
-  <div class="hero-aksi">
+  <span class="hero-pil masuk" style="--tunda:80ms" id="hero-pil"><span class="titik"></span><span id="hero-pil-teks">Memuat kondisi terkini…</span></span>
+  <h2 class="masuk" style="--tunda:180ms">Peringatan Dini<span class="baris2">Harga Pangan DIY</span></h2>
+  <p class="hero-sub masuk" style="--tunda:300ms">Sembilan pilar data resmi dihimpun otomatis, tiga sumber harga saling diaudit, dan risiko lonjakan disajikan sebagai rentang beserta peluangnya, bukan tebakan satu angka.</p>
+  <div class="hero-aksi masuk" style="--tunda:400ms">
     <button class="utama" data-lompat="ringkasan">Lihat kondisi hari ini</button>
     <button class="kedua" data-lompat="prakiraan">Prakiraan risiko harga</button>
   </div>
-  <div class="hero-gulir">Gulir ke bawah
+  <div class="hero-gulir masuk" style="--tunda:520ms">Gulir ke bawah
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
   </div>
@@ -1862,12 +1892,47 @@ async function render() {
   bukaTab(["ringkasan", "status", "prakiraan", "konteks", "data", "metodologi"].includes(awal) ? awal : "ringkasan", true);
 }
 
+/* ================= animasi masuk =================
+   Dua bagian: urutan sampul saat halaman dibuka, dan penyingkapan tiap blok
+   ketika masuk layar. Keduanya memakai IntersectionObserver bawaan peramban,
+   bukan pustaka luar, supaya papan pantau tetap utuh tanpa akses jaringan. */
+const kurangiGerak = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function nyalakanSampul() {
+  document.documentElement.classList.add("siap");
+  document.querySelectorAll(".sampul .masuk").forEach(el => el.classList.add("tampil"));
+}
+if (document.readyState === "loading")
+  document.addEventListener("DOMContentLoaded", () => requestAnimationFrame(nyalakanSampul));
+else requestAnimationFrame(nyalakanSampul);
+
+// Penyingkapan saat blok masuk layar. Sekali saja: begitu tampil, tidak diamati lagi.
+const pengamat = ("IntersectionObserver" in window) && !kurangiGerak
+  ? new IntersectionObserver((entri, ob) => {
+      entri.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("tampil");
+        ob.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.04 })
+  : null;
+
+/* Dipanggil setiap kali isi baru selesai digambar. Elemen di tab tersembunyi
+   memang belum pernah memotong layar, jadi animasinya baru berjalan saat
+   tabnya dibuka -- dan itu justru memberi transisi antar-tab secara gratis. */
+function pasangReveal(akar) {
+  const calon = (akar || document).querySelectorAll("main .blok:not(.masuk), main .kartu-pilar:not(.masuk)");
+  calon.forEach((el, i) => {
+    el.classList.add("masuk");
+    el.style.setProperty("--tunda", Math.min(i, 6) * 55 + "ms");
+    if (pengamat) pengamat.observe(el); else el.classList.add("tampil");
+  });
+}
+window.pasangReveal = pasangReveal;
+
 /* ================= sampul: tombol & pil status hidup ================= */
 document.querySelectorAll(".hero-aksi button[data-lompat]").forEach(b =>
-  b.addEventListener("click", () => {
-    bukaTab(b.dataset.lompat);
-    document.querySelector("nav.tabs").scrollIntoView({ behavior: "smooth", block: "start" });
-  }));
+  b.addEventListener("click", () => bukaTab(b.dataset.lompat)));
 
 // Diisi oleh render ringkasan supaya pil sampul menampilkan keadaan sebenarnya.
 window.setPilSampul = (teks, warna) => {
@@ -1882,8 +1947,18 @@ function bukaTab(id, ganti) {
   document.querySelectorAll(".tabpane").forEach(p => { p.hidden = p.id !== "tab-" + id; });
   document.querySelectorAll(".tabbtn").forEach(b => b.classList.toggle("aktif", b.dataset.tab === id));
   if (ganti) history.replaceState(null, "", "#" + id); else if (location.hash !== "#" + id) history.pushState(null, "", "#" + id);
-  requestAnimationFrame(() => jalankanChart(id));
-  window.scrollTo({ top: 0 });
+  requestAnimationFrame(() => { jalankanChart(id); pasangReveal(document.getElementById("tab-" + id)); });
+
+  /* Sebelum ada sampul foto, kembali ke puncak halaman sudah benar karena kepala
+     hanya setinggi beberapa baris. Sekarang puncak halaman berisi foto setinggi
+     62vh, sehingga menggulir ke sana setelah ganti tab justru MENYEMBUNYIKAN isi
+     yang barusan diminta. Maka: berhenti tepat di bawah navigasi.
+     Pemuatan pertama (ganti=true) dikecualikan supaya sampulnya tetap terlihat. */
+  if (!ganti) {
+    const nav = document.querySelector("nav.tabs");
+    const y = nav ? nav.getBoundingClientRect().top + window.scrollY : 0;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }
 }
 document.getElementById("navtabs").addEventListener("click", e => {
   const b = e.target.closest(".tabbtn");
@@ -1894,7 +1969,11 @@ window.addEventListener("popstate", () => {
   if (document.getElementById("tab-" + id)) bukaTab(id, true);
 });
 
-render().catch(e => {
+render().then(() => {
+  // Isi papan pantau digambar secara asinkron, jadi pemasangan pengamat harus
+  // menunggu sampai elemennya benar-benar ada di DOM.
+  requestAnimationFrame(() => pasangReveal());
+}).catch(e => {
   console.error(e);
   const m = document.getElementById("muat");
   if (m) m.outerHTML = '<div class="gagal">Gagal memuat dashboard: ' + String(e).slice(0, 200) + "</div>";
