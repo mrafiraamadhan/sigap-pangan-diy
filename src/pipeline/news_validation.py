@@ -104,8 +104,25 @@ def main():
     anomali = anomali.sort_values("tanggal", ascending=False)
     total_kandidat = len(anomali)
 
+    # Kliping yang SUDAH terkumpul dari run-run sebelumnya. Versi lama membuka
+    # berkas keluaran dengan mode "w", jadi tiap run menimpa habis isinya dan
+    # jumlah kliping mentok di MAKS_VALIDASI selamanya. Lebih buruk lagi:
+    # karena urutannya selalu dari anomali terbaru, kuota pencarian habis untuk
+    # MENGULANG komoditas-bulan yang sudah divalidasi kemarin, bukan menambah
+    # cakupan. Sekarang hasil lama dibaca dulu, lalu ditumpuk.
+    lama = []
+    if os.path.isfile(OUTPUT_PATH):
+        try:
+            with open(OUTPUT_PATH, newline="", encoding="utf-8") as f:
+                lama = list(csv.DictReader(f))
+            print(f"{len(lama)} kliping berita sudah terkumpul dari run sebelumnya.")
+        except Exception as e:
+            print(f"Kliping lama tidak terbaca ({type(e).__name__}), mulai dari kosong.")
+
+    sudah = {f"{r.get('komoditas')}|{str(r.get('tanggal'))[:7]}" for r in lama}
+
     hasil_semua = []
-    query_terpakai = set()
+    query_terpakai = set(sudah)      # jangan ulang yang sudah punya kliping
     beruntun_429 = 0
     percobaan = 0
     for _, row in anomali.iterrows():
@@ -140,15 +157,31 @@ def main():
                     break
         time.sleep(JEDA_ANTAR_QUERY)
 
-    if hasil_semua:
-        os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-        with open(OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=list(hasil_semua[0].keys()))
-            writer.writeheader()
-            writer.writerows(hasil_semua)
-        tervalidasi = sum(1 for h in hasil_semua if h["tervalidasi"])
-        print(f"\n{tervalidasi}/{len(hasil_semua)} anomali menemukan berita pendukung.")
-        print(f"Hasil disimpan ke {OUTPUT_PATH}")
+    if not hasil_semua:
+        print("\nTidak ada kliping baru pada run ini; berkas lama dibiarkan apa adanya.")
+        return
+
+    # Gabung lama + baru, buang kembar berdasarkan komoditas + bulan, urutkan
+    # dari yang terbaru supaya papan pantau menampilkan kliping paling relevan.
+    kolom = list(hasil_semua[0].keys())
+    gabung, terpakai = [], set()
+    for r in hasil_semua + lama:
+        k = f"{r.get('komoditas')}|{str(r.get('tanggal'))[:7]}"
+        if k in terpakai:
+            continue
+        terpakai.add(k)
+        gabung.append({c: r.get(c, "") for c in kolom})
+    gabung.sort(key=lambda r: str(r.get("tanggal", "")), reverse=True)
+
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    with open(OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=kolom)
+        writer.writeheader()
+        writer.writerows(gabung)
+
+    tervalidasi = sum(1 for h in hasil_semua if h["tervalidasi"])
+    print(f"\n{tervalidasi}/{len(hasil_semua)} anomali baru menemukan berita pendukung.")
+    print(f"Arsip kliping: {len(lama)} -> {len(gabung)} baris, disimpan ke {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":
