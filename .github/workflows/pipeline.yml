@@ -26,6 +26,12 @@ on:
           = mode biasa; isi mis. 180 utk ~6 bulan, 365 utk ~1 tahun, maks ~502)
         required: false
         default: "10"
+      hari_sp2kp:
+        description: >-
+          Isi histori SP2KP berapa hari ke belakang? (default 30 = mode biasa;
+          isi mis. 400 utk ~1 tahun, 980 utk sejak Jan 2024)
+        required: false
+        default: "30"
 
 jobs:
   run-pipeline:
@@ -54,6 +60,10 @@ jobs:
         run: python src/sources/dpkp_diy_scraper.py --pages "1-${{ github.event.inputs.halaman_dpkp || 10 }}"
         continue-on-error: true
 
+      - name: Ambil data SP2KP Kemendag (dasar penghitungan IPH)
+        run: python src/sources/sp2kp_kemendag.py --hari-mundur "${{ github.event.inputs.hari_sp2kp || 30 }}"
+        continue-on-error: true
+
       - name: Ambil data SIMOTANDI (fase tanam padi)
         run: python src/sources/simotandi.py
         continue-on-error: true
@@ -68,6 +78,10 @@ jobs:
 
       - name: Ambil indeks ENSO/El Nino (NOAA ONI)
         run: python src/sources/enso_noaa.py
+        continue-on-error: true
+
+      - name: Ringkas SP2KP untuk papan pantau
+        run: python src/pipeline/ringkas_sp2kp.py
         continue-on-error: true
 
       - name: Gabungkan & deteksi anomali
@@ -93,7 +107,14 @@ jobs:
           # raw.githubusercontent.com -- penyebab bagian dashboard kadang
           # tampak "kosong" sesaat padahal datanya ada).
           mkdir -p docs/data
-          cp -f data/*.csv docs/data/ 2>/dev/null || true
+          # Salin semua CSV KECUALI SP2KP mentah (belasan MB, terlalu berat untuk
+          # peramban). Versi ringkasnya sudah dibuat langkah "Ringkas SP2KP".
+          for f in data/*.csv; do
+            case "$(basename "$f")" in
+              harga_sp2kp_diy.csv) ;;
+              *) cp -f "$f" docs/data/ ;;
+            esac
+          done
           cp -f data/*.geojson docs/data/ 2>/dev/null || true   # batas wilayah utk peta koroplet
           git add data/ docs/data/
           git diff --cached --quiet || git commit -m "chore: update data pipeline $(date -u +%Y-%m-%dT%H:%M:%SZ)"
