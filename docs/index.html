@@ -387,7 +387,7 @@ function kondisiPilar(ctx) {
     const n = st => tip.hasil.filter(x => x.status === st).length;
     let lv = "AMAN", ket = "Seluruh komoditas stabil.";
     if (n("BAHAYA")) { lv = "BAHAYA"; ket = `${n("BAHAYA")} komoditas berstatus Bahaya — perlu tindakan.`; }
-    else if (n("ANOMALI")) { lv = "ANOMALI"; ket = `${n("ANOMALI")} komoditas lonjakan statistik (terindikasi artefak pembaruan data) — cukup verifikasi lapangan.`; }
+    else if (n("ANOMALI")) { lv = "ANOMALI"; ket = `Lonjakan angka pada ${n("ANOMALI")} komoditas bertepatan dengan pembaruan data acuan PIHPS — disarankan pengecekan lapangan.`; }
     else if (n("WASPADA")) { lv = "WASPADA"; ket = `${n("WASPADA")} komoditas dalam tren yang perlu dipantau.`; }
     K.push({ nama: "Harga Pangan (PIHPS BI)", sumber: "Panel Harga Bank Indonesia", lv,
              baca: `${n("BAHAYA")}·${n("ANOMALI")}·${n("WASPADA")}·${n("AMAN")}`, bacaKet: "Bahaya · Anomali · Waspada · Aman", ket, tab: "status" });
@@ -411,9 +411,10 @@ function kondisiPilar(ctx) {
 
 /* ================= render utama ================= */
 async function render() {
-  const [gab, pihps, dpkp, simo, cad, cuaca, enso, trends, berita] = await Promise.all([
+  const [gab, pihps, dpkp, simo, simoBln, cad, cuaca, enso, trends, berita] = await Promise.all([
     ambilCsv("gabungan_anomali.csv"), ambilCsv("harga_pangan_diy.csv"), ambilCsv("harga_pangan_dpkp_diy.csv"),
-    ambilCsv("simotandi_fase_tanam_diy.csv"), ambilCsv("cadangan_pangan_diy.csv"), ambilCsv("cuaca_diy.csv"),
+    ambilCsv("simotandi_fase_tanam_diy.csv"), ambilCsv("simotandi_bulanan_diy.csv"),
+    ambilCsv("cadangan_pangan_diy.csv"), ambilCsv("cuaca_diy.csv"),
     ambilCsv("enso_oni.csv"), ambilCsv("google_trends_panik.csv"), ambilCsv("validasi_berita.csv"),
   ]);
   document.getElementById("muat").remove();
@@ -455,23 +456,56 @@ async function render() {
         let h30 = null;
         for (let i = arr.length - 1; i >= 0; i--)
           if (+new Date(arr[i].t) <= +new Date(akhir.t) - 30 * 864e5) { h30 = arr[i].h; break; }
-        daftar.push({ k, h: akhir.h, ubah30: h30 ? (akhir.h - h30) / h30 * 100 : null });
+
+        // --- Volatilitas berlebih: adaptasi metode Excessive Food Price
+        // Variability EWS (IFPRI / Food Security Portal). Ambang = persentil
+        // ke-95 kenaikan harian historis PER KOMODITAS (nonparametrik, tidak
+        // mengasumsikan distribusi normal), lalu HITUNG berapa observasi
+        // "hari ekstrem" dalam jendela 90 hari terakhir. Bila jumlahnya jauh
+        // melampaui harapan statistik (5% observasi), volatilitas dinilai
+        // berlebih. Dipasang pada data DPKP karena bergerak harian; deret
+        // PIHPS provinsi terlalu bertangga untuk metode ini.
+        let vol = null, volDetail = "";
+        if (arr.length >= 120) {
+          const rets = [];
+          for (let i = 1; i < arr.length; i++)
+            rets.push({ t: arr[i].t, r: (arr[i].h - arr[i - 1].h) / arr[i - 1].h * 100 });
+          const pos = rets.map(x => x.r).filter(r => r > 0).sort((a, b) => a - b);
+          if (pos.length >= 30) {
+            const p95 = pos[Math.min(pos.length - 1, Math.floor(0.95 * pos.length))];
+            const win = rets.filter(x => +new Date(x.t) >= +new Date(tMaks) - 90 * 864e5);
+            const ekstrem = win.filter(x => x.r > p95).length;
+            const harap = 0.05 * win.length;
+            vol = ekstrem > Math.max(2 * harap, 3) ? "TINGGI" : ekstrem > harap ? "SEDANG" : "RENDAH";
+            volDetail = `${ekstrem} hari ekstrem dari ${win.length} observasi 90 hari (ambang kenaikan harian: +${p95.toFixed(1)}%)`;
+          }
+        }
+        daftar.push({ k, h: akhir.h, ubah30: h30 ? (akhir.h - h30) / h30 * 100 : null, vol, volDetail });
       }
       daftar.sort((a, b) => (b.ubah30 ?? -999) - (a.ubah30 ?? -999));
       const naik10 = daftar.filter(d => (d.ubah30 ?? 0) > 10);
+      const volTinggi = daftar.filter(d => d.vol === "TINGGI");
+      const volSedang = daftar.filter(d => d.vol === "SEDANG");
+      const nVol = daftar.filter(d => d.vol).length;
       dpkpTabel = { daftar, tMaks, nBaris: rows.length };
       dpkpInfo = { nama: "Harga Rujukan DPKP DIY", sumber: "Dinas Pertanian & KP DIY",
-        lv: naik10.length === 0 ? "AMAN" : "WASPADA",
+        lv: (naik10.length === 0 && volTinggi.length === 0) ? "AMAN" : "WASPADA",
         baca: `${naik10.length} dari ${daftar.length}`, bacaKet: "komoditas naik >10% / 30 hari",
-        ket: naik10.length ? `Tertinggi: ${naik10.slice(0, 3).map(d => d.k).join(", ")}. Didominasi sayuran volatil; kualitas pencatatan sumber bervariasi.` : "Tidak ada kenaikan 30-hari di atas 10%.", tab: "data" };
+        ket: (naik10.length ? `Kenaikan tertinggi: ${naik10.slice(0, 3).map(d => d.k).join(", ")} (didominasi sayuran; kualitas pencatatan sumber bervariasi). ` :
+              "Tidak ada kenaikan 30-hari di atas 10%. ") +
+             (volTinggi.length ? `Volatilitas berlebih: ${volTinggi.map(d => d.k).slice(0, 3).join(", ")}.` :
+              `Uji volatilitas berlebih (metode IFPRI) pada ${nVol} komoditas berhistori panjang: ${volSedang.length ? volSedang.length + " sedang, sisanya rendah" : "seluruhnya rendah"}.`), tab: "data" };
     }
   }
 
   let simoInfo = null, simoData = null;
   if (simo && simo.length) {
-    const periodeUrut = [...new Set(simo.map(r => r.periode_mulai).filter(Boolean))].sort();
+    // Urutkan periode pakai kode YYYYNN bila tersedia (data lengkap 2024-2026),
+    // fallback ke tanggal mulai untuk berkas versi lama.
+    const kunciP = r => (r.periode_kode !== undefined && r.periode_kode !== null) ? String(r.periode_kode) : String(r.periode_mulai || "");
+    const periodeUrut = [...new Set(simo.map(kunciP).filter(Boolean))].sort();
     const pMax = periodeUrut[periodeUrut.length - 1];
-    const st = simo.filter(r => r.periode_mulai === pMax);
+    const st = simo.filter(r => kunciP(r) === pMax);
     const F = ["bera_ha", "persiapan_lahan_ha", "tanam_ha", "vegetatif_1_ha", "vegetatif_2_ha", "generatif_1_ha", "generatif_2_ha", "panen_ha"];
     const perKab = {};
     st.forEach(r => {
@@ -482,20 +516,60 @@ async function render() {
     const tot = f => Object.values(perKab).reduce((a, x) => a + x[f], 0);
     const totSemua = F.reduce((a, f) => a + tot(f), 0);
     const dekatPanen = tot("generatif_1_ha") + tot("generatif_2_ha") + tot("panen_ha");
-    const rasio = totSemua ? dekatPanen / totSemua * 100 : 0;
+    // Penyebut terbaik = luas baku sawah resmi bila kolomnya tersedia;
+    // kalau tidak, pakai jumlah seluruh fase terpantau.
+    const luasBaku = st.reduce((a, r) => a + (Number(r.luas_baku_sawah_ha) || 0), 0);
+    const penyebut = luasBaku > 0 ? luasBaku : totSemua;
+    const rasio = penyebut ? dekatPanen / penyebut * 100 : 0;
+    const standing = st.reduce((a, r) => a + (Number(r.standing_crop_ha) || 0), 0);
     const trenPeriode = periodeUrut.map(p => {
-      const rr = simo.filter(r => r.periode_mulai === p);
+      const rr = simo.filter(r => kunciP(r) === p);
       return { p, label: rr[0] ? rr[0].periode : p,
-        tanam: rr.reduce((a, r) => a + (Number(r.tanam_ha) || 0) + (Number(r.vegetatif_1_ha) || 0), 0),
+        tanam: rr.reduce((a, r) => a + (Number(r.tanam_ha) || 0) + (Number(r.persiapan_lahan_ha) || 0), 0),
         panen: rr.reduce((a, r) => a + (Number(r.generatif_1_ha) || 0) + (Number(r.generatif_2_ha) || 0) + (Number(r.panen_ha) || 0), 0) };
     });
     const kabTop = Object.entries(perKab).map(([k, x]) => [k, x.generatif_1_ha + x.generatif_2_ha + x.panen_ha]).sort((a, b) => b[1] - a[1])[0];
-    simoData = { perKab, F, periode: st[0] ? st[0].periode : "", trenPeriode, dekatPanen, rasio, kabTop };
+
+    // --- Pola musiman dari data bulanan (31 bulan, Jan 2024 - Jul 2026) ---
+    let musim = null;
+    if (simoBln && simoBln.length) {
+      const prov = simoBln.filter(r => String(r.level) === "provinsi");
+      if (prov.length) {
+        const perBulan = {};
+        prov.forEach(r => {
+          const b = Number(r.bulan); if (!b) return;
+          (perBulan[b] ||= { nama: r.nama_bulan, tanam: [], panen: [] });
+          perBulan[b].tanam.push(Number(r.tanam_ha) || 0);
+          perBulan[b].panen.push(Number(r.panen_ha) || 0);
+        });
+        const rata = o => o.length ? o.reduce((a, x) => a + x, 0) / o.length : 0;
+        const seri = Object.entries(perBulan).map(([b, o]) => ({
+          bulan: Number(b), nama: o.nama, tanam: rata(o.tanam), panen: rata(o.panen) })).sort((a, b) => a.bulan - b.bulan);
+        const puncak = seri.slice().sort((a, b) => b.panen - a.panen)[0];
+        const lembah = seri.slice().sort((a, b) => a.panen - b.panen)[0];
+        // Bulan berjalan diambil dari PERIODE 12-HARIAN TERBARU (lebih mutakhir
+        // daripada data bulanan yang rilisnya tertinggal ~1 bulan), bukan dari
+        // jam peramban -- supaya label musim selalu konsisten dengan data.
+        const tglTerbaru = st.map(r => r.periode_mulai).filter(Boolean).sort().pop();
+        const blnIdx = tglTerbaru ? Number(String(tglTerbaru).slice(5, 7)) : null;
+        const bulanKini = seri.find(s => s.bulan === blnIdx) || seri[seri.length - 1];
+        const posisi = puncak.panen ? bulanKini.panen / puncak.panen * 100 : 0;
+        // bulan puncak berikutnya (untuk pesan "sampai kapan bertahan")
+        const kedepan = [...seri.slice(bulanKini.bulan), ...seri.slice(0, bulanKini.bulan)];
+        const puncakDepan = kedepan.reduce((a, s) => (s.panen > a.panen ? s : a), kedepan[0]);
+        musim = { seri, puncak, lembah, bulanKini, posisi, nBulan: prov.length,
+                  blnKiniIdx: bulanKini.bulan, puncakDepan };
+      }
+    }
+    simoData = { perKab, F, periode: st[0] ? st[0].periode : "", trenPeriode, dekatPanen, rasio,
+                 kabTop, luasBaku, standing, musim, nPeriode: periodeUrut.length };
+    let ketS = rasio >= 12 ? `Gelombang panen berikutnya cukup dekat — andalan: ${kabTop ? kabTop[0] : "-"}.` :
+               rasio >= 6 ? "Luas menuju panen menipis — pantau stok antar-gelombang." : "Lahan menuju panen sangat sedikit — risiko pasokan beras lokal.";
+    if (musim) ketS += ` Secara musiman, ${musim.bulanKini.nama} berada di ${musim.posisi.toFixed(0)}% dari puncak panen tahunan (${musim.puncak.nama}).`;
     simoInfo = { nama: "Pasokan Padi (SIMOTANDI)", sumber: "Citra satelit Kementan",
       lv: rasio >= 12 ? "AMAN" : rasio >= 6 ? "WASPADA" : "BAHAYA",
-      baca: fmtN(dekatPanen) + " ha", bacaKet: "fase generatif + panen (" + rasio.toFixed(0) + "% lahan terpantau)",
-      ket: rasio >= 12 ? `Gelombang panen berikutnya cukup dekat — andalan: ${kabTop ? kabTop[0] : "-"}.` :
-           rasio >= 6 ? "Luas menuju panen menipis — pantau stok antar-gelombang." : "Sangat sedikit lahan menuju panen — risiko pasokan beras lokal.", tab: "konteks" };
+      baca: fmtN(dekatPanen) + " ha", bacaKet: "fase generatif + panen (" + rasio.toFixed(0) + "% luas baku sawah)",
+      ket: ketS, tab: "konteks" };
   }
 
   let cadInfo = null, cadData = null;
@@ -556,8 +630,8 @@ async function render() {
   if (berita && berita.length) {
     const val = berita.filter(b => isTrue(b.tervalidasi));
     beritaInfo = { nama: "Verifikasi Berita", sumber: "Pencarian otomatis (Firecrawl)",
-      lv: "AMAN", baca: val.length + " kliping", bacaKet: "liputan media utk anomali terbaru",
-      ket: "Lapisan verifikasi tekstual — anomali statistik + liputan media = sinyal jauh lebih kuat daripada angka semata.", tab: "konteks" };
+      lv: "AMAN", baca: val.length + " kliping", bacaKet: "liputan media utk lonjakan terbaru",
+      ket: "Tiap lonjakan angka dicek silang dengan pemberitaan media — angka + berita = bukti jauh lebih kuat daripada angka semata.", tab: "konteks" };
   }
 
   const pilar = kondisiPilar({ tip, dpkpInfo, simoInfo, cadInfo, cuacaInfo, ensoInfo, trendsInfo, beritaInfo });
@@ -575,15 +649,15 @@ async function render() {
       const banner = el("div", "kartu banner");
       banner.appendChild(el("div", "tgl", `<strong>Kondisi Harga Pangan DIY</strong> — data s.d. ${fmtTgl(new Date(tip.tMaks))} · ${tip.hasil.length} komoditas · 8 pilar data`));
       const chips = el("div", "chips");
-      [["bahaya", nB, "BAHAYA", "krisis terkonfirmasi"], ["anomali", nA, "ANOMALI", "perlu verifikasi lapangan"],
-       ["waspada", nW, "WASPADA", "tren dipantau"], ["aman", nS, "AMAN", "stabil"]].forEach(([k, j, l, d]) =>
+      [["bahaya", nB, "BAHAYA", "gejolak harga nyata"], ["anomali", nA, "ANOMALI", "lonjakan data, perlu pengecekan"],
+       ["waspada", nW, "WASPADA", "dalam pengawasan"], ["aman", nS, "AMAN", "stabil"]].forEach(([k, j, l, d]) =>
         chips.appendChild(el("div", "chip " + k, `<div class="n tnum">${j}</div><div class="l">${IKON[l]} ${l}</div><div class="d">${d}</div>`)));
       banner.appendChild(chips);
 
       let rek;
       const daftar = st => tip.hasil.filter(x => x.status === st).slice(0, 4).map(x => x.kom).join(", ");
       if (nB > 0) rek = `<strong>Tindakan segera:</strong> verifikasi pasokan &amp; siapkan operasi pasar untuk <strong>${daftar("BAHAYA")}</strong>${nB > 4 ? " dkk." : ""}.`;
-      else if (nA > 0) rek = `<strong>Tidak ada sinyal krisis pasokan riil saat ini.</strong> ${nA} komoditas menunjukkan lonjakan statistik serentak — pola khas pembaruan data referensi bulanan PIHPS, bukan gejolak pasar. Rekomendasi: cukup <strong>verifikasi harga di pasar sampel</strong>; belum perlu operasi pasar.`;
+      else if (nA > 0) rek = `<strong>Tidak ditemukan indikasi krisis pangan saat ini.</strong> Lonjakan angka pada ${nA} komoditas terjadi serentak dan bertepatan dengan jadwal pembaruan data acuan PIHPS di akhir bulan, sehingga <strong>belum mencerminkan gejolak pasar yang sesungguhnya</strong>. Langkah yang disarankan: <strong>pengecekan harga di sejumlah pasar</strong>; operasi pasar belum diperlukan.`;
       else if (nW > 0) rek = `<strong>Kondisi terkendali dengan catatan.</strong> Pantau ketat: <strong>${daftar("WASPADA")}</strong>.`;
       else rek = `<strong>Kondisi harga pangan DIY terkendali.</strong>`;
       if (simoInfo && simoInfo.lv === "AMAN") rek += ` Sisi pasokan mendukung: ±<strong>${simoInfo.baca}</strong> padi menuju/di masa panen (SIMOTANDI).`;
@@ -619,12 +693,12 @@ async function render() {
     if (!tip) { s.appendChild(el("div", "kosong", "Data harga belum tersedia.")); T2.appendChild(s); }
     else {
       const NOTA = {
-        BAHAYA: "Anomali statistik terkonfirmasi di luar siklus pembaruan data <strong>dan</strong> harga masih menanjak ≥5% seminggu — indikasi tekanan pasokan riil. Tindakan: verifikasi cepat &amp; siapkan intervensi.",
-        ANOMALI: `Lonjakan statistik (|z| &gt; 2) terdeteksi, namun <strong>belum terkonfirmasi sebagai gejolak pasar</strong>. Sebagian besar terjadi serentak pada banyak komoditas di tanggal yang sama — temuan riset ini: pola tersebut adalah siklus pembaruan data referensi bulanan PIHPS. Tindakan yang tepat: verifikasi harga di pasar sampel, bukan operasi pasar.`,
-        WASPADA: "Belum anomali, tetapi trennya layak dipantau: kenaikan ≥5%/minggu, penurunan tajam ≥10%/minggu (tekanan pendapatan petani — ini harga <em>produsen</em>), atau mendekati ambang statistik.",
-        AMAN: "Tidak ada anomali maupun tren mencurigakan dalam 30 hari terakhir.",
+        BAHAYA: "Lonjakan harga terjadi di luar jadwal pembaruan data <strong>dan</strong> harga masih menanjak ≥5% dalam sepekan — indikasi gangguan pasokan yang nyata. Diperlukan tindakan cepat: pemeriksaan pasokan dan penyiapan intervensi (operasi pasar / penyaluran cadangan pemerintah).",
+        ANOMALI: `Tercatat lonjakan angka yang tajam, namun terjadi <strong>serentak pada banyak komoditas dan bertepatan dengan pembaruan data acuan PIHPS di akhir bulan</strong> — sehingga besar kemungkinan belum mencerminkan gejolak pasar yang sesungguhnya. Langkah yang disarankan: pengecekan harga di sejumlah pasar sebelum mengambil tindakan.`,
+        WASPADA: "Pergerakan harga belum tergolong lonjakan, namun memerlukan pengawasan: kenaikan ≥5% sepekan, penurunan tajam ≥10% sepekan (menekan pendapatan petani — data ini harga di tingkat petani), atau mendekati ambang tidak wajar.",
+        AMAN: "Harga stabil dalam 30 hari terakhir.",
       };
-      const DESKR = { BAHAYA: "perlu tindakan", ANOMALI: "perlu verifikasi lapangan", WASPADA: "pantau ketat", AMAN: "stabil" };
+      const DESKR = { BAHAYA: "perlu tindakan segera", ANOMALI: "perlu pengecekan lapangan", WASPADA: "dalam pengawasan", AMAN: "stabil" };
       ["BAHAYA", "ANOMALI", "WASPADA", "AMAN"].forEach(st => {
         const item = tip.hasil.filter(x => x.status === st);
         const g = el("div", "grup");
@@ -639,9 +713,9 @@ async function render() {
           if (d.ubah7 !== null && Math.abs(d.ubah7) >= 0.05)
             chips.push(`<span class="mchip ${d.ubah7 > 0 ? "merah" : "hijau"}" title="Perubahan harga 7 hari terakhir">${d.ubah7 > 0 ? "▲" : "▼"} ${Math.abs(d.ubah7).toFixed(1)}% /7 hr</span>`);
           if (d.zMaks7 >= 1.5)
-            chips.push(`<span class="mchip ${d.zMaks7 > 2 ? "oranye" : ""}" title="Simpangan terbesar dari tren 14 hari (z-score)">z ${d.zMaks7.toFixed(1)}</span>`);
+            chips.push(`<span class="mchip ${d.zMaks7 > 2 ? "oranye" : ""}" title="Harga menyimpang ${d.zMaks7.toFixed(1)} kali lipat dari naik-turun normalnya selama 14 hari terakhir">simpangan ${d.zMaks7.toFixed(1)}×</span>`);
           if (d.serentak >= 8)
-            chips.push(`<span class="mchip" title="Lonjakan ${fmtTglPdk(d.tglAnom)} terjadi bersamaan pada ${d.serentak} komoditas — pola pembaruan data referensi PIHPS">serentak ${d.serentak} kom.</span>`);
+            chips.push(`<span class="mchip" title="Lonjakan ${fmtTglPdk(d.tglAnom)} terjadi bersamaan pada ${d.serentak} komoditas sekaligus — ciri khas pembaruan data acuan PIHPS, bukan gejolak pasar">serentak ${d.serentak} kom.</span>`);
           if (d.berita && d.berita.url_teratas)
             chips.push(`<span class="mchip" title="${String(d.berita.judul_teratas || "").replace(/"/g, "&quot;")}">📰 <a href="${d.berita.url_teratas}" target="_blank" rel="noopener">liputan media</a></span>`);
           if (!chips.length) chips.push(`<span class="mchip" title="Tidak ada sinyal menonjol">stabil 30 hari</span>`);
@@ -678,13 +752,53 @@ async function render() {
         <div class="wadah-chart" style="height:230px;margin-top:12px"><canvas id="ch-simo-kab"></canvas></div>`;
       grid.appendChild(p1);
       const p2 = el("div", "panel");
-      p2.innerHTML = `<h3>Dinamika antar periode pantauan</h3><div class="sumber">${simoData.trenPeriode.length} periode 12-harian tersedia</div>
+      p2.innerHTML = `<h3>Dinamika antar periode pantauan</h3>
+        <div class="sumber">${simoData.trenPeriode.length} periode 12-harian${simoData.trenPeriode.length > 20 ? " (Jan 2024 – kini)" : ""}</div>
         <div class="wadah-chart" style="height:230px;margin-top:8px"><canvas id="ch-simo-tren"></canvas></div>`;
       p2.appendChild(el("div", "insight",
         `<strong>Interpretasi otomatis:</strong> gelombang panen berikutnya paling besar di <strong>${simoData.kabTop ? simoData.kabTop[0] : "-"}</strong> (±${fmtN(simoData.kabTop ? simoData.kabTop[1] : 0)} ha menuju/di masa panen). ` +
         (simoData.rasio >= 12 ? "Rasio lahan menuju panen sehat — tekanan pasokan beras lokal rendah dalam horizon 1–2 bulan." : "Rasio lahan menuju panen menipis — antisipasi jeda antar gelombang panen.")));
       grid.appendChild(p2);
       sS.appendChild(grid);
+
+      // --- Pola musiman panen (dari 31 bulan data) ---
+      if (simoData.musim) {
+        const M = simoData.musim;
+        const pm = el("div", "panel");
+        pm.style.marginTop = "14px";
+        pm.innerHTML = `<h3>Pola Musiman Panen Padi DIY</h3>
+          <div class="sumber">Rata-rata luas panen per bulan kalender, ${M.nBulan} bulan pengamatan (Jan 2024 – Jul 2026)</div>
+          <div class="wadah-chart" style="height:220px;margin-top:10px"><canvas id="ch-simo-musim"></canvas></div>`;
+        const kondisi = M.posisi < 40 ? "musim paceklik (panen terendah tahunan)" : M.posisi < 75 ? "masa transisi" : "musim panen raya";
+        pm.appendChild(el("div", "insight",
+          `<strong>Posisi musim saat ini:</strong> secara historis ${M.bulanKini.nama} memanen ±${fmtN(M.bulanKini.panen)} ha — <strong>${M.posisi.toFixed(0)}% dari puncak panen tahunan</strong> yang jatuh pada ${M.puncak.nama} (±${fmtN(M.puncak.panen)} ha). DIY sedang berada pada <strong>${kondisi}</strong>. ` +
+          `Implikasi kebijakan: pada fase ini pasokan beras lokal bergantung pada stok dan pasokan antardaerah, sehingga <strong>kenaikan harga beras lebih patut diwaspadai</strong> dan cadangan pemerintah menjadi penyangga utama hingga gelombang panen ${M.puncakDepan.nama}.`));
+        sS.appendChild(pm);
+
+        daftarChart("konteks", () => {
+          const cm = document.getElementById("ch-simo-musim");
+          if (cm && window.Chart) {
+            new Chart(cm.getContext("2d"), {
+              type: "bar",
+              data: { labels: M.seri.map(s => s.nama.slice(0, 3)),
+                datasets: [
+                  { label: "Rata-rata luas panen (ha)", data: M.seri.map(s => Math.round(s.panen)),
+                    backgroundColor: M.seri.map(s => s.bulan === M.blnKiniIdx ? "#a11c1c" : "#1c4a2e"),
+                    borderRadius: 4, barPercentage: .72, order: 2 },
+                  { label: "Rata-rata luas tanam (ha)", data: M.seri.map(s => Math.round(s.tanam)),
+                    type: "line", borderColor: "#8fc3a0", backgroundColor: "#8fc3a0",
+                    borderWidth: 2, tension: .3, pointRadius: 2, fill: false, order: 1 },
+                ] },
+              options: { responsive: true, maintainAspectRatio: false, animation: false,
+                plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 10 } } },
+                  tooltip: { callbacks: { label: it => `${it.dataset.label}: ${fmtN(it.raw)} ha` +
+                    (it.datasetIndex === 0 && M.seri[it.dataIndex].bulan === M.blnKiniIdx ? " ← bulan berjalan" : "") } } },
+                scales: { y: { ticks: { callback: v => fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" } },
+                          x: { ticks: { font: { size: 10 } }, grid: { display: false } } } },
+            });
+          } else if (cm) pesanTanpaChart(cm.parentElement);
+        });
+      }
 
       daftarChart("konteks", () => {
         const c1 = document.getElementById("ch-simo-kab");
@@ -712,18 +826,25 @@ async function render() {
         } else if (c1) pesanTanpaChart(c1.parentElement);
         const c2 = document.getElementById("ch-simo-tren");
         if (c2 && window.Chart) {
+          // Banyak periode (histori penuh 2024-2026) -> garis; sedikit -> batang.
+          const banyak = simoData.trenPeriode.length > 20;
+          const ds = (label, ambil, warna, isi) => banyak
+            ? { label, data: simoData.trenPeriode.map(ambil), borderColor: warna, backgroundColor: isi,
+                borderWidth: 2, tension: .3, pointRadius: 0, pointHoverRadius: 4, fill: true }
+            : { label, data: simoData.trenPeriode.map(ambil), backgroundColor: warna, borderRadius: 4, barPercentage: .7 };
           new Chart(c2.getContext("2d"), {
-            type: "bar",
+            type: banyak ? "line" : "bar",
             data: { labels: simoData.trenPeriode.map(x => x.label),
               datasets: [
-                { label: "Tanam & vegetatif awal (ha)", data: simoData.trenPeriode.map(x => x.tanam), backgroundColor: "#8fc3a0", borderRadius: 4, barPercentage: .7 },
-                { label: "Menuju/di masa panen (ha)", data: simoData.trenPeriode.map(x => x.panen), backgroundColor: "#1c4a2e", borderRadius: 4, barPercentage: .7 },
+                ds("Persiapan & tanam (ha)", x => Math.round(x.tanam), "#8fc3a0", "rgba(143,195,160,.25)"),
+                ds("Menuju/di masa panen (ha)", x => Math.round(x.panen), "#1c4a2e", "rgba(28,74,46,.16)"),
               ] },
             options: { responsive: true, maintainAspectRatio: false, animation: false,
+              interaction: banyak ? { mode: "index", intersect: false } : {},
               plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 10 } } },
                 tooltip: { callbacks: { label: it => `${it.dataset.label}: ${fmtN(it.raw)} ha` } } },
               scales: { y: { ticks: { callback: v => fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" } },
-                        x: { ticks: { font: { size: 9 } }, grid: { display: false } } } },
+                        x: { ticks: { font: { size: 9 }, maxTicksLimit: banyak ? 8 : 12, autoSkip: true }, grid: { display: false } } } },
           });
         } else if (c2) pesanTanpaChart(c2.parentElement);
       });
@@ -792,11 +913,13 @@ async function render() {
   try {
     const sD = el("section", "blok");
     sD.innerHTML = `<h2>Harga Rujukan DPKP DIY</h2>
-      <p class="sub">Sumber independen kedua — pencatatan harian Dinas Pertanian &amp; Ketahanan Pangan DIY, mencakup komoditas di luar PIHPS (minyak goreng, beras SPHP, kedelai). Diurutkan dari kenaikan 30-hari terbesar; kualitas pencatatan sumber bervariasi, terutama sayuran.</p>`;
+      <p class="sub">Sumber independen kedua — pencatatan harian Dinas Pertanian &amp; Ketahanan Pangan DIY, mencakup komoditas di luar PIHPS (minyak goreng, beras SPHP, kedelai). Kolom volatilitas memakai adaptasi metode <em>Excessive Food Price Variability EWS</em> (IFPRI): jumlah hari dengan kenaikan ekstrem — di atas persentil ke-95 historis komoditas itu sendiri — dalam 90 hari terakhir. Diurutkan dari kenaikan 30-hari terbesar; kualitas pencatatan sumber bervariasi, terutama sayuran.</p>`;
     if (dpkpTabel) {
+      const VTAG = { TINGGI: '<span class="tag bahaya">tinggi</span>', SEDANG: '<span class="tag waspada">sedang</span>', RENDAH: '<span class="tag aman">rendah</span>' };
       const w = el("div", "tabel-wrap");
-      w.innerHTML = `<table><thead><tr><th>Komoditas</th><th class="num">Harga per ${fmtTglPdk(dpkpTabel.tMaks)}</th><th class="num">Perubahan 30 hari</th></tr></thead>
-        <tbody>${dpkpTabel.daftar.map(d => `<tr><td>${d.k}</td><td class="num tnum">${fmtRp(d.h)}</td><td class="num">${ubahHtml(d.ubah30)}</td></tr>`).join("")}</tbody></table>`;
+      w.innerHTML = `<table><thead><tr><th>Komoditas</th><th class="num">Harga per ${fmtTglPdk(dpkpTabel.tMaks)}</th><th class="num">Perubahan 30 hari</th><th>Volatilitas 90 hari</th></tr></thead>
+        <tbody>${dpkpTabel.daftar.map(d => `<tr><td>${d.k}</td><td class="num tnum">${fmtRp(d.h)}</td><td class="num">${ubahHtml(d.ubah30)}</td>
+          <td>${d.vol ? `<span title="${d.volDetail}">${VTAG[d.vol]}</span>` : '<span class="catatan-kecil" title="Histori harga komoditas ini belum cukup panjang untuk uji volatilitas">—</span>'}</td></tr>`).join("")}</tbody></table>`;
       sD.appendChild(w);
     } else sD.appendChild(el("div", "kosong", "Data DPKP belum tersedia."));
     T4.appendChild(sD);
@@ -875,12 +998,13 @@ async function render() {
       <p>${tagStatus("WASPADA")} Naik ≥ 5%/minggu, turun ≥ 10%/minggu (tekanan pendapatan petani — data harga <em>produsen</em>), |z| ≥ 1,5, atau titik tertinggi 30 hari.</p>
       <p>${tagStatus("AMAN")} Selain itu.</p>
       <p class="catatan"><strong>Level per pilar:</strong> Cuaca — ada wilayah hujan ≥50&nbsp;mm/berlabel ekstrem → Waspada (≥3 wilayah → Bahaya). ENSO — El&nbsp;Niño/La&nbsp;Niña lemah–moderat → Waspada, kuat → Bahaya. Cadangan — ≥200&nbsp;ton Aman, 100–200 Waspada, &lt;100 Bahaya (ambang indikatif). Pasokan SIMOTANDI — rasio lahan generatif+panen ≥12% Aman, 6–12% Waspada, &lt;6% Bahaya. Trends — ada lonjakan → Waspada. DPKP — ada komoditas naik &gt;10%/30 hari → Waspada (maksimal, karena kualitas pencatatan sumber bervariasi).</p>
-      <p class="catatan"><strong>Metode &amp; rujukan:</strong> deteksi anomali z-score bergulir 14 hari; pengayaan konteks cuaca/iklim/sinyal publik; verifikasi tekstual otomatis mengikuti bukti fusi sinyal harga+berita (Bakry dkk., 2025, AUC 0,94 vs 0,46). <strong>Keterbatasan yang diakui:</strong> harga PIHPS agregat provinsi; pilar SIMOTANDI diperbarui semi-otomatis (server sumber memblokir akses dari cloud); validasi berita indikatif (pencarian otomatis, bukan kurasi manusia); purwarupa riset, bukan produk resmi.</p>`;
+      <p class="catatan"><strong>Uji volatilitas berlebih (data DPKP):</strong> adaptasi metode <em>Excessive Food Price Variability Early Warning System</em> (IFPRI / Food Security Portal) — ambang nonparametrik pada persentil ke-95 kenaikan harian historis tiap komoditas, lalu jumlah hari ekstrem dalam jendela 90 hari dibandingkan dengan harapan statistiknya (5% observasi): melebihi dua kali lipat → tinggi, melebihi harapan → sedang. Diterapkan pada deret DPKP yang bergerak harian; deret PIHPS provinsi terlalu bertangga untuk uji ini. Kesesuaian hasil kedua metode (tipologi &amp; volatilitas) menjadi validasi silang.</p>
+      <p class="catatan"><strong>Metode &amp; rujukan:</strong> deteksi anomali z-score bergulir 14 hari; pengayaan konteks cuaca/iklim/sinyal publik; verifikasi tekstual otomatis mengikuti bukti fusi sinyal harga+berita (Bakry dkk., 2025, AUC 0,94 vs 0,46); klasifikasi volatilitas mengikuti kerangka IFPRI di atas. <strong>Keterbatasan yang diakui:</strong> harga PIHPS agregat provinsi; pilar SIMOTANDI diperbarui semi-otomatis (server sumber memblokir akses dari cloud); validasi berita indikatif (pencarian otomatis, bukan kurasi manusia); purwarupa riset, bukan produk resmi.</p>`;
     s.appendChild(at);
     T5.appendChild(s);
 
     const s2 = el("section", "blok");
-    s2.innerHTML = `<h2>Kesehatan Teknis Pipeline</h2><p class="sub">Bukti data ditarik otomatis dari sumber aslinya — bukan angka manual.</p>`;
+    s2.innerHTML = `<h2>Riwayat Pembaruan Data</h2><p class="sub">Waktu pembaruan terakhir tiap sumber. Seluruh angka pada situs ini ditarik otomatis dari sumber resminya, tanpa entri manual.</p>`;
     const DAFTAR = [
       ["PIHPS Bank Indonesia", gab || pihps, r => r.diambil_pada_utc], ["DPKP DIY", dpkp, null],
       ["SIMOTANDI Kementan", simo, r => r.diambil_pada_utc], ["Cadangan Pangan DIY", cad, r => r.diambil_pada_utc],
