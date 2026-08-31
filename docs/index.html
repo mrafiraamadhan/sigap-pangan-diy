@@ -42,7 +42,21 @@
   .num, .tnum { font-variant-numeric: tabular-nums; }
 
   /* ===== Header ===== */
-  header { background: linear-gradient(118deg, #12301d 0%, #1c4a2e 55%, #24603c 100%); color: #fff; }
+  /* Pita kepala: foto perbukitan Menoreh berkabut dipasang SEBAGAI TEKSTUR, bukan
+     sebagai sampul. Gradien hijau tetap dilukis di atasnya dengan pekat, sehingga
+     kontras teks putih tidak berkurang sedikit pun dan tinggi kepala tidak
+     bertambah. Papan pantau ini dipakai mengambil keputusan; fotonya memberi
+     identitas tempat, bukan mendorong isi turun ke bawah layar. */
+  header {
+    position: relative; color: #fff;
+    background: #12301d url("img/pita-menoreh.jpg") center 62% / cover no-repeat;
+  }
+  header::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(118deg, rgba(18,48,29,.965) 0%, rgba(28,74,46,.925) 55%, rgba(36,96,60,.82) 100%);
+  }
+  header > .wrap { position: relative; }
+  @media (prefers-reduced-motion: no-preference) { header { background-attachment: scroll; } }
   header .wrap { max-width: 1180px; margin: 0 auto; padding: 26px 22px 18px; }
   .brand { display: flex; align-items: center; gap: 13px; }
   .logo { width: 44px; height: 44px; border-radius: 11px; background: rgba(255,255,255,.12);
@@ -111,6 +125,15 @@
   .tag.waspada { color: var(--waspada); background: var(--waspada-bg); border-color: var(--waspada-bd); }
   .tag.aman    { color: var(--aman);    background: var(--aman-bg);    border-color: var(--aman-bd); }
   .tag.netral  { color: var(--ink-2); background: var(--surface-2); border-color: var(--border); }
+
+  /* Lencana kesegaran data per pilar. Sengaja kecil dan tidak memakai merah, karena
+     data terlambat adalah keterangan, bukan peringatan risiko. */
+  .lencana-segar { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px;
+                   font-size: .62rem; font-weight: 700; letter-spacing: .02em;
+                   border: 1px solid; white-space: nowrap; vertical-align: 1px; }
+  .lencana-segar.baru   { color: var(--aman);    background: var(--aman-bg);    border-color: var(--aman-bd); }
+  .lencana-segar.sedang { color: var(--ink-2);   background: var(--surface-2);  border-color: var(--border); }
+  .lencana-segar.lama   { color: var(--waspada); background: var(--waspada-bg); border-color: var(--waspada-bd); }
 
   /* ===== Papan status ===== */
   .grup { margin-bottom: 22px; }
@@ -282,7 +305,7 @@
     </div>
     <div class="metahead">
       <span><b>Pengguna:</b> TPID DIY · Bank Indonesia · DPKP · Bulog</span>
-      <span><b>9 pilar data</b> diperbarui otomatis (GitHub Actions)</span>
+      <span><b>9 pilar data</b> · 7 diperbarui otomatis (GitHub Actions)</span>
       <span id="badge-update">Memuat…</span>
     </div>
   </div>
@@ -368,9 +391,14 @@ function ubahHtml(p) {
   const t = p > 0.05 ? "▲" : p < -0.05 ? "▼" : "＝";
   return `<span class="${k} tnum">${t} ${Math.abs(p).toFixed(1)}%</span>`;
 }
-const IKON = { BAHAYA: "🔴", ANOMALI: "🟠", WASPADA: "🟡", AMAN: "🟢" };
-const KELAS = { BAHAYA: "bahaya", ANOMALI: "anomali", WASPADA: "waspada", AMAN: "aman" };
-const tagStatus = (st, teks) => `<span class="tag ${KELAS[st] || "netral"}">${IKON[st] || ""} ${teks || st}</span>`;
+// DATA bukan tingkat risiko, melainkan pernyataan bahwa pilarnya TIDAK DAPAT dinilai.
+// Memakai merah untuk basis data yang rusak mencampur dua hal berbeda: kondisi pangan
+// dan kesehatan datanya. Warnanya sengaja netral supaya merah tetap berarti "ada yang
+// harus segera dikerjakan".
+const IKON = { BAHAYA: "🔴", ANOMALI: "🟠", WASPADA: "🟡", AMAN: "🟢", DATA: "⚪" };
+const KELAS = { BAHAYA: "bahaya", ANOMALI: "anomali", WASPADA: "waspada", AMAN: "aman", DATA: "netral" };
+const NAMA_ST = { DATA: "TIDAK DAPAT DINILAI" };
+const tagStatus = (st, teks) => `<span class="tag ${KELAS[st] || "netral"}">${IKON[st] || ""} ${teks || NAMA_ST[st] || st}</span>`;
 const domainDari = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
 
 /* ===== grafik: registry lazy per tab (chart di tab tersembunyi berukuran 0) ===== */
@@ -462,7 +490,7 @@ function kondisiPilar(ctx) {
     if (n("BAHAYA")) { lv = "BAHAYA"; ket = `${n("BAHAYA")} komoditas berstatus Bahaya dan perlu segera ditindaklanjuti.`; }
     else if (n("ANOMALI")) { lv = "ANOMALI"; ket = `Lonjakan angka pada ${n("ANOMALI")} komoditas bertepatan dengan pembaruan data acuan PIHPS. Sebaiknya dicek dulu ke lapangan sebelum diambil tindakan.`; }
     else if (n("WASPADA")) { lv = "WASPADA"; ket = `${n("WASPADA")} komoditas dalam tren yang perlu dipantau.`; }
-    K.push({ nama: "Harga Pangan (PIHPS BI)", sumber: "Panel Harga Bank Indonesia", lv,
+    K.push({ nama: "Harga Pangan (PIHPS BI)", sumber: "Panel Harga Bank Indonesia", tgl: tip.tMaks, lv,
              baca: `${n("BAHAYA")}·${n("ANOMALI")}·${n("WASPADA")}·${n("AMAN")}`, bacaKet: "Bahaya · Anomali · Waspada · Aman", ket, tab: "status" });
   } else K.push({ nama: "Harga Pangan (PIHPS BI)", sumber: "Panel Harga Bank Indonesia", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "status" });
   // 2. SP2KP Kemendag
@@ -480,7 +508,7 @@ function kondisiPilar(ctx) {
   // 7. Trends
   K.push(trendsInfo || { nama: "Kepanikan Publik (Trends)", sumber: "Google Trends DIY", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "konteks" });
   // 8. Berita
-  K.push(beritaInfo || { nama: "Verifikasi Berita", sumber: "Pencarian otomatis (Firecrawl)", lv: null, baca: "–", ket: "Belum ada hasil.", tab: "konteks" });
+  K.push(beritaInfo || { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi", lv: null, baca: "–", ket: "Belum ada hasil.", tab: "konteks" });
   return K;
 }
 
@@ -566,7 +594,7 @@ async function render() {
       const volSedang = daftar.filter(d => d.vol === "SEDANG");
       const nVol = daftar.filter(d => d.vol).length;
       dpkpTabel = { daftar, tMaks, nBaris: rows.length };
-      dpkpInfo = { nama: "Harga Rujukan DPKP DIY", sumber: "Dinas Pertanian & KP DIY",
+      dpkpInfo = { nama: "Harga Rujukan DPKP DIY", sumber: "Dinas Pertanian & KP DIY", tgl: tMaks,
         lv: (naik10.length === 0 && volTinggi.length === 0) ? "AMAN" : "WASPADA",
         baca: `${naik10.length} dari ${daftar.length}`, bacaKet: "komoditas naik >10% / 30 hari",
         ket: (naik10.length ? `Kenaikan tertinggi: ${naik10.slice(0, 3).map(d => d.k).join(", ")} (kebanyakan sayuran, dan mutu pencatatan di sumbernya tidak selalu seragam). ` :
@@ -604,7 +632,7 @@ async function render() {
       daftar.sort((x, y) => Math.abs(y.u30 ?? 0) - Math.abs(x.u30 ?? 0));
       const naik10 = daftar.filter(d => (d.u30 ?? 0) > 10);
       sp2kpData = { daftar, tMaks, nPasar: Math.max(...daftar.map(d => d.nPasar || 1)) };
-      sp2kpInfo = { nama: "Harga Pasar (SP2KP Kemendag)", sumber: "Dasar penghitungan IPH · " + sp2kpData.nPasar + " pasar",
+      sp2kpInfo = { nama: "Harga Pasar (SP2KP Kemendag)", sumber: "Dasar penghitungan IPH · " + sp2kpData.nPasar + " pasar melapor", tgl: sp2kpData.tMaks,
         lv: naik10.length === 0 ? "AMAN" : "WASPADA",
         baca: `${naik10.length} dari ${daftar.length}`, bacaKet: "varian naik >10% / 30 hari",
         ket: (naik10.length
@@ -683,7 +711,7 @@ async function render() {
     let ketS = rasio >= 12 ? `Gelombang panen berikutnya sudah dekat. Penyumbang terbesar: ${kabTop ? kabTop[0] : "-"}.` :
                rasio >= 6 ? "Luas lahan yang menuju panen sedang menipis. Stok perlu dijaga sampai gelombang panen berikutnya tiba." : "Lahan yang menuju panen sangat sedikit, sehingga pasokan beras lokal berisiko seret.";
     if (musim) ketS += ` Secara musiman, ${musim.bulanKini.nama} berada di ${musim.posisi.toFixed(0)}% dari puncak panen tahunan (${musim.puncak.nama}).`;
-    simoInfo = { nama: "Pasokan Padi (SIMOTANDI)", sumber: "Citra satelit Kementan",
+    simoInfo = { nama: "Pasokan Padi (SIMOTANDI)", sumber: "Citra satelit Kementan · periode " + (simoData.periode || "-"),
       lv: rasio >= 12 ? "AMAN" : rasio >= 6 ? "WASPADA" : "BAHAYA",
       baca: fmtN(dekatPanen) + " ha", bacaKet: "fase generatif + panen (" + rasio.toFixed(0) + "% luas baku sawah)",
       ket: ketS, tab: "konteks" };
@@ -719,8 +747,11 @@ async function render() {
     cadData = { thn, ct, kolS, total, totalTon, takTerpelihara, nTahun: nilaiTahun.length };
     cadInfo = takTerpelihara
       ? { nama: "Cadangan Pangan Pemerintah", sumber: "DPKP DIY · " + thn,
-          lv: "BAHAYA", baca: "tidak terpelihara", bacaKet: "portal sumber tidak diperbarui",
-          ket: `Portal cadangan pangan menampilkan angka yang persis sama untuk ${nilaiTahun.length} tahun anggaran berturut-turut, dengan total hanya ${fmtN(total, 1)} kg se-DIY. Angka sebesar itu tidak masuk akal untuk cadangan provinsi, sehingga pilar ini tidak dapat dipakai menilai kapasitas intervensi. Pemutakhiran basis data di sumbernya adalah prasyarat sebelum sistem peringatan dini mana pun dapat berfungsi penuh.`,
+          // Statusnya BUKAN merah. Yang bermasalah adalah basis datanya, bukan cadangannya
+          // terbukti gawat. Menandainya BAHAYA akan membuat papan pantau seolah menyatakan
+          // krisis padahal kondisinya justru tidak diketahui.
+          lv: "DATA", baca: "tidak dapat dinilai", bacaKet: "portal sumber tidak diperbarui",
+          ket: `Portal cadangan pangan menampilkan angka yang persis sama untuk ${nilaiTahun.length} tahun anggaran berturut-turut, dengan total hanya ${fmtN(total, 1)} kg se-DIY. Angka sebesar itu tidak masuk akal untuk cadangan provinsi. Karena itu pilar ini <strong>tidak kami masukkan ke skala Aman sampai Bahaya</strong>: kondisi cadangan pangan DIY saat ini tidak diketahui, bukan diketahui buruk. Pemutakhiran basis data di sumbernya adalah prasyarat sebelum sistem peringatan dini mana pun dapat berfungsi penuh.`,
           tab: "konteks" }
       : { nama: "Cadangan Pangan Pemerintah", sumber: "DPKP DIY · " + thn,
           lv: totalTon >= 200 ? "AMAN" : totalTon >= 100 ? "WASPADA" : "BAHAYA",
@@ -772,9 +803,9 @@ async function render() {
   let beritaInfo = null;
   if (berita && berita.length) {
     const val = berita.filter(b => isTrue(b.tervalidasi));
-    beritaInfo = { nama: "Verifikasi Berita", sumber: "Pencarian otomatis (Firecrawl)",
+    beritaInfo = { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi",
       lv: "AMAN", baca: val.length + " kliping", bacaKet: "liputan media untuk lonjakan terbaru",
-      ket: "Tiap lonjakan angka dicek silang dengan pemberitaan media. Angka yang didukung berita jauh lebih kuat daripada angka yang berdiri sendiri.", tab: "konteks" };
+      ket: "Pencarian berita otomatis untuk tiap lonjakan, sebagai bukti pendukung yang <strong>belum dikurasi manusia</strong>. Kliping yang cocok memperkuat sinyal, tetapi jumlah kliping saja belum berarti lonjakannya sudah terverifikasi.", tab: "konteks" };
   }
 
   const pilar = kondisiPilar({ tip, sp2kpInfo, dpkpInfo, simoInfo, cadInfo, cuacaInfo, ensoInfo, trendsInfo, beritaInfo });
@@ -790,17 +821,32 @@ async function render() {
 
       const s = el("section", "blok");
       const banner = el("div", "kartu banner");
-      banner.appendChild(el("div", "tgl", `<strong>Kondisi Harga Pangan DIY</strong> · data s.d. ${fmtTgl(new Date(tip.tMaks))} · ${tip.hasil.length} komoditas · 9 pilar data`));
+      // PIHPS menerbitkan beberapa seri untuk barang yang sama, mis. "Daging Ayam" dan
+      // "Daging Ayam Ras Segar". Menghitungnya sebagai komoditas terpisah membuat angka
+      // anomali terbaca lebih dramatis daripada keadaannya. Di sini seri dipetakan dulu ke
+      // kelompok induknya, lalu KEDUANYA dilaporkan supaya tidak ada yang disembunyikan.
+      const indukKom = nm => String(nm)
+        .replace(/\s*\((.*?)\)/g, "")
+        .replace(/\b(Ras|Segar|Broiler|Ukuran|Sedang|Besar|Kecil|Kualitas|Premium|Medium|Super|Bawah|Atas|I{1,3}|Lokal|Impor|Merah|Putih|Hijau|Keriting|Rawit|Biji|Kering|Kemasan|Curah|Pipilan|Murni|Konsumsi|Halus)\b/gi, "")
+        .replace(/\s+/g, " ").trim() || String(nm);
+      const nKelompok = st => new Set(tip.hasil.filter(x => x.status === st).map(x => indukKom(x.kom))).size;
+      const totKelompok = new Set(tip.hasil.map(x => indukKom(x.kom))).size;
+
+      banner.appendChild(el("div", "tgl", `<strong>Kondisi Harga Pangan DIY</strong> · data s.d. ${fmtTgl(new Date(tip.tMaks))} · ${tip.hasil.length} seri harga dari ${totKelompok} kelompok komoditas · 9 pilar data`));
       const chips = el("div", "chips");
       [["bahaya", nB, "BAHAYA", "gejolak harga nyata"], ["anomali", nA, "ANOMALI", "lonjakan data, perlu pengecekan"],
-       ["waspada", nW, "WASPADA", "dalam pengawasan"], ["aman", nS, "AMAN", "stabil"]].forEach(([k, j, l, d]) =>
-        chips.appendChild(el("div", "chip " + k, `<div class="n tnum">${j}</div><div class="l">${IKON[l]} ${l}</div><div class="d">${d}</div>`)));
+       ["waspada", nW, "WASPADA", "dalam pengawasan"], ["aman", nS, "AMAN", "stabil"]].forEach(([k, j, l, d]) => {
+        const kel = nKelompok(l);
+        const rinci = j ? `<div class="d" style="opacity:.85">${j} seri · ${kel} kelompok</div>` : "";
+        chips.appendChild(el("div", "chip " + k,
+          `<div class="n tnum">${j}</div><div class="l">${IKON[l]} ${l}</div><div class="d">${d}</div>${rinci}`));
+       });
       banner.appendChild(chips);
 
       let rek;
       const daftar = st => tip.hasil.filter(x => x.status === st).slice(0, 4).map(x => x.kom).join(", ");
       if (nB > 0) rek = `<strong>Perlu segera ditangani:</strong> cek kondisi pasokan dan siapkan operasi pasar untuk <strong>${daftar("BAHAYA")}</strong>${nB > 4 ? " dkk." : ""}.`;
-      else if (nA > 0) rek = `<strong>Saat ini tidak ada tanda krisis pangan.</strong> Lonjakan angka pada ${nA} komoditas terjadi serentak dan pas bertepatan dengan jadwal pembaruan data acuan PIHPS di akhir bulan, jadi <strong>kemungkinan besar itu bukan gejolak pasar</strong>. Yang perlu dilakukan cukup <strong>mengecek harga di beberapa pasar</strong>. Operasi pasar belum perlu digelar.`;
+      else if (nA > 0) rek = `<strong>Saat ini tidak ada tanda krisis pangan.</strong> Lonjakan angka pada ${nA} seri harga terjadi serentak dan pas bertepatan dengan jadwal pembaruan data acuan PIHPS di akhir bulan, jadi <strong>kemungkinan besar itu bukan gejolak pasar</strong>. Yang perlu dilakukan cukup <strong>mengecek harga di beberapa pasar</strong>. Operasi pasar belum perlu digelar.`;
       else if (nW > 0) rek = `<strong>Kondisi terkendali, tapi ada catatan.</strong> Yang perlu dipantau ketat: <strong>${daftar("WASPADA")}</strong>.`;
       else rek = `<strong>Kondisi harga pangan DIY terkendali.</strong>`;
       if (simoInfo && simoInfo.lv === "AMAN") rek += ` Dari sisi pasokan juga mendukung: sekitar <strong>${simoInfo.baca}</strong> lahan padi sedang menuju panen atau sudah panen menurut SIMOTANDI.`;
@@ -816,8 +862,15 @@ async function render() {
     pilar.forEach(p => {
       const k = el("div", "kartu-pilar");
       k.style.cursor = "pointer";
+      // Judul halaman menyebut satu tanggal, padahal tiap pilar punya tanggal datanya
+      // sendiri. Tanpa penanda ini pembaca mudah mengira semua angka sekondisi.
+      const hariLalu = p.tgl ? Math.floor((Date.now() - +new Date(p.tgl)) / 864e5) : null;
+      const segar = hariLalu === null ? "" :
+        `<span class="lencana-segar ${hariLalu <= 2 ? "baru" : hariLalu <= 10 ? "sedang" : "lama"}"
+           title="Data terakhir pilar ini: ${fmtTgl(new Date(p.tgl))}">${
+           hariLalu <= 0 ? "hari ini" : hariLalu === 1 ? "kemarin" : hariLalu + " hari lalu"}</span>`;
       k.innerHTML = `
-        <div class="kp-head"><div><div class="kp-nama">${p.nama}</div><div class="kp-sumber">${p.sumber}</div></div>
+        <div class="kp-head"><div><div class="kp-nama">${p.nama}</div><div class="kp-sumber">${p.sumber} ${segar}</div></div>
           ${p.lv ? tagStatus(p.lv) : '<span class="tag netral">n/a</span>'}</div>
         <div class="kp-baca tnum">${p.baca}${p.bacaKet ? ` <span style="font-size:.7rem;font-weight:500;color:var(--ink-2)">${p.bacaKet}</span>` : ""}</div>
         <div class="kp-ket">${p.ket}</div>`;
@@ -908,11 +961,11 @@ async function render() {
         <dl>
           <dt>Model terpilih</dt><dd><strong>Penduga bergerbang: model berlag dipakai hanya bila terbukti menang, selebihnya penduga naif; rentangnya dari kuantil empiris berpenskala volatilitas.</strong> Cara kerjanya begini. Untuk tiap komoditas, sistem menguji dulu di data lamanya sendiri apakah model berlag benar-benar lebih akurat daripada sekadar memakai harga hari ini. Kalau menang cukup meyakinkan, model itu dipakai; kalau tidak, tebakannya kembali ke harga hari ini. Lalu di sekeliling tebakan itu dipasang rentang, yang lebarnya diambil dari seberapa jauh harga komoditas tersebut biasanya bergeser sepanjang riwayatnya, kemudian disesuaikan dengan seberapa bergejolak harganya empat minggu terakhir. Penyesuaian terakhir itu terbukti memperbaiki mutu rentang sebesar 2% sampai 4%.</dd>
           <dt>Lawan yang diadu</dt><dd>Tiga tahap pengujian. Tahap pertama mengadu delapan pendekatan: naif, drift, SES, Theta, Holt teredam, ARIMA, naif musiman, dan regresi Ridge. Tahap kedua menambahkan ARIMAX dan ARDL yang memakai peubah luar seperti harga dari sumber lain, sebaran harga antarpasar, indeks El Niño, dan luas panen padi. Tahap ketiga tidak lagi mematok bentuk modelnya, melainkan mencari sendiri berapa banyak lag yang dipakai tiap komoditas.</dd>
-          <dt>Cara mengujinya</dt><dd>Memakai uji-mundur. Tiap model hanya diberi data sampai satu titik waktu tertentu, lalu disuruh menebak, dan tebakannya dibandingkan dengan harga yang benar-benar terjadi sesudahnya. Proses ini diulang di sepanjang sekitar 226 minggu (Apr 2022 sampai Agu 2026) untuk 14 komoditas.</dd>
+          <dt>Cara mengujinya</dt><dd>Memakai uji-mundur. Tiap model hanya diberi data sampai satu titik waktu tertentu, lalu disuruh menebak, dan tebakannya dibandingkan dengan harga yang benar-benar terjadi sesudahnya. Proses ini diulang di sepanjang sekitar 228 minggu (Apr 2022 sampai Agu 2026) untuk 14 komoditas.</dd>
           <dt>Hasilnya</dt><dd>Harga pangan ternyata bukan sepenuhnya acak: pada 23 dari 50 komoditas, pergerakan mingguannya masih menyimpan pola yang bisa dipelajari. Meski begitu, tidak ada model yang menang pada rata-rata seluruh komoditas; “harga besok sama dengan harga hari ini” tetap sulit dikalahkan. Pengecualiannya justru pada komoditas yang paling merepotkan: cabai rawit merah bisa diramalkan 12% sampai 16% lebih baik daripada tebakan sederhana itu. Sebaliknya pada beras, gula, dan minyak goreng yang harganya banyak dipengaruhi kebijakan, model malah memperburuk. Hasil ini bukan tanda kami mengambil jalan pintas. Harga pangan dalam jangka pendek memang bergerak nyaris acak, sehingga menambah kerumitan model hanya menambah kesalahan.</dd>
           <dt>Apakah rentangnya jujur</dt><dd>Sudah diperiksa. Rentang yang kami beri label “80%” ternyata benar-benar memuat harga yang terjadi pada 76% kasus untuk horizon 1 minggu, dan 83% untuk 1 bulan. Rentang berlabel “95%” tercapai di kisaran 94 sampai 95%. Artinya, kalau di tabel tertulis peluang naik lebih dari 10% adalah 20%, angka 20% itu memang berarti kira-kira 1 dari 5 kali.</dd>
         </dl>
-        <p class="tips">Prakiraan ini memakai <strong>SP2KP Kemendag</strong> sebagai sumber utama, karena dari uji kelayakan hanya sumber ini yang paling banyak deretnya cukup bergerak untuk diprakirakan: 31 dari 52, dibanding DPKP 14 dari 19 dan PIHPS <strong>nol dari 20</strong>. Kolom terakhir menunjukkan hasil hitungan yang sama dari data DPKP yang dikumpulkan lembaga berbeda. Bila keduanya <em>sepakat</em>, sinyalnya jauh lebih kuat; bila <em>berbeda</em>, sebaiknya dicek ke pasar dulu. Perbandingan lengkap model ada di tab <strong>Metodologi</strong>.</p>
+        <p class="tips">Prakiraan ini memakai <strong>SP2KP Kemendag</strong> sebagai sumber utama, karena dari uji kelayakan hanya sumber ini yang paling banyak deretnya cukup bergerak untuk diprakirakan: 24 dari 52, dibanding DPKP 10 dari 19 dan PIHPS <strong>nol dari 20</strong>. Kolom terakhir menunjukkan hasil hitungan yang sama dari data DPKP yang dikumpulkan lembaga berbeda. Bila keduanya <em>sepakat</em>, sinyalnya jauh lebih kuat; bila <em>berbeda</em>, sebaiknya dicek ke pasar dulu. Perbandingan lengkap model ada di tab <strong>Metodologi</strong>.</p>
       </div>`;
     if (!prakiraan || !prakiraan.length) {
       s.appendChild(el("div", "kosong", "Data prakiraan belum tersedia. Isinya akan muncul otomatis setelah pipeline berjalan."));
@@ -1463,7 +1516,7 @@ async function render() {
 
     // --- kliping berita ---
     const sB = el("section", "blok");
-    sB.innerHTML = `<h2>Kliping Verifikasi Berita</h2>
+    sB.innerHTML = `<h2>Sinyal Media Pendukung</h2>
       <p class="sub">Untuk tiap lonjakan yang tercatat, sistem otomatis mencari pemberitaannya sebagai lapisan pengecekan kedua. Menggabungkan sinyal harga dengan teks berita terbukti lebih tajam daripada mengandalkan angka harga saja (Bakry dkk., 2025).</p>`;
     if (berita && berita.length) {
       const unik = [];
@@ -1520,7 +1573,7 @@ async function render() {
       };
       const sB = el("section", "blok");
       sB.innerHTML = `<h2>Membandingkan Tiga Sumber Harga Resmi</h2>
-        <p class="sub">Ketiganya mengukur pasar yang sama tetapi dengan cara dan kecepatan berbeda. SP2KP dan DPKP bergerak hampir serentak. PIHPS berbentuk tangga karena angkanya hanya diperbarui pada tanggal 25 sampai 27, sehingga gejolak yang terjadi awal bulan baru terlihat di PIHPS pada akhir bulan. Ini bukan kekurangan PIHPS, melainkan konsekuensi peruntukannya sebagai harga acuan produsen.</p>`;
+        <p class="sub">Ketiganya mengukur pasar yang sama tetapi dengan cara dan kecepatan berbeda. SP2KP dan DPKP bergerak hampir serentak. PIHPS berbentuk tangga karena angkanya hanya diperbarui pada tanggal 25 sampai 28, sehingga gejolak yang terjadi awal bulan baru terlihat di PIHPS pada akhir bulan. Ini bukan kekurangan PIHPS, melainkan konsekuensi peruntukannya sebagai harga acuan produsen.</p>`;
       const kb = el("div", "kontrol");
       kb.innerHTML = `<label for="pilih-band" style="font-size:.84rem">Komoditas:</label>
         <select id="pilih-band">${Object.keys(PADAN).map(k => `<option>${k}</option>`).join("")}</select>`;
@@ -1671,7 +1724,7 @@ async function render() {
           <dt>Temuan soal sumber data</dt><dd>Ketiga sumber harga resmi ternyata sangat berbeda kecepatannya. SP2KP dan DPKP bergerak hampir serentak, sedangkan PIHPS baru mengikuti dua sampai empat minggu kemudian karena angkanya cuma diperbarui pada tanggal 25 sampai 27. Karena itu prakiraan dan kalender risiko memakai SP2KP dan DPKP, sedangkan PIHPS dipakai sebagai acuan harga di tingkat petani.</dd>
           <dt>Temuan penting</dt><dd>Ternyata hampir semua penandaan itu jatuh bersamaan pada tanggal 25 sampai 28 tiap bulan, serentak di belasan komoditas. Yang terekam di situ bukan pasar yang bergolak, tapi jadwal pembaruan angka acuan PIHPS. Karena itu lonjakan yang serentak kami turunkan ke status <strong>Anomali</strong> yang berarti perlu dicek, bukan <strong>Bahaya</strong>. Tujuannya supaya pengambil kebijakan tidak mengeluarkan biaya untuk sesuatu yang sebenarnya cuma urusan administrasi data.</dd>
           <dt>Kenapa peramalannya berupa rentang</dt><dd>Delapan model peramalan sudah kami adu, dan tidak ada yang sanggup mengalahkan tebakan paling sederhana, yaitu “harga besok sama dengan harga hari ini”. Daripada menyodorkan satu angka yang terdengar pasti padahal tidak, kami memilih menyajikan rentang dan peluang. Kejujuran rentang itu sendiri sudah diuji terhadap apa yang benar-benar terjadi.</dd>
-          <dt>Apa yang belum sempurna</dt><dd>Ada lima hal yang perlu kami akui. Harga PIHPS adalah rata-rata provinsi, bukan angka per pasar, dan angkanya tertinggal dua sampai empat minggu di belakang dua sumber lain. Data SP2KP baru mencakup Kota Yogyakarta dan Gunungkidul. Data luas tanam SIMOTANDI masih diperbarui setengah manual, karena server sumbernya menolak akses dari komputer awan. Kliping berita sifatnya baru indikatif, sebab berasal dari pencarian otomatis dan belum disaring manusia. Dan yang terakhir, ini purwarupa riset, bukan produk resmi pemerintah.</dd>
+          <dt>Apa yang belum sempurna</dt><dd>Ada enam hal yang perlu kami akui. Harga PIHPS adalah rata-rata provinsi, bukan angka per pasar, dan angkanya tertinggal dua sampai empat minggu di belakang dua sumber lain. Data SP2KP baru mencakup Kota Yogyakarta dan Gunungkidul. Data luas tanam SIMOTANDI masih diperbarui setengah manual, karena server sumbernya menolak akses dari komputer awan. Riwayat SP2KP juga belum menyegarkan diri: antarmukanya dapat dihubungi tetapi mengabaikan parameter tanggal dan wilayah yang kami kirim, jadi angkanya kami muat dari berkas terbitan resmi SP2KP sampai antarmuka yang sesuai tersedia. Kliping berita sifatnya baru indikatif, sebab berasal dari pencarian otomatis dan belum disaring manusia. Dan yang terakhir, ini purwarupa riset, bukan produk resmi pemerintah.</dd>
         </dl>
       </div>
       <h2 style="margin-top:26px">Lapis 2: rincian teknis</h2>
