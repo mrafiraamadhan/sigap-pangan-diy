@@ -23,11 +23,12 @@ MENEMUKAN SENDIRI bentuk balasan API saat pertama kali berjalan:
   - mencoba beberapa kemungkinan nama parameter sampai ada yang mengembalikan data
   - mengenali bentuk balasan (list polos, {"data": [...]}, atau {"result": [...]})
   - memetakan nama kolom secara lentur (tanggal/date/tgl, harga/price/nilai, dst.)
-  - MENCETAK satu record mentah ke log bila pemetaan gagal, supaya bentuk aslinya
+  - MEMIPIHKAN nilai bersarang, mis. {"komoditas": {"id": 12, "nama": "Bawang"}}
+  - MENCETAK record mentah DAN hasil pemetaannya ke log, supaya bentuk aslinya
     dapat dibaca dan modul ini diperbaiki tanpa menebak lagi
 
-Jadi bila run pertama gagal, lihat log langkah ini: di sana tercetak contoh
-balasan mentah yang dibutuhkan untuk membetulkan pemetaan.
+Jadi bila run gagal, lihat log langkah ini: di sana tercetak contoh balasan
+mentah yang dibutuhkan untuk membetulkan pemetaan.
 
 Keluaran: data/harga_sp2kp_diy.csv
 """
@@ -128,15 +129,74 @@ def daftar_dari(obj):
     return []
 
 
+# Kunci yang biasa memuat NAMA di dalam objek bersarang, diperiksa berurutan.
+KUNCI_NAMA = ("nama", "name", "nama_pasar", "nama_komoditas", "nama_varian",
+              "label", "title", "text", "deskripsi", "description", "value", "kode", "code")
+KUNCI_ANGKA = ("harga", "price", "nilai", "value", "average_price", "avg_price",
+               "harga_rata_rata", "rata_rata", "average", "avg")
+
+
+def ratakan(v, dalam=0):
+    """Pipihkan nilai bersarang menjadi satu nilai yang bisa di-hash.
+
+    Pelajaran dari run 31 Agt: SP2KP mengembalikan sebagian kolom sebagai objek,
+    misalnya "komoditas": {"id": 12, "nama": "Bawang"}. pandas.drop_duplicates
+    memanggil factorize yang menuntut nilai bisa di-hash, sehingga dict mentah
+    menggagalkan seluruh langkah dengan TypeError: unhashable type: 'dict'.
+    """
+    if v is None or isinstance(v, (str, int, float, bool)):
+        return v
+    if isinstance(v, dict):
+        if dalam < 3:
+            for target in KUNCI_NAMA:
+                for k, w in v.items():
+                    if str(k).lower().strip() == target:
+                        hasil = ratakan(w, dalam + 1)
+                        if hasil not in (None, ""):
+                            return hasil
+        for w in v.values():                       # usaha terakhir: skalar pertama
+            if isinstance(w, (str, int, float)) and not isinstance(w, bool) and w != "":
+                return w
+        return json.dumps(v, ensure_ascii=False, sort_keys=True)[:120]
+    if isinstance(v, (list, tuple)):
+        bagian = [str(ratakan(x, dalam + 1)) for x in v if x is not None]
+        return " | ".join(bagian) if bagian else None
+    return str(v)
+
+
+def ratakan_angka(v, dalam=0):
+    """Seperti ratakan() tetapi mengutamakan isi yang benar-benar angka."""
+    if isinstance(v, dict):
+        if dalam < 3:
+            for target in KUNCI_ANGKA:
+                for k, w in v.items():
+                    if str(k).lower().strip() == target:
+                        hasil = ratakan_angka(w, dalam + 1)
+                        if hasil is not None:
+                            return hasil
+        for w in v.values():
+            if isinstance(w, (int, float)) and not isinstance(w, bool):
+                return w
+    return ratakan(v, dalam)
+
+
 def petakan(rec):
     """Petakan satu record ke kolom baku kita. None bila tidak dikenali."""
+    if not isinstance(rec, dict):
+        return None
     kecil = {str(k).lower().strip(): v for k, v in rec.items()}
     out = {}
     for baku, kandidat in SINONIM.items():
         for c in kandidat:
-            if c in kecil and kecil[c] not in (None, ""):
-                out[baku] = kecil[c]
-                break
+            if c in kecil and kecil[c] not in (None, "", []):
+                nilai = ratakan_angka(kecil[c]) if baku == "harga" else ratakan(kecil[c])
+                if nilai not in (None, ""):
+                    out[baku] = nilai
+                    break
+    # Modul peringkas mengelompokkan deret berdasarkan `varian`. Kalau balasan API
+    # tidak memuatnya, komoditas dipakai supaya deretnya tidak hilang.
+    if "varian" not in out and "komoditas" in out:
+        out["varian"] = out["komoditas"]
     return out if ("tanggal" in out and "harga" in out) else None
 
 
@@ -204,7 +264,21 @@ def main():
     df = pd.DataFrame(baris)
     df["tanggal"] = pd.to_datetime(df["tanggal"], errors="coerce").dt.date
     df["harga"] = pd.to_numeric(df["harga"], errors="coerce")
+    # Kolom teks dipaksa jadi teks. Ini yang mencegah TypeError saat dedup.
+    for k in ("kabupaten_kota", "pasar", "komoditas", "varian", "satuan"):
+        if k in df.columns:
+            df[k] = df[k].map(lambda x: "" if x is None else str(ratakan(x)).strip())
     df = df.dropna(subset=["tanggal", "harga"]).query("harga > 0")
+
+    if not len(df):
+        catat("Semua record gugur saat pembersihan (tanggal/harga tidak terbaca).")
+        catat("Berkas lama TIDAK ditimpa. Perbaiki pemetaan lebih dulu.")
+        return 0
+
+    catat(f"{len(df)} baris bersih. Contoh hasil pemetaan:")
+    for _, b in df.head(2).iterrows():
+        catat("  " + json.dumps({k: str(v) for k, v in b.items()}, ensure_ascii=False)[:400])
+
     df["diambil_pada_utc"] = datetime.now(timezone.utc).isoformat()
 
     kunci = [k for k in ("tanggal", "pasar", "komoditas", "varian") if k in df.columns]
@@ -212,11 +286,36 @@ def main():
     if os.path.exists(KELUARAN):
         lama = pd.read_csv(KELUARAN)
         lama["tanggal"] = pd.to_datetime(lama["tanggal"], errors="coerce").dt.date
+        for k in ("kabupaten_kota", "pasar", "komoditas", "varian", "satuan"):
+            if k in lama.columns:
+                lama[k] = lama[k].fillna("").astype(str).str.strip()
+        # Kalau penamaan varian dari API tidak sama dengan riwayat yang sudah ada,
+        # deret barunya akan dianggap komoditas lain dan modul prakiraan kehilangan
+        # riwayat panjangnya. Ini diperiksa dan dilaporkan, bukan didiamkan.
+        if "varian" in df.columns and "varian" in lama.columns:
+            baru_set, lama_set = set(df.varian.unique()), set(lama.varian.unique())
+            beririsan = baru_set & lama_set
+            catat(f"Varian: {len(baru_set)} dari API, {len(lama_set)} di riwayat, "
+                  f"{len(beririsan)} beririsan.")
+            if not beririsan:
+                catat("PERINGATAN: tidak ada satu pun nama varian yang cocok dengan "
+                      "riwayat. Penamaan dari API kemungkinan berbeda; periksa contoh "
+                      "di atas sebelum hasil prakiraan dipercaya.")
+            elif len(baru_set - lama_set):
+                catat(f"  varian baru yang belum ada di riwayat: "
+                      f"{sorted(baru_set - lama_set)[:8]}")
+        sebelum = len(lama)
         df = pd.concat([lama, df], ignore_index=True)
+    else:
+        sebelum = 0
+
+    for k in kunci:
+        if k != "tanggal":
+            df[k] = df[k].fillna("").astype(str)
     df = df.drop_duplicates(subset=kunci, keep="last").sort_values(kunci)
     df.to_csv(KELUARAN, index=False)
 
-    catat(f"Tersimpan {KELUARAN}: {len(df)} baris, "
+    catat(f"Tersimpan {KELUARAN}: {len(df)} baris (+{len(df) - sebelum} dari run ini), "
           f"{df['komoditas'].nunique() if 'komoditas' in df else '?'} komoditas, "
           f"{df.tanggal.min()} s.d. {df.tanggal.max()}")
     return 0
