@@ -143,6 +143,28 @@
   .mchip a { color: inherit; text-decoration: none; }
   .mchip a:hover { text-decoration: underline; }
 
+  /* ===== Peta koroplet ===== */
+  .peta-wrap { position: relative; }
+  .peta-svg { width: 100%; height: auto; display: block; }
+  .peta-svg path { stroke: #fff; stroke-width: .5; cursor: pointer; transition: opacity .12s; }
+  .peta-svg path:hover { opacity: .78; stroke: #14331f; stroke-width: 1.1; }
+  .peta-tip { position: absolute; pointer-events: none; background: #14331f; color: #fff;
+              border-radius: 7px; padding: 7px 10px; font-size: .74rem; line-height: 1.5;
+              opacity: 0; transition: opacity .12s; white-space: nowrap; z-index: 5;
+              box-shadow: 0 4px 14px rgba(0,0,0,.22); }
+  .peta-tip b { font-size: .8rem; }
+  .peta-legenda { display: flex; align-items: center; gap: 9px; margin-top: 10px; font-size: .72rem; color: var(--ink-2); flex-wrap: wrap; }
+  .legenda-skala { display: flex; height: 11px; border-radius: 3px; overflow: hidden; width: 190px; }
+  .legenda-skala i { flex: 1; }
+
+  /* ===== Bar probabilitas ===== */
+  .pbar { display: flex; align-items: center; gap: 7px; min-width: 118px; }
+  .pbar-track { display: block; flex: 1; height: 7px; background: #eeeade; border-radius: 4px; overflow: hidden; }
+  .pbar-fill { display: block; height: 100%; border-radius: 4px; min-width: 2px; }
+  .pbar-val { font-size: .75rem; font-weight: 650; min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+  .rentang { font-size: .78rem; white-space: nowrap; }
+  .rentang .rp { font-weight: 600; }
+
   /* ===== Panel & grid ===== */
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 14px; }
   .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
@@ -239,6 +261,7 @@
 <nav class="tabs"><div class="wrap" id="navtabs">
   <button class="tabbtn" data-tab="ringkasan">Ringkasan</button>
   <button class="tabbtn" data-tab="status">Status Komoditas <span class="bulat" id="nb-status"></span></button>
+  <button class="tabbtn" data-tab="prakiraan">Prakiraan Risiko</button>
   <button class="tabbtn" data-tab="konteks">Konteks &amp; Pasokan</button>
   <button class="tabbtn" data-tab="data">Data &amp; Tren</button>
   <button class="tabbtn" data-tab="metodologi">Metodologi</button>
@@ -248,6 +271,7 @@
   <div id="muat" class="loading">Memuat 9 sumber data…</div>
   <div class="tabpane" id="tab-ringkasan" hidden></div>
   <div class="tabpane" id="tab-status" hidden></div>
+  <div class="tabpane" id="tab-prakiraan" hidden></div>
   <div class="tabpane" id="tab-konteks" hidden></div>
   <div class="tabpane" id="tab-data" hidden></div>
   <div class="tabpane" id="tab-metodologi" hidden></div>
@@ -286,8 +310,22 @@ async function ambilCsv(file) {
   return null;
 }
 
+async function ambilJson(file) {
+  for (const basis of ["data/", REPO_RAW]) {
+    for (let p = 0; p < 2; p++) {
+      try {
+        const res = await fetch(basis + file + "?t=" + Date.now(), { cache: "no-store" });
+        if (res.status === 404) break;
+        if (!res.ok) { await tunggu(700); continue; }
+        return await res.json();
+      } catch (e) { console.warn("gagal", basis + file, e); await tunggu(700); }
+    }
+  }
+  return null;
+}
+
 /* ================= util ================= */
-const fmtRp = n => "Rp " + Number(n).toLocaleString("id-ID");
+const fmtRp = n => "Rp " + Math.round(Number(n)).toLocaleString("id-ID");
 const fmtN = (n, d = 0) => Number(n).toLocaleString("id-ID", { maximumFractionDigits: d });
 const fmtTgl = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }); };
 const fmtTglPdk = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toLocaleDateString("id-ID", { day: "numeric", month: "short" }); };
@@ -417,6 +455,8 @@ async function render() {
     ambilCsv("cadangan_pangan_diy.csv"), ambilCsv("cuaca_diy.csv"),
     ambilCsv("enso_oni.csv"), ambilCsv("google_trends_panik.csv"), ambilCsv("validasi_berita.csv"),
   ]);
+  const prakiraan = await ambilCsv("prakiraan_harga.csv");
+  const petaKec = await ambilJson("peta_kecamatan_diy.geojson");
   document.getElementById("muat").remove();
   if (!window.Papa) {
     document.querySelector("main").innerHTML =
@@ -736,6 +776,134 @@ async function render() {
     }
   } catch (e) { T2.appendChild(seksiGagal("Papan status", e)); }
 
+  /* ================= TAB 2b: PRAKIRAAN RISIKO ================= */
+  const TP = document.getElementById("tab-prakiraan");
+  try {
+    const s = el("section", "blok");
+    s.innerHTML = `<h2>Prakiraan Risiko Harga</h2>
+      <p class="sub">Bukan ramalan angka tunggal, melainkan <strong>rentang harga &amp; peluang lonjakan</strong> — bentuk yang teruji dapat dipertanggungjawabkan. Uji-mundur atas 226 minggu data menunjukkan tidak ada model (ARIMA, Theta, Holt, Ridge) yang mengalahkan penduga naif pada horizon pendek, sehingga penduga titik tetap harga terkini dan yang diprakirakan adalah ketidakpastiannya. Rincian metode &amp; hasil uji ada di tab Metodologi.</p>`;
+    if (!prakiraan || !prakiraan.length) {
+      s.appendChild(el("div", "kosong", "Data prakiraan belum tersedia — akan terisi otomatis setelah pipeline berjalan."));
+      TP.appendChild(s);
+    } else {
+      const warnaP = p => p >= 35 ? "var(--bahaya)" : p >= 20 ? "var(--anomali)" : p >= 10 ? "var(--waspada)" : "var(--aman)";
+      const barP = p => `<span class="pbar"><span class="pbar-track"><span class="pbar-fill" style="width:${Math.min(100, p)}%;background:${warnaP(p)}"></span></span><span class="pbar-val" style="color:${warnaP(p)}">${p.toFixed(0)}%</span></span>`;
+
+      // pilih horizon
+      const kontrol = el("div", "kontrol");
+      kontrol.innerHTML = `<label for="pilih-h" style="font-size:.84rem">Horizon prakiraan:</label>
+        <select id="pilih-h"><option value="1 bulan">1 bulan ke depan</option><option value="1 minggu">1 minggu ke depan</option></select>`;
+      s.appendChild(kontrol);
+      const wrapTabel = el("div"); s.appendChild(wrapTabel);
+
+      const gambarTabel = (hz) => {
+        const rows = prakiraan.filter(r => String(r.horizon) === hz)
+          .sort((a, b) => Number(b.prob_naik_10) - Number(a.prob_naik_10));
+        if (!rows.length) { wrapTabel.innerHTML = ""; wrapTabel.appendChild(el("div", "kosong", "Tidak ada data untuk horizon ini.")); return; }
+        const tgl = rows[0].tanggal_target;
+        wrapTabel.innerHTML = `<p class="catatan-kecil" style="margin:0 0 8px">Dari harga per ${fmtTgl(rows[0].tanggal_data_terakhir)} untuk target ${fmtTgl(tgl)} · diurutkan dari risiko lonjakan tertinggi</p>
+          <div class="tabel-wrap"><table><thead><tr>
+            <th>Komoditas</th><th class="num">Harga kini</th><th>Rentang 80% ${hz} lagi</th>
+            <th>Peluang naik &gt;5%</th><th>Peluang naik &gt;10%</th><th>Peluang turun &gt;5%</th></tr></thead>
+          <tbody>${rows.map(r => {
+            const lebar = Number(r.lebar80_persen);
+            return `<tr>
+              <td>${r.komoditas}</td>
+              <td class="num tnum">${fmtRp(r.harga_terkini)}</td>
+              <td class="rentang tnum" title="Interval prakiraan 80% — lebar ${lebar.toFixed(0)}% dari harga kini">
+                <span class="rp">${fmtRp(r.lo80)}</span> – <span class="rp">${fmtRp(r.hi80)}</span></td>
+              <td>${barP(Number(r.prob_naik_5))}</td>
+              <td>${barP(Number(r.prob_naik_10))}</td>
+              <td>${barP(Number(r.prob_turun_5))}</td></tr>`;
+          }).join("")}</tbody></table></div>`;
+      };
+      gambarTabel("1 bulan");
+      queueMicrotask(() => {
+        const sel = document.getElementById("pilih-h");
+        if (sel) sel.addEventListener("change", e => gambarTabel(e.target.value));
+      });
+      TP.appendChild(s);
+
+      // --- fan chart: riwayat DPKP + kerucut ketidakpastian ---
+      if (dpkpTabel) {
+        const sf = el("section", "blok");
+        sf.innerHTML = `<h2>Kerucut Ketidakpastian per Komoditas</h2>
+          <p class="sub">Riwayat harga DPKP 6 bulan terakhir disambung dengan rentang prakiraan 80% dan 95%. Semakin lebar kerucut, semakin sulit harga komoditas itu diprediksi.</p>`;
+        const komP = [...new Set(prakiraan.map(r => r.komoditas))].sort();
+        const kf = el("div", "kontrol");
+        kf.innerHTML = `<label for="pilih-fan" style="font-size:.84rem">Komoditas:</label>
+          <select id="pilih-fan">${komP.map(k => `<option>${k}</option>`).join("")}</select>`;
+        sf.appendChild(kf);
+        const kg = el("div", "kartu kartu-grafik");
+        kg.innerHTML = `<div class="wadah-chart" style="height:320px"><canvas id="ch-fan"></canvas></div>`;
+        sf.appendChild(kg);
+        TP.appendChild(sf);
+
+        // riwayat mentah DPKP per komoditas
+        const kol = Object.keys(dpkp[0]);
+        const cT = kol.find(c => String(c).startsWith("Tanggal")), cK = kol.find(c => String(c).startsWith("Komoditas")), cH = kol.find(c => String(c).startsWith("Harga"));
+        const riwayat = {};
+        dpkp.forEach(r => {
+          const k = r[cK], t = r[cT], h = Number(r[cH]);
+          if (!k || !t || !(h > 0)) return;
+          (riwayat[k] ||= []).push({ t: String(t), h });
+        });
+        Object.values(riwayat).forEach(a => a.sort((x, y2) => (x.t < y2.t ? -1 : 1)));
+
+        let fanChart = null;
+        const gambarFan = (kom) => {
+          const cnv = document.getElementById("ch-fan");
+          if (!cnv) return;
+          if (!window.Chart) { pesanTanpaChart(cnv.parentElement); return; }
+          const hist = (riwayat[kom] || []).slice(-40);
+          const pr = prakiraan.filter(r => r.komoditas === kom);
+          const p1 = pr.find(r => String(r.horizon) === "1 minggu"), p4 = pr.find(r => String(r.horizon) === "1 bulan");
+          if (!hist.length || !p4) return;
+          const labels = hist.map(x => x.t);
+          const tAkhir = new Date(hist[hist.length - 1].t);
+          const tgl = (w) => { const d = new Date(tAkhir); d.setDate(d.getDate() + w * 7); return d.toISOString().slice(0, 10); };
+          if (p1) labels.push(tgl(1));
+          labels.push(tgl(4));
+          const n = hist.length, kosong = new Array(n - 1).fill(null);
+          const hAkhir = hist[n - 1].h;
+          const seri = (a, b) => [...kosong, hAkhir, ...(p1 ? [Number(a)] : []), Number(b)];
+          if (fanChart) fanChart.destroy();
+          fanChart = new Chart(cnv.getContext("2d"), {
+            type: "line",
+            data: { labels, datasets: [
+              { label: "Batas atas 95%", data: seri(p1 && p1.hi95, p4.hi95), borderColor: "rgba(161,28,28,.25)",
+                backgroundColor: "rgba(161,28,28,.07)", borderWidth: 1, borderDash: [4, 3], pointRadius: 0, fill: "+3", tension: .1 },
+              { label: "Batas atas 80%", data: seri(p1 && p1.hi80, p4.hi80), borderColor: "rgba(176,83,10,.45)",
+                backgroundColor: "rgba(176,83,10,.10)", borderWidth: 1, pointRadius: 0, fill: "+1", tension: .1 },
+              { label: "Penduga titik (harga kini)", data: seri(p1 && p1.titik, p4.titik), borderColor: "#1c4a2e",
+                borderWidth: 2, borderDash: [5, 4], pointRadius: 0, fill: false, tension: .1 },
+              { label: "Batas bawah 80%", data: seri(p1 && p1.lo80, p4.lo80), borderColor: "rgba(176,83,10,.45)",
+                borderWidth: 1, pointRadius: 0, fill: false, tension: .1 },
+              { label: "Batas bawah 95%", data: seri(p1 && p1.lo95, p4.lo95), borderColor: "rgba(161,28,28,.25)",
+                borderWidth: 1, borderDash: [4, 3], pointRadius: 0, fill: false, tension: .1 },
+              { label: "Harga tercatat (DPKP)", data: [...hist.map(x => x.h), ...(p1 ? [null] : []), null],
+                borderColor: "#2f7a4c", backgroundColor: "rgba(47,122,76,.06)", borderWidth: 2, pointRadius: 0, tension: .25, fill: false },
+            ] },
+            options: { responsive: true, maintainAspectRatio: false, animation: false,
+              interaction: { mode: "index", intersect: false },
+              plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 9 }, filter: it => !it.text.startsWith("Batas bawah") } },
+                tooltip: { callbacks: { title: it => it[0] ? fmtTgl(it[0].label) : "", label: it => it.raw == null ? null : `${it.dataset.label}: ${fmtRp(it.raw)}` } } },
+              scales: { y: { ticks: { callback: v => "Rp " + fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" } },
+                        x: { ticks: { font: { size: 9 }, maxTicksLimit: 8 }, grid: { display: false } } } },
+          });
+        };
+        daftarChart("prakiraan", () => {
+          const sel = document.getElementById("pilih-fan");
+          const awal = prakiraan.filter(r => String(r.horizon) === "1 bulan")
+            .sort((a, b) => Number(b.prob_naik_10) - Number(a.prob_naik_10))[0];
+          if (sel && awal) sel.value = awal.komoditas;
+          gambarFan(sel ? sel.value : komP[0]);
+          if (sel) sel.addEventListener("change", e => gambarFan(e.target.value));
+        });
+      }
+    }
+  } catch (e) { TP.appendChild(seksiGagal("Prakiraan risiko", e)); }
+
   /* ================= TAB 3: KONTEKS & PASOKAN ================= */
   const T3 = document.getElementById("tab-konteks");
   try {
@@ -760,6 +928,117 @@ async function render() {
         (simoData.rasio >= 12 ? "Rasio lahan menuju panen sehat — tekanan pasokan beras lokal rendah dalam horizon 1–2 bulan." : "Rasio lahan menuju panen menipis — antisipasi jeda antar gelombang panen.")));
       grid.appendChild(p2);
       sS.appendChild(grid);
+
+      // --- PETA KOROPLET per kecamatan ---
+      if (petaKec && petaKec.features && petaKec.features.length) {
+        const pMaxK = [...new Set(simo.map(r => (r.periode_kode ?? r.periode_mulai)))].map(String).sort().pop();
+        const stK = simo.filter(r => String(r.periode_kode ?? r.periode_mulai) === pMaxK);
+        const nilaiKec = {};
+        stK.forEach(r => {
+          const k = String(r.kecamatan || "").trim(); if (!k) return;
+          const gen = (Number(r.generatif_1_ha) || 0) + (Number(r.generatif_2_ha) || 0);
+          nilaiKec[k] = {
+            kab: r.kabupaten_kota,
+            panen: Number(r.panen_ha) || 0,
+            menuju: gen + (Number(r.panen_ha) || 0),
+            tanam: (Number(r.tanam_ha) || 0) + (Number(r.persiapan_lahan_ha) || 0),
+            baku: Number(r.luas_baku_sawah_ha) || 0,
+          };
+          nilaiKec[k].rasio = nilaiKec[k].baku > 0 ? nilaiKec[k].menuju / nilaiKec[k].baku * 100 : null;
+        });
+
+        const METRIK = {
+          menuju: { label: "Luas menuju panen (generatif + panen)", unit: "ha", fmt: v => fmtN(v) + " ha" },
+          rasio:  { label: "Kesiapan panen (% luas baku sawah)",    unit: "%",  fmt: v => v.toFixed(1) + "%" },
+          panen:  { label: "Luas sedang panen",                      unit: "ha", fmt: v => fmtN(v) + " ha" },
+          tanam:  { label: "Luas persiapan & tanam",                 unit: "ha", fmt: v => fmtN(v) + " ha" },
+        };
+        // skala berurutan satu rona (terang -> gelap), sesuai kaidah peta kuantitas
+        const RAMPA = ["#eef5ef", "#d3e7d9", "#a9d1b6", "#7bb890", "#4f9c6b", "#2f7a4c", "#1c4a2e"];
+
+        const sp = el("section", "blok");
+        sp.innerHTML = `<h2>Peta Sebaran Pasokan Padi per Kecamatan</h2>
+          <p class="sub">78 kecamatan DIY, periode ${stK[0] ? stK[0].periode : ""}. Warna makin pekat = luas makin besar. Arahkan kursor ke wilayah untuk detail.</p>`;
+        const kp2 = el("div", "kontrol");
+        kp2.innerHTML = `<label for="pilih-metrik" style="font-size:.84rem">Tampilkan:</label>
+          <select id="pilih-metrik">${Object.entries(METRIK).map(([k, m], i) => `<option value="${k}"${i === 0 ? " selected" : ""}>${m.label}</option>`).join("")}</select>`;
+        sp.appendChild(kp2);
+        const kartuPeta = el("div", "panel");
+        kartuPeta.innerHTML = `<div class="peta-wrap"><div id="peta-host"></div><div class="peta-tip" id="peta-tip"></div></div>
+          <div class="peta-legenda" id="peta-legenda"></div>`;
+        sp.appendChild(kartuPeta);
+        sS.appendChild(sp);
+
+        // --- proyeksi & penggambar SVG (tanpa pustaka peta; aman dari pemblokiran) ---
+        const gambarPeta = (metrik) => {
+          const host = document.getElementById("peta-host");
+          const tip = document.getElementById("peta-tip");
+          if (!host) return;
+          const fitur = petaKec.features;
+          let minLon = 1e9, maxLon = -1e9, minLat = 1e9, maxLat = -1e9;
+          const cincin = g => g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+          fitur.forEach(f => cincin(f.geometry).forEach(poly => poly.forEach(r => r.forEach(([x, y]) => {
+            if (x < minLon) minLon = x; if (x > maxLon) maxLon = x;
+            if (y < minLat) minLat = y; if (y > maxLat) maxLat = y;
+          }))));
+          const latTengah = (minLat + maxLat) / 2;
+          const kx = Math.cos(latTengah * Math.PI / 180);   // koreksi aspek bujur
+          const W = 760, pad = 8;
+          const spanX = (maxLon - minLon) * kx, spanY = (maxLat - minLat);
+          const sc = (W - pad * 2) / spanX;
+          const H = spanY * sc + pad * 2;
+          const px = ([x, y]) => [((x - minLon) * kx * sc + pad).toFixed(1), ((maxLat - y) * sc + pad).toFixed(1)];
+          const dOf = g => cincin(g).map(poly => poly.map(r => "M" + r.map(c => px(c).join(",")).join("L") + "Z").join("")).join("");
+
+          const vals = fitur.map(f => {
+            const v = nilaiKec[f.properties.kecamatan];
+            return v ? v[metrik] : null;
+          }).filter(v => v !== null && isFinite(v));
+          const vMin = Math.min(...vals), vMax = Math.max(...vals);
+          const warna = v => {
+            if (v === null || !isFinite(v)) return "#e8e4d8";
+            const t = vMax > vMin ? (v - vMin) / (vMax - vMin) : 0;
+            return RAMPA[Math.min(RAMPA.length - 1, Math.floor(t * RAMPA.length))];
+          };
+          const M = METRIK[metrik];
+          host.innerHTML = `<svg class="peta-svg" viewBox="0 0 ${W} ${H.toFixed(0)}" role="img"
+            aria-label="Peta ${M.label} per kecamatan di DIY">${
+            fitur.map((f, i) => {
+              const nm = f.properties.kecamatan, v = nilaiKec[nm] ? nilaiKec[nm][metrik] : null;
+              const kab = nilaiKec[nm] ? nilaiKec[nm].kab : f.properties.kabupaten;
+              return `<path d="${dOf(f.geometry)}" fill="${warna(v)}" data-i="${i}"
+                data-nm="${nm}" data-kab="${kab}"
+                data-v="${v === null || !isFinite(v) ? "" : M.fmt(v)}"><title>${nm} — ${v === null ? "tidak ada data" : M.fmt(v)}</title></path>`;
+            }).join("")}</svg>`;
+          // legenda
+          const lg = document.getElementById("peta-legenda");
+          if (lg) lg.innerHTML = `<span>${M.label}</span>
+            <span class="tnum">${M.unit === "%" ? vMin.toFixed(1) + "%" : fmtN(vMin)}</span>
+            <span class="legenda-skala">${RAMPA.map(c => `<i style="background:${c}"></i>`).join("")}</span>
+            <span class="tnum">${M.unit === "%" ? vMax.toFixed(1) + "%" : fmtN(vMax)}</span>
+            <span style="margin-left:6px">· sumber: SIMOTANDI Kementan &amp; batas wilayah desa BIG</span>`;
+          // tooltip
+          const svg = host.querySelector("svg");
+          if (svg && tip) {
+            svg.addEventListener("mousemove", ev => {
+              const p = ev.target.closest("path");
+              if (!p) { tip.style.opacity = 0; return; }
+              const r = host.getBoundingClientRect();
+              tip.innerHTML = `<b>${p.dataset.nm}</b><br>${p.dataset.kab}<br>${M.label}: ${p.dataset.v || "tidak ada data"}`;
+              tip.style.opacity = 1;
+              const tw = tip.offsetWidth, x = ev.clientX - r.left, y = ev.clientY - r.top;
+              tip.style.left = Math.max(0, Math.min(r.width - tw, x + 14)) + "px";
+              tip.style.top = Math.max(0, y - 52) + "px";
+            });
+            svg.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+          }
+        };
+        daftarChart("konteks", () => {
+          gambarPeta("menuju");
+          const selM = document.getElementById("pilih-metrik");
+          if (selM) selM.addEventListener("change", e => gambarPeta(e.target.value));
+        });
+      }
 
       // --- Pola musiman panen (dari 31 bulan data) ---
       if (simoData.musim) {
@@ -998,6 +1277,7 @@ async function render() {
       <p>${tagStatus("WASPADA")} Naik ≥ 5%/minggu, turun ≥ 10%/minggu (tekanan pendapatan petani — data harga <em>produsen</em>), |z| ≥ 1,5, atau titik tertinggi 30 hari.</p>
       <p>${tagStatus("AMAN")} Selain itu.</p>
       <p class="catatan"><strong>Level per pilar:</strong> Cuaca — ada wilayah hujan ≥50&nbsp;mm/berlabel ekstrem → Waspada (≥3 wilayah → Bahaya). ENSO — El&nbsp;Niño/La&nbsp;Niña lemah–moderat → Waspada, kuat → Bahaya. Cadangan — ≥200&nbsp;ton Aman, 100–200 Waspada, &lt;100 Bahaya (ambang indikatif). Pasokan SIMOTANDI — rasio lahan generatif+panen ≥12% Aman, 6–12% Waspada, &lt;6% Bahaya. Trends — ada lonjakan → Waspada. DPKP — ada komoditas naik &gt;10%/30 hari → Waspada (maksimal, karena kualitas pencatatan sumber bervariasi).</p>
+      <p class="catatan"><strong>Prakiraan risiko harga (tab Prakiraan):</strong> uji-mundur <em>rolling-origin</em> atas 14 komoditas DPKP, ±226 minggu (Apr 2022–Agu 2026), membandingkan delapan pendekatan — naif/<em>random walk</em>, drift, SES, Theta, Holt teredam, ARIMA(1,1,1), naif musiman, dan regresi Ridge lag+musim. Hasil: <strong>tidak ada model yang mengalahkan penduga naif</strong> pada horizon 1 minggu (MASE terbaik = 1,000), dan pada horizon 1 bulan naif tetap unggul rata-rata (SES menang di 5/14 komoditas, ARIMA 7/14, tetapi kalah pada rerata lintas komoditas) — konsisten dengan sifat mendekati <em>martingale</em> pada harga komoditas horizon pendek. Karena itu penduga titik dipertahankan sebagai harga terkini, dan yang diprakirakan adalah <strong>ketidakpastiannya</strong>: interval dari kuantil empiris nonparametrik perubahan h-langkah tiap komoditas. Kalibrasi teruji: cakupan interval 80% tercapai 76,0% (h=1 minggu) dan 82,7% (h=1 bulan); interval 95% tercapai 94,5% dan 94,1%. Prakiraan peluang menembus ambang memiliki <em>Brier skill</em> +10,3% terhadap acuan iklim. Pengondisian pada bulan kalender diuji dan <strong>dilaporkan tidak membantu</strong> (skill turun ke +4,8%) sehingga tidak dipakai. Deret PIHPS tidak dipakai untuk prakiraan karena berbentuk fungsi tangga (9 nilai unik dalam 260 hari).</p>
       <p class="catatan"><strong>Uji volatilitas berlebih (data DPKP):</strong> adaptasi metode <em>Excessive Food Price Variability Early Warning System</em> (IFPRI / Food Security Portal) — ambang nonparametrik pada persentil ke-95 kenaikan harian historis tiap komoditas, lalu jumlah hari ekstrem dalam jendela 90 hari dibandingkan dengan harapan statistiknya (5% observasi): melebihi dua kali lipat → tinggi, melebihi harapan → sedang. Diterapkan pada deret DPKP yang bergerak harian; deret PIHPS provinsi terlalu bertangga untuk uji ini. Kesesuaian hasil kedua metode (tipologi &amp; volatilitas) menjadi validasi silang.</p>
       <p class="catatan"><strong>Metode &amp; rujukan:</strong> deteksi anomali z-score bergulir 14 hari; pengayaan konteks cuaca/iklim/sinyal publik; verifikasi tekstual otomatis mengikuti bukti fusi sinyal harga+berita (Bakry dkk., 2025, AUC 0,94 vs 0,46); klasifikasi volatilitas mengikuti kerangka IFPRI di atas. <strong>Keterbatasan yang diakui:</strong> harga PIHPS agregat provinsi; pilar SIMOTANDI diperbarui semi-otomatis (server sumber memblokir akses dari cloud); validasi berita indikatif (pencarian otomatis, bukan kurasi manusia); purwarupa riset, bukan produk resmi.</p>`;
     s.appendChild(at);
@@ -1031,7 +1311,7 @@ async function render() {
 
   /* ---------- aktifkan tab awal ---------- */
   const awal = (location.hash || "#ringkasan").slice(1);
-  bukaTab(["ringkasan", "status", "konteks", "data", "metodologi"].includes(awal) ? awal : "ringkasan", true);
+  bukaTab(["ringkasan", "status", "prakiraan", "konteks", "data", "metodologi"].includes(awal) ? awal : "ringkasan", true);
 }
 
 /* ================= navigasi tab ================= */
