@@ -74,6 +74,10 @@ jobs:
         run: python src/pipeline/merge_and_detect.py
         continue-on-error: true
 
+      - name: Prakiraan harga & risiko lonjakan (1 minggu & 1 bulan)
+        run: python src/pipeline/forecast_harga.py
+        continue-on-error: true
+
       - name: Validasi anomali via berita (Firecrawl)
         run: python src/pipeline/news_validation.py
         env:
@@ -90,6 +94,7 @@ jobs:
           # tampak "kosong" sesaat padahal datanya ada).
           mkdir -p docs/data
           cp -f data/*.csv docs/data/ 2>/dev/null || true
+          cp -f data/*.geojson docs/data/ 2>/dev/null || true   # batas wilayah utk peta koroplet
           git add data/ docs/data/
           git diff --cached --quiet || git commit -m "chore: update data pipeline $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           # PENTING (pelajaran run 30 Agt yang gagal setelah 1 jam): kalau ada
