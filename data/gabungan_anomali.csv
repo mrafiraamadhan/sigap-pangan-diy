@@ -1313,6 +1313,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Bawang Merah,1,V,24650.0,DI Yogyakarta,2026-09-11T12:06:17.934752+00:00,DI Yogyakarta,24650.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Bawang Merah,1,V,24650.0,DI Yogyakarta,2026-09-14T12:06:47.459959+00:00,DI Yogyakarta,24650.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Bawang Merah,1,V,24650.0,DI Yogyakarta,2026-09-15T12:06:14.153566+00:00,DI Yogyakarta,24650.0,0.0,,False,1.52,25.670928785915486,False,False
+2026-09-16,Bawang Merah,1,V,24650.0,DI Yogyakarta,2026-09-16T12:06:26.527117+00:00,DI Yogyakarta,24650.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Bawang Merah Ukuran Sedang,2,1,20150.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Bawang Merah Ukuran Sedang,2,1,20150.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Bawang Merah Ukuran Sedang,2,1,20150.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -2627,7 +2628,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Bawang Merah Ukuran Sedang,2,1,24650.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,24650.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Bawang Merah Ukuran Sedang,2,1,24650.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,24650.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Bawang Merah Ukuran Sedang,2,1,24650.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,24650.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Bawang Merah Ukuran Sedang,2,1,24650.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,24650.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Bawang Merah Ukuran Sedang,2,1,24650.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,24650.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Beras,1,I,8550.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Beras,1,I,8550.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Beras,1,I,8550.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -3942,6 +3943,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Beras,1,I,14250.0,DI Yogyakarta,2026-09-11T12:06:17.934752+00:00,DI Yogyakarta,14250.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Beras,1,I,14250.0,DI Yogyakarta,2026-09-14T12:06:47.459959+00:00,DI Yogyakarta,14250.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Beras,1,I,14250.0,DI Yogyakarta,2026-09-15T12:06:14.153566+00:00,DI Yogyakarta,14250.0,0.0,,False,1.52,25.670928785915486,False,False
+2026-09-16,Beras,1,I,14250.0,DI Yogyakarta,2026-09-16T12:06:26.527117+00:00,DI Yogyakarta,14250.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Beras Kualitas Bawah I,2,1,7000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Beras Kualitas Bawah I,2,1,7000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Beras Kualitas Bawah I,2,1,7000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -5256,7 +5258,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Beras Kualitas Bawah I,2,1,13000.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,13000.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Beras Kualitas Bawah I,2,1,13000.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,13000.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Beras Kualitas Bawah I,2,1,13000.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,13000.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Beras Kualitas Bawah I,2,1,13000.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,13000.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Beras Kualitas Bawah I,2,1,13000.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,13000.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Beras Kualitas Medium I,2,2,8650.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Beras Kualitas Medium I,2,2,8650.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Beras Kualitas Medium I,2,2,8650.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -6571,7 +6573,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Beras Kualitas Medium I,2,2,13850.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,13850.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Beras Kualitas Medium I,2,2,13850.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,13850.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Beras Kualitas Medium I,2,2,13850.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,13850.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Beras Kualitas Medium I,2,2,13850.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,13850.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Beras Kualitas Medium I,2,2,13850.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,13850.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Beras Kualitas Super I,2,3,10050.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Beras Kualitas Super I,2,3,10050.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Beras Kualitas Super I,2,3,10050.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -7886,7 +7888,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,15950.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,15950.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,15950.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,15950.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Beras Kualitas Super I,2,3,15950.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,15950.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Cabai Merah,1,VI,9250.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Cabai Merah,1,VI,9250.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Cabai Merah,1,VI,9250.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -9201,6 +9203,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Cabai Merah,1,VI,23150.0,DI Yogyakarta,2026-09-11T12:06:17.934752+00:00,DI Yogyakarta,23150.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Cabai Merah,1,VI,23150.0,DI Yogyakarta,2026-09-14T12:06:47.459959+00:00,DI Yogyakarta,23150.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Cabai Merah,1,VI,23150.0,DI Yogyakarta,2026-09-15T12:06:14.153566+00:00,DI Yogyakarta,23150.0,0.0,,False,1.52,25.670928785915486,False,False
+2026-09-16,Cabai Merah,1,VI,23150.0,DI Yogyakarta,2026-09-16T12:06:26.527117+00:00,DI Yogyakarta,23150.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Cabai Merah Besar,2,1,9850.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Cabai Merah Besar,2,1,9850.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Cabai Merah Besar,2,1,9850.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -10515,7 +10518,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Cabai Merah Besar,2,1,29650.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,29650.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Cabai Merah Besar,2,1,29650.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,29650.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Cabai Merah Besar,2,1,29650.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,29650.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Cabai Merah Besar,2,1,29650.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,29650.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Cabai Merah Besar,2,1,29650.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,29650.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Cabai Merah Keriting ,2,2,8650.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Cabai Merah Keriting ,2,2,8650.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Cabai Merah Keriting ,2,2,8650.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -11830,7 +11833,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Cabai Merah Keriting ,2,2,16650.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,16650.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Cabai Merah Keriting ,2,2,16650.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,16650.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Cabai Merah Keriting ,2,2,16650.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,16650.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Cabai Merah Keriting ,2,2,16650.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,16650.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Cabai Merah Keriting ,2,2,16650.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,16650.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Cabai Rawit,1,VII,10450.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Cabai Rawit,1,VII,10450.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Cabai Rawit,1,VII,10450.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -13145,6 +13148,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Cabai Rawit,1,VII,34700.0,DI Yogyakarta,2026-09-11T12:06:17.934752+00:00,DI Yogyakarta,34700.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Cabai Rawit,1,VII,34700.0,DI Yogyakarta,2026-09-14T12:06:47.459959+00:00,DI Yogyakarta,34700.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Cabai Rawit,1,VII,34700.0,DI Yogyakarta,2026-09-15T12:06:14.153566+00:00,DI Yogyakarta,34700.0,0.0,,False,1.52,25.670928785915486,False,False
+2026-09-16,Cabai Rawit,1,VII,34700.0,DI Yogyakarta,2026-09-16T12:06:26.527117+00:00,DI Yogyakarta,34700.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Cabai Rawit Hijau,2,1,10350.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Cabai Rawit Hijau,2,1,10350.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Cabai Rawit Hijau,2,1,10350.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -14459,7 +14463,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Cabai Rawit Hijau,2,1,34350.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,34350.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Cabai Rawit Hijau,2,1,34350.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,34350.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Cabai Rawit Hijau,2,1,34350.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,34350.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Cabai Rawit Hijau,2,1,34350.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,34350.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Cabai Rawit Hijau,2,1,34350.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,34350.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Cabai Rawit Merah,2,2,10500.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Cabai Rawit Merah,2,2,10500.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Cabai Rawit Merah,2,2,10500.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -15774,7 +15778,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Cabai Rawit Merah,2,2,35000.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,35000.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Cabai Rawit Merah,2,2,35000.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,35000.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Cabai Rawit Merah,2,2,35000.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,35000.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Cabai Rawit Merah,2,2,35000.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,35000.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Cabai Rawit Merah,2,2,35000.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,35000.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Daging Ayam,1,II,21000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Daging Ayam,1,II,21000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Daging Ayam,1,II,21000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -17089,6 +17093,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Daging Ayam,1,II,28350.0,DI Yogyakarta,2026-09-11T12:06:17.934752+00:00,DI Yogyakarta,28350.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Daging Ayam,1,II,28350.0,DI Yogyakarta,2026-09-14T12:06:47.459959+00:00,DI Yogyakarta,28350.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Daging Ayam,1,II,28350.0,DI Yogyakarta,2026-09-15T12:06:14.153566+00:00,DI Yogyakarta,28350.0,0.0,,False,1.52,25.670928785915486,False,False
+2026-09-16,Daging Ayam,1,II,28350.0,DI Yogyakarta,2026-09-16T12:06:26.527117+00:00,DI Yogyakarta,28350.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Daging Ayam Ras Segar,2,1,21000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Daging Ayam Ras Segar,2,1,21000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Daging Ayam Ras Segar,2,1,21000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -18403,7 +18408,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Daging Ayam Ras Segar,2,1,28350.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,28350.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Daging Ayam Ras Segar,2,1,28350.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,28350.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Daging Ayam Ras Segar,2,1,28350.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,28350.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Daging Ayam Ras Segar,2,1,28350.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,28350.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Daging Ayam Ras Segar,2,1,28350.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,28350.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Daging Sapi,1,III,105000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Daging Sapi,1,III,105000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Daging Sapi,1,III,105000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -19718,6 +19723,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-09-11T12:06:17.934752+00:00,DI Yogyakarta,140000.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-09-14T12:06:47.459959+00:00,DI Yogyakarta,140000.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-09-15T12:06:14.153566+00:00,DI Yogyakarta,140000.0,0.0,,False,1.52,25.670928785915486,False,False
+2026-09-16,Daging Sapi,1,III,140000.0,DI Yogyakarta,2026-09-16T12:06:26.527117+00:00,DI Yogyakarta,140000.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Daging Sapi Kualitas 1,2,1,105000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Daging Sapi Kualitas 1,2,1,105000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Daging Sapi Kualitas 1,2,1,105000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -21032,7 +21038,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,140000.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,140000.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,140000.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,140000.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Daging Sapi Kualitas 1,2,1,140000.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,140000.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Gula Pasir,1,VIII,10300.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Gula Pasir,1,VIII,10300.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Gula Pasir,1,VIII,10300.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -22347,6 +22353,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-09-11T12:06:17.934752+00:00,DI Yogyakarta,16000.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-09-14T12:06:47.459959+00:00,DI Yogyakarta,16000.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-09-15T12:06:14.153566+00:00,DI Yogyakarta,16000.0,0.0,,False,1.52,25.670928785915486,False,False
+2026-09-16,Gula Pasir,1,VIII,16000.0,DI Yogyakarta,2026-09-16T12:06:26.527117+00:00,DI Yogyakarta,16000.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Gula Pasir Kualitas Premium,2,1,10300.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Gula Pasir Kualitas Premium,2,1,10300.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Gula Pasir Kualitas Premium,2,1,10300.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -23661,7 +23668,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,16000.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,16000.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,16000.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,16000.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Gula Pasir Kualitas Premium,2,1,16000.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,16000.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Telur Ayam,1,IV,18000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Telur Ayam,1,IV,18000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Telur Ayam,1,IV,18000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -24976,6 +24983,7 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Telur Ayam,1,IV,19750.0,DI Yogyakarta,2026-09-11T12:06:17.934752+00:00,DI Yogyakarta,19750.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Telur Ayam,1,IV,19750.0,DI Yogyakarta,2026-09-14T12:06:47.459959+00:00,DI Yogyakarta,19750.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Telur Ayam,1,IV,19750.0,DI Yogyakarta,2026-09-15T12:06:14.153566+00:00,DI Yogyakarta,19750.0,0.0,,False,1.52,25.670928785915486,False,False
+2026-09-16,Telur Ayam,1,IV,19750.0,DI Yogyakarta,2026-09-16T12:06:26.527117+00:00,DI Yogyakarta,19750.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
 2021-09-01,Telur Ayam Ras Segar,2,1,18000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-02,Telur Ayam Ras Segar,2,1,18000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
 2021-09-03,Telur Ayam Ras Segar,2,1,18000.0,DI Yogyakarta,2026-08-31T13:28:06.761327+00:00,DI Yogyakarta,,,,False,,,,False
@@ -26290,4 +26298,4 @@ tanggal,komoditas,level,no_urut,harga,provinsi,diambil_pada_utc,kabupaten_kota,r
 2026-09-11,Telur Ayam Ras Segar,2,1,19750.0,DI Yogyakarta,2026-09-11T02:02:40.659133+00:00,DI Yogyakarta,19750.0,0.0,,False,2.82,25.51404958677686,False,False
 2026-09-14,Telur Ayam Ras Segar,2,1,19750.0,DI Yogyakarta,2026-09-14T02:03:03.092051+00:00,DI Yogyakarta,19750.0,0.0,,False,0.16,25.910537665842618,False,False
 2026-09-15,Telur Ayam Ras Segar,2,1,19750.0,DI Yogyakarta,2026-09-15T02:04:04.118771+00:00,DI Yogyakarta,19750.0,0.0,,False,1.52,25.670928785915486,False,False
-2026-09-16,Telur Ayam Ras Segar,2,1,19750.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,19750.0,0.0,,False,1.8399999999999999,25.58555962756972,False,False
+2026-09-16,Telur Ayam Ras Segar,2,1,19750.0,DI Yogyakarta,2026-09-16T02:02:34.865189+00:00,DI Yogyakarta,19750.0,0.0,,False,1.8399999999999999,25.543319804310052,False,False
