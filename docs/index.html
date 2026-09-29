@@ -240,6 +240,9 @@
   .kp-sumber { font-size: .68rem; color: var(--ink-3); margin-top: 1px; }
   .kp-baca { font-family: var(--font-judul); font-size: 1.12rem; font-weight: 750; color: var(--hijau-900); }
   .kp-ket { font-size: .76rem; color: var(--ink-2); line-height: 1.45; }
+  .kp-tgl { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--border-2); font-size: .7rem; color: var(--ink-3);
+            display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+  .kp-tgl .lencana-segar { margin-left: 0; }
   .tag { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; padding: 2px 10px;
          border-radius: 999px; font-size: .7rem; border: 1px solid; white-space: nowrap; }
   .tag.bahaya  { color: var(--bahaya);  background: var(--bahaya-bg);  border-color: var(--bahaya-bd); }
@@ -613,6 +616,9 @@ const fmtTgl = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toL
 const fmtTglPdk = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toLocaleDateString("id-ID", { day: "numeric", month: "short" }); };
 const fmtBlnThn = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toLocaleDateString("id-ID", { month: "short", year: "numeric" }); };
 const isTrue = v => v === true || v === "True" || v === "TRUE" || v === "true";
+// Waktu paling akhir dari sekumpulan nilai tanggal. PapaParse (dynamicTyping) mengubah
+// teks ISO ber-zona waktu menjadi objek Date, sehingga .sort() biasa (urut teks) salah.
+const maksWaktu = arr => (arr || []).filter(Boolean).map(v => new Date(v)).filter(d => !isNaN(d)).sort((a, b) => a - b).pop() || null;
 function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; }
 function ubahHtml(p) {
   if (p === null || p === undefined || isNaN(p)) return "<span>–</span>";
@@ -793,7 +799,7 @@ function kondisiPilar(ctx) {
     if (n("BAHAYA")) { lv = "BAHAYA"; ket = `${n("BAHAYA")} komoditas berstatus Bahaya dan perlu segera ditindaklanjuti.`; }
     else if (n("ANOMALI")) { lv = "ANOMALI"; ket = `Lonjakan angka pada ${n("ANOMALI")} komoditas bertepatan dengan pembaruan data acuan PIHPS. Sebaiknya dicek dulu ke lapangan sebelum diambil tindakan.`; }
     else if (n("WASPADA")) { lv = "WASPADA"; ket = `${n("WASPADA")} komoditas dalam tren yang perlu dipantau.`; }
-    K.push({ nama: "Harga Pangan (PIHPS BI)", sumber: "Panel Harga Bank Indonesia", tgl: tip.tMaks, lv,
+    K.push({ nama: "Harga Pangan (PIHPS BI)", sumber: "Panel Harga Bank Indonesia", tgl: tip.tMaks, tglTeks: "data harian s.d. " + fmtTgl(new Date(tip.tMaks)), lv,
              // Empat angka telanjang memaksa pembaca mencocokkannya dengan empat kata
              // di baris lain. Yang nol dibuang; yang tersisa langsung berlabel.
              baca: [["BAHAYA","bahaya"],["ANOMALI","anomali"],["WASPADA","waspada"],["AMAN","aman"]]
@@ -909,7 +915,7 @@ async function render() {
       const volSedang = daftar.filter(d => d.vol === "SEDANG");
       const nVol = daftar.filter(d => d.vol).length;
       dpkpTabel = { daftar, tMaks, nBaris: rows.length };
-      dpkpInfo = { nama: "Harga Rujukan DPKP DIY", sumber: "Dinas Pertanian & KP DIY", tgl: tMaks,
+      dpkpInfo = { nama: "Harga Rujukan DPKP DIY", sumber: "Dinas Pertanian & KP DIY", tgl: tMaks, tglTeks: "data harian s.d. " + fmtTgl(tMaks),
         lv: (naik10.length === 0 && volTinggi.length === 0) ? "AMAN" : "WASPADA",
         baca: `${naik10.length} dari ${daftar.length}`, bacaKet: "komoditas naik >10% / 30 hari",
         ket: (naik10.length ? `Kenaikan tertinggi: ${naik10.slice(0, 3).map(d => d.k).join(", ")} (kebanyakan sayuran, dan mutu pencatatan di sumbernya tidak selalu seragam). ` :
@@ -948,6 +954,7 @@ async function render() {
       const naik10 = daftar.filter(d => (d.u30 ?? 0) > 10);
       sp2kpData = { daftar, tMaks, nPasar: Math.max(...daftar.map(d => d.nPasar || 1)) };
       sp2kpInfo = { nama: "Harga Pasar (SP2KP Kemendag)", sumber: "Dasar penghitungan IPH (Indeks Perkembangan Harga) · " + sp2kpData.nPasar + " pasar melapor", tgl: sp2kpData.tMaks,
+        tglTeks: "data harian s.d. " + fmtTgl(sp2kpData.tMaks) + " (diunduh manual)",
         lv: naik10.length === 0 ? "AMAN" : "WASPADA",
         baca: `${naik10.length} dari ${daftar.length}`, bacaKet: "varian naik >10% / 30 hari",
         ket: (naik10.length
@@ -1026,7 +1033,9 @@ async function render() {
     let ketS = rasio >= 12 ? `Gelombang panen berikutnya sudah dekat. Penyumbang terbesar: ${kabTop ? kabTop[0] : "-"}.` :
                rasio >= 6 ? "Luas lahan yang menuju panen sedang menipis. Stok perlu dijaga sampai gelombang panen berikutnya tiba." : "Lahan yang menuju panen sangat sedikit, sehingga pasokan beras lokal berisiko seret.";
     if (musim) ketS += ` Panen bulan ${musim.bulanKini.nama} biasanya hanya sekitar ${musim.posisi.toFixed(0)}% dari bulan puncaknya, yaitu ${musim.puncak.nama}.`;
-    simoInfo = { nama: "Pasokan Padi (SIMOTANDI)", sumber: "Citra satelit Kementan · periode " + (simoData.periode || "-"),
+    const simoAkhir = st.map(r => r.periode_selesai).filter(Boolean).sort().pop() || st.map(r => r.periode_mulai).filter(Boolean).sort().pop();
+    simoInfo = { nama: "Pasokan Padi (SIMOTANDI)", sumber: "Citra satelit Kementan",
+      tgl: simoAkhir, tglTeks: "periode " + (simoData.periode || "-") + " (diunduh manual)",
       lv: rasio >= 12 ? "AMAN" : rasio >= 6 ? "WASPADA" : "BAHAYA",
       baca: fmtN(dekatPanen) + " ha", bacaKet: "fase generatif + panen (" + rasio.toFixed(0) + "% luas baku sawah)",
       ket: ketS, tab: "konteks" };
@@ -1060,8 +1069,10 @@ async function render() {
       new Set(nilaiTahun.map(v => Math.round(v * 100))).size === 1;
 
     cadData = { thn, ct, kolS, total, totalTon, takTerpelihara, nTahun: nilaiTahun.length };
+    const cadDicek = maksWaktu(cad.map(r => r.diambil_pada_utc));
     cadInfo = takTerpelihara
       ? { nama: "Cadangan Pangan Pemerintah", sumber: "DPKP DIY · " + thn,
+          tgl: cadDicek, tglTeks: "tahun anggaran " + thn + (cadDicek ? " · portal dicek " + fmtTgl(cadDicek) : ""),
           // Statusnya BUKAN merah. Yang bermasalah adalah basis datanya, bukan cadangannya
           // terbukti gawat. Menandainya BAHAYA akan membuat papan pantau seolah menyatakan
           // krisis padahal kondisinya justru tidak diketahui.
@@ -1069,6 +1080,7 @@ async function render() {
           ket: `Portal cadangan pangan menampilkan angka yang persis sama untuk ${nilaiTahun.length} tahun anggaran berturut-turut, dengan total hanya ${fmtN(total, 1)} kg se-DIY. Angka sebesar itu tidak masuk akal untuk cadangan provinsi. Karena itu pilar ini <strong>tidak kami masukkan ke skala Aman sampai Bahaya</strong>: kondisi cadangan pangan DIY saat ini tidak diketahui, bukan diketahui buruk. Selama data di portal sumbernya belum diperbarui, tidak ada sistem peringatan dini yang bisa menilai kondisi cadangan ini.`,
           tab: "konteks" }
       : { nama: "Cadangan Pangan Pemerintah", sumber: "DPKP DIY · " + thn,
+          tgl: cadDicek, tglTeks: "tahun anggaran " + thn + (cadDicek ? " · portal dicek " + fmtTgl(cadDicek) : ""),
           lv: totalTon >= 200 ? "AMAN" : totalTon >= 100 ? "WASPADA" : "BAHAYA",
           baca: fmtN(totalTon, 1) + " ton", bacaKet: "beras/gabah pemerintah se-DIY",
           ket: totalTon >= 200 ? "Stok untuk operasi pasar masih cukup bila sewaktu-waktu harga bergejolak." :
@@ -1088,7 +1100,9 @@ async function render() {
     const hujanMaks = Math.max(...daftarKab.map(r => Number(r.curah_hujan_mm) || 0));
     const ekstrem = daftarKab.filter(r => (Number(r.curah_hujan_mm) || 0) >= 50 || /lebat|petir|ekstrem/i.test(String(r.cuaca_desc || "")));
     cuacaData = { daftarKab };
+    const cuacaDiambil = maksWaktu(daftarKab.map(r => r.fetched_at_utc));
     cuacaInfo = { nama: "Cuaca (BMKG)", sumber: "Prakiraan terkini per kab/kota",
+      tgl: cuacaDiambil, tglTeks: cuacaDiambil ? "prakiraan diperbarui " + new Date(cuacaDiambil).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" }) + " WIB" : "",
       lv: ekstrem.length >= 3 ? "BAHAYA" : ekstrem.length ? "WASPADA" : "AMAN",
       baca: ekstrem.length ? `${ekstrem.length} wilayah` : "Kondusif", bacaKet: ekstrem.length ? "berpotensi cuaca ekstrem" : `curah hujan tertinggi ${hujanMaks} mm, masih dalam batas normal`,
       ket: ekstrem.length ? "Waspadai gangguan panen/distribusi di: " + ekstrem.map(r => r.kabupaten_kota).join(", ") : "Cuaca sedang tidak mengganggu produksi maupun distribusi.", tab: "konteks" };
@@ -1100,7 +1114,8 @@ async function render() {
     const stt = String(ensoAkhir.status_enso || "");
     const low = stt.toLowerCase();
     const lv = /kuat/.test(low) ? "BAHAYA" : /moderat|lemah/.test(low) && /nino|nina/.test(low) ? "WASPADA" : "AMAN";
-    ensoInfo = { nama: "Iklim (ENSO/El Niño)", sumber: "NOAA · periode " + (ensoAkhir.musim || "") + " " + (ensoAkhir.tahun || ""),
+    ensoInfo = { nama: "Iklim (ENSO/El Niño)", sumber: "NOAA, indeks ONI",
+      tglTeks: "periode " + (ensoAkhir.musim || "") + " " + (ensoAkhir.tahun || ""), segarTeks: "terbit bulanan",
       lv, baca: stt || "–", bacaKet: "anomali suhu laut " + (Number(ensoAkhir.anomali_nino34_c) > 0 ? "+" : "") + ensoAkhir.anomali_nino34_c + "°C",
       ket: lv === "AMAN" ? "Iklim sedang tidak menekan produksi." :
            "Dalam catatan sejarah, El Niño membuat kemarau di Jawa lebih panjang. Musim tanam berikutnya perlu diwaspadai dan harga beras dipantau lebih ketat.", tab: "konteks" };
@@ -1109,7 +1124,9 @@ async function render() {
   let trendsInfo = null;
   if (trends && trends.length) {
     const lonjakan = trends.filter(r => isTrue(r.lonjakan_minat)).length;
+    const trendsAkhir = trends.map(r => String(r.date || "")).filter(Boolean).sort().pop();
     trendsInfo = { nama: "Perhatian Publik (Google Trends)", sumber: "Google Trends DIY · " + trends.length + " hari",
+      tgl: trendsAkhir, tglTeks: trendsAkhir ? "data harian s.d. " + fmtTgl(trendsAkhir) : "",
       lv: lonjakan === 0 ? "AMAN" : "WASPADA",
       baca: lonjakan === 0 ? "Tidak ada" : lonjakan + " hari", bacaKet: "hari dengan lonjakan pencarian soal pangan",
       ket: lonjakan === 0 ? "Publik tenang. Tidak ada lonjakan pencarian soal kelangkaan atau kenaikan harga." : "Ada lonjakan pencarian. Sentimen publik perlu dipantau.", tab: "konteks" };
@@ -1121,6 +1138,7 @@ async function render() {
     const nArtikel = new Set(val.map(b => String(b.url_teratas).trim())).size;
     const tglBerita = val.map(b => String(b.tanggal)).sort().pop();
     beritaInfo = { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi", tgl: tglBerita,
+      tglTeks: tglBerita ? "kliping s.d. lonjakan " + fmtTgl(tglBerita) : "",
       lv: "AMAN", baca: nArtikel + " artikel", bacaKet: `dari ${val.length} lonjakan yang dicarikan beritanya`,
       ket: "Tiap lonjakan yang terdeteksi otomatis dicarikan pemberitaannya, sebagai bukti pendukung yang <strong>belum disaring manusia</strong>. Berita yang cocok memperkuat sinyal, tetapi banyaknya berita saja belum berarti lonjakannya sudah terbukti. Semua artikel bisa ditelusuri per komoditas di tab Berita.", tab: "berita" };
   }
@@ -1195,16 +1213,20 @@ async function render() {
       k.style.cursor = "pointer";
       // Judul halaman menyebut satu tanggal, padahal tiap pilar punya tanggal datanya
       // sendiri. Tanpa penanda ini pembaca mudah mengira semua angka sekondisi.
+      // Baris tanggal di kaki kartu: periode/tanggal data terakhir + lencana kesegaran.
+      // Tiap pilar punya irama sendiri (harian, 12-harian, bulanan), jadi teksnya
+      // ditulis per pilar, bukan satu rumus untuk semua.
       const hariLalu = p.tgl ? Math.floor((Date.now() - +new Date(p.tgl)) / 864e5) : null;
-      const segar = hariLalu === null ? "" :
+      const segar = p.segarTeks ? `<span class="lencana-segar sedang">${p.segarTeks}</span>` : hariLalu === null ? "" :
         `<span class="lencana-segar ${hariLalu <= 2 ? "baru" : hariLalu <= 10 ? "sedang" : "lama"}"
-           title="Data terakhir pilar ini: ${fmtTgl(new Date(p.tgl))}">${
+           title="Selisih hari sejak data/pengambilan terakhir">${
            hariLalu <= 0 ? "hari ini" : hariLalu === 1 ? "kemarin" : hariLalu + " hari lalu"}</span>`;
+      const barisTgl = (p.tglTeks || segar) ? `<div class="kp-tgl">📅 ${p.tglTeks || ""} ${segar}</div>` : "";
       k.innerHTML = `
-        <div class="kp-head"><div><div class="kp-nama">${p.nama}</div><div class="kp-sumber">${p.sumber} ${segar}</div></div>
+        <div class="kp-head"><div><div class="kp-nama">${p.nama}</div><div class="kp-sumber">${p.sumber}</div></div>
           ${p.lv ? tagStatus(p.lv) : '<span class="tag netral">belum ada data</span>'}</div>
         <div class="kp-baca tnum">${p.baca}${p.bacaKet ? ` <span style="font-size:.7rem;font-weight:500;color:var(--ink-2)">${p.bacaKet}</span>` : ""}</div>
-        <div class="kp-ket">${p.ket}</div>`;
+        <div class="kp-ket">${p.ket}</div>${barisTgl}`;
       k.addEventListener("click", () => bukaTab(p.tab, false, p.jangkar));
       k.title = "Buka rincian " + p.nama;
       gp.appendChild(k);
