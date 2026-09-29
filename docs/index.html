@@ -619,6 +619,13 @@ const isTrue = v => v === true || v === "True" || v === "TRUE" || v === "true";
 // Waktu paling akhir dari sekumpulan nilai tanggal. PapaParse (dynamicTyping) mengubah
 // teks ISO ber-zona waktu menjadi objek Date, sehingga .sort() biasa (urut teks) salah.
 const maksWaktu = arr => (arr || []).filter(Boolean).map(v => new Date(v)).filter(d => !isNaN(d)).sort((a, b) => a - b).pop() || null;
+// Selisih HARI KALENDER (zona WIB) antara sekarang dan sebuah waktu; 0 = hari ini, 1 = kemarin.
+// Dihitung dari tanggal kalender, bukan kelipatan 24 jam, supaya "28 Sep 19.07 WIB" yang
+// dilihat pada 29 Sep pagi terbaca "kemarin", bukan "hari ini".
+const tglWIB = t => { const d = new Date(t); return isNaN(d) ? null : d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }); };
+const hariKalender = t => { const a = tglWIB(t), b = tglWIB(Date.now()); return a && b ? Math.round((Date.parse(b) - Date.parse(a)) / 864e5) : null; };
+const lencanaSegar = t => { const n = hariKalender(t); if (n === null) return "";
+  return `<span class="lencana-segar ${n <= 2 ? "baru" : n <= 10 ? "sedang" : "lama"}" title="Selisih hari kalender (WIB) sejak data/pengambilan terakhir">${n <= 0 ? "hari ini" : n === 1 ? "kemarin" : n + " hari lalu"}</span>`; };
 function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; }
 function ubahHtml(p) {
   if (p === null || p === undefined || isNaN(p)) return "<span>–</span>";
@@ -843,6 +850,10 @@ async function render() {
     ambilCsv("enso_oni.csv"), ambilCsv("google_trends_panik.csv"), ambilCsv("validasi_berita.csv"),
   ]);
   const prakiraan = await ambilCsv("prakiraan_harga.csv");
+  // Status tiap langkah pipeline (kapan sumber dicek, berubah/tidak). Opsional:
+  // kalau berkasnya belum ada, papan pantau tetap jalan tanpa informasi itu.
+  const statusPipe = {};
+  (await ambilCsv("status_pipeline.csv") || []).forEach(r => { if (r.pilar) statusPipe[String(r.pilar).trim()] = r; });
   const petaKec = await ambilJson("peta_kecamatan_diy.geojson");
   document.getElementById("muat").remove();
   if (!window.Papa) {
@@ -915,7 +926,9 @@ async function render() {
       const volSedang = daftar.filter(d => d.vol === "SEDANG");
       const nVol = daftar.filter(d => d.vol).length;
       dpkpTabel = { daftar, tMaks, nBaris: rows.length };
-      dpkpInfo = { nama: "Harga Rujukan DPKP DIY", sumber: "Dinas Pertanian & KP DIY", tgl: tMaks, tglTeks: "data harian s.d. " + fmtTgl(tMaks),
+      const dpkpDicek = statusPipe["DPKP DIY"] && statusPipe["DPKP DIY"].dicek_pada_utc;
+      dpkpInfo = { nama: "Harga Rujukan DPKP DIY", sumber: "Dinas Pertanian & KP DIY", tgl: tMaks,
+        tglTeks: "data harian s.d. " + fmtTgl(tMaks) + (dpkpDicek ? " · situs dicek " + fmtTgl(dpkpDicek) + ", belum ada data baru" : ""),
         lv: (naik10.length === 0 && volTinggi.length === 0) ? "AMAN" : "WASPADA",
         baca: `${naik10.length} dari ${daftar.length}`, bacaKet: "komoditas naik >10% / 30 hari",
         ket: (naik10.length ? `Kenaikan tertinggi: ${naik10.slice(0, 3).map(d => d.k).join(", ")} (kebanyakan sayuran, dan mutu pencatatan di sumbernya tidak selalu seragam). ` :
@@ -1216,11 +1229,7 @@ async function render() {
       // Baris tanggal di kaki kartu: periode/tanggal data terakhir + lencana kesegaran.
       // Tiap pilar punya irama sendiri (harian, 12-harian, bulanan), jadi teksnya
       // ditulis per pilar, bukan satu rumus untuk semua.
-      const hariLalu = p.tgl ? Math.floor((Date.now() - +new Date(p.tgl)) / 864e5) : null;
-      const segar = p.segarTeks ? `<span class="lencana-segar sedang">${p.segarTeks}</span>` : hariLalu === null ? "" :
-        `<span class="lencana-segar ${hariLalu <= 2 ? "baru" : hariLalu <= 10 ? "sedang" : "lama"}"
-           title="Selisih hari sejak data/pengambilan terakhir">${
-           hariLalu <= 0 ? "hari ini" : hariLalu === 1 ? "kemarin" : hariLalu + " hari lalu"}</span>`;
+      const segar = p.segarTeks ? `<span class="lencana-segar sedang">${p.segarTeks}</span>` : (p.tgl ? lencanaSegar(p.tgl) : "");
       const barisTgl = (p.tglTeks || segar) ? `<div class="kp-tgl">📅 ${p.tglTeks || ""} ${segar}</div>` : "";
       k.innerHTML = `
         <div class="kp-head"><div><div class="kp-nama">${p.nama}</div><div class="kp-sumber">${p.sumber}</div></div>
@@ -2393,7 +2402,7 @@ async function render() {
     T5.appendChild(s);
 
     const s2 = el("section", "blok");
-    s2.innerHTML = `<h2>Riwayat Pembaruan Data</h2><p class="sub">Tujuh sumber ditarik otomatis oleh pipeline (GitHub Actions) sesuai jadwalnya masing-masing. Dua sumber, SP2KP dan SIMOTANDI, diunduh manual dari portal resminya karena servernya memblokir akses otomatis, lalu dimasukkan lewat skrip konverter. Tidak ada satu pun angka yang diketik tangan. Kolom <em>data terakhir</em> = tanggal pengamatan terbaru di dalam data; <em>terakhir diambil</em> = kapan berkasnya ditarik dari sumber.</p>`;
+    s2.innerHTML = `<h2>Riwayat Pembaruan Data</h2><p class="sub">Tujuh sumber ditarik otomatis oleh pipeline (GitHub Actions) sesuai jadwalnya masing-masing. Dua sumber, SP2KP dan SIMOTANDI, diunduh manual dari portal resminya karena servernya memblokir akses otomatis, lalu dimasukkan lewat skrip konverter. Tidak ada satu pun angka yang diketik tangan. Kolom <em>data terakhir</em> = tanggal pengamatan terbaru di dalam data; <em>terakhir diambil / dicek</em> = kapan berkasnya ditarik dari sumber, atau kapan pipeline terakhir mengecek sumber yang belum memuat data baru.</p>`;
     // [nama, data, cara, jadwal, pengambil waktu-ambil (per baris), teks data terakhir (dari seluruh data)]
     const maksKolom = (data, ...kolom) => { let m = null; data.forEach(r => { for (const k of kolom) if (r[k]) { const v = String(r[k]).slice(0, 10); if (!m || v > m) m = v; break; } }); return m; };
     const tglRapi = v => v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? fmtTgl(v) : v;
@@ -2410,7 +2419,7 @@ async function render() {
     ];
     const w = el("div", "tabel-wrap");
     w.style.maxHeight = "none";
-    w.innerHTML = `<table><thead><tr><th>Pilar</th><th>Cara pembaruan</th><th class="num">Baris data</th><th>Data terakhir</th><th>Terakhir diambil</th></tr></thead><tbody>${
+    w.innerHTML = `<table><thead><tr><th>Pilar</th><th>Cara pembaruan</th><th class="num">Baris data</th><th>Data terakhir</th><th>Terakhir diambil / dicek</th></tr></thead><tbody>${
       DAFTAR.map(([nama, data, cara, jadwal, ambil, tglData]) => {
         const ada = data && data.length;
         let waktu = null, teksTgl = "–";
@@ -2418,8 +2427,19 @@ async function render() {
           if (ambil) data.forEach(r => { const v = ambil(r); if (v) { const d = new Date(v); if (!isNaN(d) && (!waktu || d > waktu)) waktu = d; } });
           try { if (tglData) teksTgl = tglData(data) || "–"; } catch (e) { teksTgl = "–"; }
         }
-        const teksWaktu = waktu ? waktu.toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" }) + " WIB"
-          : '<span class="catatan-kecil" title="Skrip sumber ini belum mencatat jam pengambilan; akan terisi pada pembaruan berikutnya">belum dicatat</span>';
+        const fmtWaktu = d => d.toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" }) + " WIB";
+        const st = statusPipe[nama];
+        const dicek = st && st.dicek_pada_utc ? new Date(st.dicek_pada_utc) : null;
+        // Jam ambil dari berkasnya sendiri selalu diutamakan. Catatan "dicek" dari
+        // pipeline dipakai bila berkas tidak punya jam ambil, atau bila pipeline sudah
+        // mengecek lagi jauh setelah jam ambil terakhir (sumber belum memuat data baru).
+        const adaDicek = dicek && !isNaN(dicek);
+        const keteranganDicek = `<span class="catatan-kecil" title="Pipeline mengecek sumber ini pada run terakhir, tetapi sumber belum memuat data baru">dicek ${adaDicek ? fmtWaktu(dicek) : ""}, tidak ada data baru</span>`;
+        let teksWaktu;
+        if (waktu && (!adaDicek || dicek - waktu < 36 * 3600e3)) teksWaktu = fmtWaktu(waktu);
+        else if (waktu && adaDicek) teksWaktu = `${fmtWaktu(waktu)}<br>${keteranganDicek}`;
+        else if (adaDicek) teksWaktu = keteranganDicek;
+        else teksWaktu = '<span class="catatan-kecil" title="Skrip sumber ini belum mencatat jam pengambilan; akan terisi pada pembaruan berikutnya">belum dicatat</span>';
         return `<tr><td>${nama}</td><td><span class="tag ${cara === "otomatis" ? "aman" : "netral"}">${cara}</span> <span class="catatan-kecil">${jadwal}</span></td>
           <td class="num tnum">${ada ? fmtN(data.length) : "0"}</td><td class="tnum">${ada ? teksTgl : "–"}</td><td class="tnum">${ada ? teksWaktu : "–"}</td></tr>`;
       }).join("")}</tbody></table>`;
