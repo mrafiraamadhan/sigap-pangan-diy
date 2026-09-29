@@ -2402,20 +2402,20 @@ async function render() {
     T5.appendChild(s);
 
     const s2 = el("section", "blok");
-    s2.innerHTML = `<h2>Riwayat Pembaruan Data</h2><p class="sub">Tujuh sumber ditarik otomatis oleh pipeline (GitHub Actions) sesuai jadwalnya masing-masing. Dua sumber, SP2KP dan SIMOTANDI, diunduh manual dari portal resminya karena servernya memblokir akses otomatis, lalu dimasukkan lewat skrip konverter. Tidak ada satu pun angka yang diketik tangan. Kolom <em>data terakhir</em> = tanggal pengamatan terbaru di dalam data; <em>terakhir diambil / dicek</em> = kapan berkasnya ditarik dari sumber, atau kapan pipeline terakhir mengecek sumber yang belum memuat data baru.</p>`;
+    s2.innerHTML = `<h2>Riwayat Pembaruan Data</h2><p class="sub">Tujuh sumber ditarik otomatis oleh pipeline (GitHub Actions) tiga kali sehari: <strong>06.05 WIB</strong> (pagi, siap sebelum jam kantor), <strong>10.05 WIB</strong> (menangkap harga PIHPS hari berjalan, yang diterbitkan Bank Indonesia sekitar pukul 08.00–09.00; siap untuk rapat pagi), dan <strong>13.05 WIB</strong> (siang, selesai sebelum jam istirahat berakhir; siap untuk rapat sore). Jam mulai bisa bergeser 5–30 menit mengikuti antrean server GitHub. Dua sumber, SP2KP dan SIMOTANDI, diunduh manual dari portal resminya karena servernya memblokir akses otomatis, lalu dimasukkan lewat skrip konverter. Tidak ada satu pun angka yang diketik tangan. Kolom <em>data terakhir</em> = tanggal pengamatan terbaru di dalam data; <em>terakhir diambil / dicek</em> = kapan berkasnya ditarik dari sumber, atau kapan pipeline terakhir mengecek sumber yang belum memuat data baru.</p>`;
     // [nama, data, cara, jadwal, pengambil waktu-ambil (per baris), teks data terakhir (dari seluruh data)]
     const maksKolom = (data, ...kolom) => { let m = null; data.forEach(r => { for (const k of kolom) if (r[k]) { const v = String(r[k]).slice(0, 10); if (!m || v > m) m = v; break; } }); return m; };
     const tglRapi = v => v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? fmtTgl(v) : v;
     const DAFTAR = [
-      ["PIHPS Bank Indonesia", gab || pihps, "otomatis", "tiap hari 06.30", r => r.diambil_pada_utc, d => tglRapi(maksKolom(d, "tanggal"))],
+      ["PIHPS Bank Indonesia", gab || pihps, "otomatis", "06.05 · 10.05 · 13.05 WIB (harga hari ini masuk di run 10.05)", r => r.diambil_pada_utc, d => tglRapi(maksKolom(d, "tanggal"))],
       ["SP2KP Kemendag", sp2kp, "manual", "unduh Excel per pasar, bulanan", r => r.diambil_pada_utc, d => tglRapi(maksKolom(d, "tanggal"))],
-      ["DPKP DIY", dpkp, "otomatis", "tiap hari", r => r.diambil_pada_utc, d => { const k = Object.keys(d[0] || {}).find(c => String(c).startsWith("Tanggal")); return k ? tglRapi(maksKolom(d, k)) : null; }],
+      ["DPKP DIY", dpkp, "otomatis", "06.05 · 10.05 · 13.05 WIB", r => r.diambil_pada_utc, d => { const k = Object.keys(d[0] || {}).find(c => String(c).startsWith("Tanggal")); return k ? tglRapi(maksKolom(d, k)) : null; }],
       ["SIMOTANDI Kementan", simo, "manual", "unduh Excel per periode 12 hari", r => r.diambil_pada_utc, d => { const m = maksKolom(d, "periode_mulai"); const r = d.find(x => String(x.periode_mulai).slice(0, 10) === m); return r && r.periode ? "periode " + r.periode : tglRapi(m); }],
-      ["Cadangan Pangan DIY", cad, "otomatis", "tiap hari", r => r.diambil_pada_utc, d => { const th = Math.max(...d.map(r => Number(r.tahun_filter) || 0)); return th ? "tahun anggaran " + th : null; }],
-      ["BMKG", cuaca, "otomatis", "tiap 6 jam", r => r.fetched_at_utc, d => { const m = maksKolom(d, "waktu_lokal"); return m ? "prakiraan s.d. " + fmtTgl(m) : null; }],
-      ["NOAA (ENSO/ONI)", enso, "otomatis", "tiap hari (data terbit bulanan)", r => r.diambil_pada_utc, d => { const r = d[d.length - 1]; return r && r.musim ? `periode ${r.musim} ${r.tahun}` : null; }],
-      ["Google Trends", trends, "otomatis", "tiap hari", r => r.diambil_pada_utc, d => tglRapi(maksKolom(d, "date"))],
-      ["Sinyal Media", berita, "otomatis", "tiap run, maks. 20 pencarian", r => r.diambil_pada_utc, d => { const m = maksKolom(d, "tanggal"); return m ? "lonjakan " + fmtTgl(m) : null; }],
+      ["Cadangan Pangan DIY", cad, "otomatis", "06.05 · 10.05 · 13.05 WIB", r => r.diambil_pada_utc, d => { const th = Math.max(...d.map(r => Number(r.tahun_filter) || 0)); return th ? "tahun anggaran " + th : null; }],
+      ["BMKG", cuaca, "otomatis", "06.05 · 10.05 · 13.05 WIB", r => r.fetched_at_utc, d => { const m = maksKolom(d, "waktu_lokal"); return m ? "prakiraan s.d. " + fmtTgl(m) : null; }],
+      ["NOAA (ENSO/ONI)", enso, "otomatis", "tiap run (indeks terbit bulanan)", r => r.diambil_pada_utc, d => { const r = d[d.length - 1]; return r && r.musim ? `periode ${r.musim} ${r.tahun}` : null; }],
+      ["Google Trends", trends, "otomatis", "06.05 · 10.05 · 13.05 WIB", r => r.diambil_pada_utc, d => tglRapi(maksKolom(d, "date"))],
+      ["Sinyal Media", berita, "otomatis", "tiap run, maks. 20 pencarian baru", r => r.diambil_pada_utc, d => { const m = maksKolom(d, "tanggal"); return m ? "lonjakan " + fmtTgl(m) : null; }],
     ];
     const w = el("div", "tabel-wrap");
     w.style.maxHeight = "none";
