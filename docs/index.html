@@ -212,7 +212,14 @@
   .banner { padding: 18px 20px; }
   .banner .tgl { font-size: .8rem; color: var(--ink-2); margin-bottom: 12px; }
   .chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-  .chip { border-radius: 10px; padding: 13px 15px; border: 1px solid; }
+  .chip { border-radius: 10px; padding: 13px 15px; border: 1px solid; cursor: pointer;
+          transition: transform .14s ease, box-shadow .14s ease; }
+  .chip:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(25,40,30,.10); }
+  .chip:focus-visible { outline: 3px solid var(--hijau-500); outline-offset: 2px; }
+  .chip .d.tautan { margin-top: 6px; font-weight: 600; opacity: 1; }
+  /* Sorotan sesaat pada bagian yang dituju lompatan dari Ringkasan */
+  @keyframes sorotMasuk { 0% { box-shadow: 0 0 0 0 rgba(47,122,76,.55); } 70% { box-shadow: 0 0 0 9px rgba(47,122,76,0); } 100% { box-shadow: none; } }
+  .sorot { animation: sorotMasuk 2.4s ease-out 1; border-radius: var(--radius); }
   .chip .n { font-family: var(--font-judul); font-size: 1.75rem; font-weight: 800; line-height: 1.05; }
   .chip .l { font-size: .74rem; font-weight: 700; letter-spacing: .6px; margin-top: 3px; }
   .chip .d { font-size: .7rem; margin-top: 2px; opacity: .85; }
@@ -367,6 +374,7 @@
   .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
            box-shadow: var(--shadow); padding: 16px 18px; }
   .panel .sumber { font-size: .7rem; color: var(--ink-3); margin: 0 0 10px; }
+  .panel .baris + .sumber, .panel .insight + .sumber { margin-top: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
   .angka-hero { font-size: 1.65rem; font-weight: 800; color: var(--hijau-900); line-height: 1.1; }
   .angka-ket { font-size: .76rem; color: var(--ink-2); margin-top: 2px; }
   .baris { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0;
@@ -808,6 +816,14 @@ function kondisiPilar(ctx) {
   K.push(trendsInfo || { nama: "Perhatian Publik (Google Trends)", sumber: "Google Trends DIY", lv: null, baca: "–", ket: "Data belum tersedia.", tab: "konteks" });
   // 8. Berita
   K.push(beritaInfo || { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi", lv: null, baca: "–", ket: "Belum ada hasil.", tab: "konteks" });
+  // Tujuan lompatan tiap kartu: id elemen di dalam tab-nya. Tanpa ini, semua kartu
+  // hanya membuka bagian atas tab, sehingga klik "El Niño" mendarat di SIMOTANDI.
+  const JANGKAR = {
+    "Harga Pangan (PIHPS BI)": null, "Harga Pasar (SP2KP Kemendag)": "sek-sp2kp", "Harga Rujukan DPKP DIY": "sek-dpkp",
+    "Pasokan Padi (SIMOTANDI)": "sek-simotandi", "Cadangan Pangan Pemerintah": "sek-cadangan", "Cuaca (BMKG)": "sek-cuaca",
+    "Iklim (ENSO/El Niño)": "sek-enso", "Perhatian Publik (Google Trends)": "sek-trends", "Sinyal Media": null,
+  };
+  K.forEach(p => { p.jangkar = JANGKAR[p.nama] || null; });
   return K;
 }
 
@@ -1146,9 +1162,15 @@ async function render() {
       [["bahaya", nB, "BAHAYA", "gejolak harga nyata"], ["anomali", nA, "ANOMALI", "lonjakan data, perlu pengecekan"],
        ["waspada", nW, "WASPADA", "dalam pengawasan"], ["aman", nS, "AMAN", "stabil"]].forEach(([k, j, l, d]) => {
         const kel = nKelompok(l);
-        const rinci = j ? `<div class="d" style="opacity:.85">${j} seri · ${kel} kelompok</div>` : "";
-        chips.appendChild(el("div", "chip " + k,
-          `<div class="n tnum">${j}</div><div class="l">${IKON[l]} ${l}</div><div class="d">${d}</div>${rinci}`));
+        const rinci = j ? `<div class="d" style="opacity:.85">${j} seri · ${kel} kelompok</div><div class="d tautan">lihat daftarnya →</div>` : "";
+        const chip = el("div", "chip " + k,
+          `<div class="n tnum">${j}</div><div class="l">${IKON[l]} ${l}</div><div class="d">${d}</div>${rinci}`);
+        chip.setAttribute("role", "button"); chip.tabIndex = 0;
+        chip.title = j ? `Lihat ${j} komoditas berstatus ${l} di tab Status Komoditas` : `Tidak ada komoditas berstatus ${l} saat ini`;
+        const lompat = () => bukaTab("status", false, "grup-" + k);
+        chip.addEventListener("click", lompat);
+        chip.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); lompat(); } });
+        chips.appendChild(chip);
        });
       banner.appendChild(chips);
 
@@ -1166,7 +1188,7 @@ async function render() {
     } else T1.appendChild(el("div", "kosong", "Data harga belum tersedia."));
 
     const s2 = el("section", "blok");
-    s2.innerHTML = `<h2>Kondisi Terkini per Pilar</h2><p class="sub">Sembilan sumber data yang dikumpulkan lembaga berbeda, tiga di antaranya sumber harga. Aturan penilaian tiap pilar kami buka di tab Metodologi. Klik ikon untuk melihat rincian.</p>`;
+    s2.innerHTML = `<h2>Kondisi Terkini per Pilar</h2><p class="sub">Sembilan sumber data yang dikumpulkan lembaga berbeda, tiga di antaranya sumber harga. Aturan penilaian tiap pilar kami buka di tab Metodologi. Klik sebuah kartu untuk melompat langsung ke bagian rinciannya.</p>`;
     const gp = el("div", "grid-pilar");
     pilar.forEach(p => {
       const k = el("div", "kartu-pilar");
@@ -1183,7 +1205,8 @@ async function render() {
           ${p.lv ? tagStatus(p.lv) : '<span class="tag netral">belum ada data</span>'}</div>
         <div class="kp-baca tnum">${p.baca}${p.bacaKet ? ` <span style="font-size:.7rem;font-weight:500;color:var(--ink-2)">${p.bacaKet}</span>` : ""}</div>
         <div class="kp-ket">${p.ket}</div>`;
-      k.addEventListener("click", () => bukaTab(p.tab));
+      k.addEventListener("click", () => bukaTab(p.tab, false, p.jangkar));
+      k.title = "Buka rincian " + p.nama;
       gp.appendChild(k);
     });
     s2.appendChild(gp);
@@ -1218,6 +1241,7 @@ async function render() {
       ["BAHAYA", "ANOMALI", "WASPADA", "AMAN"].forEach(st => {
         const item = tip.hasil.filter(x => x.status === st);
         const g = el("div", "grup");
+        g.id = "grup-" + KELAS[st];
         g.appendChild(el("div", "grup-head " + KELAS[st], `<span>${IKON[st]}</span><span>${st}</span><span class="jml tnum">${item.length}</span><span style="font-weight:500;font-size:.78rem">komoditas, ${DESKR[st]}</span>`));
         if (!item.length) { g.appendChild(el("div", "grup-kosong", "Tidak ada komoditas pada status ini.")); s.appendChild(g); return; }
         g.appendChild(el("p", "grup-nota", NOTA[st]));
@@ -1480,6 +1504,7 @@ async function render() {
   try {
     // --- SIMOTANDI panggung utama ---
     const sS = el("section", "blok");
+    sS.id = "sek-simotandi";
     sS.innerHTML = `<h2>Pasokan Padi dari Satelit (SIMOTANDI Kementan)</h2>
       <p class="sub">Fase pertanaman padi di seluruh 78 kecamatan DIY, hasil klasifikasi citra satelit. Bagian ini menjawab satu pertanyaan: kapan pasokan beras lokal berikutnya masuk.</p>`;
     if (simoData) {
@@ -1803,32 +1828,113 @@ async function render() {
 
     // --- cadangan + iklim ---
     const sK = el("section", "blok");
-    sK.innerHTML = `<h2>Cadangan, Iklim &amp; Sinyal Publik</h2>`;
+    sK.innerHTML = `<h2>Cadangan, Cuaca, Iklim &amp; Perhatian Publik</h2>
+      <p class="sub">Empat pilar pendukung yang menjelaskan <em>kenapa</em> harga bisa bergerak: stok pemerintah, cuaca hari ini, iklim musiman, dan seberapa gelisah publik mencari soal harga pangan.</p>`;
     const g2 = el("div", "grid-2");
     const pC = el("div", "panel");
+    pC.id = "sek-cadangan";
     if (cadData) {
       pC.innerHTML = `<h3>Cadangan Pangan Pemerintah</h3><div class="sumber">DPKP DIY · snapshot ${cadData.thn} (histori 2019–${cadData.thn} di data mentah)</div>
         <div class="angka-hero tnum">${fmtN(cadData.total, 1)} kg</div><div class="angka-ket">total beras/gabah pemerintah se-DIY menurut portal sumber</div>`;
       if (cadData.takTerpelihara)
         pC.appendChild(el("div", "insight",
           `<strong>Pilar ini tidak dapat dipakai.</strong> Portal cadangan pangan menampilkan angka yang persis sama untuk ${cadData.nTahun} tahun anggaran berturut-turut. Angka ${fmtN(cadData.total, 1)} kg juga tidak masuk akal sebagai cadangan tingkat provinsi. Selama datanya belum diperbarui di sumbernya, kami tidak bisa memberi tahu berapa stok yang siap dipakai kalau harga bergejolak.`));
-      cadData.ct.filter(r => r["Jenis Komoditas"]).forEach(r =>
-        pC.appendChild(el("div", "baris", `<span>${r["Jenis Komoditas"]}</span><span class="v tnum">${fmtN(Number(r[cadData.kolS]), 1)} kg</span>`)));
-      cadData.ct.filter(r => r.Wilayah && r.Wilayah !== "Total" && Number(r[cadData.kolS]) > 0).forEach(r =>
-        pC.appendChild(el("div", "baris", `<span>${r.Wilayah}</span><span class="v tnum">${fmtN(Number(r[cadData.kolS]), 1)} kg</span>`)));
+      // Berkas sumber memuat beberapa blok tabel untuk tahun yang sama (per jenis,
+      // per wilayah, daftar lumbung), kadang lebih dari sekali. Tanpa dedup, daftar
+      // di panel ini mengulang "GKG, Beras Medium, ..., Total" berkali-kali.
+      // Yang dipakai hanya BLOK PERTAMA tiap tabel (berhenti di baris "Total" pertama),
+      // supaya rinciannya konsisten dengan angka total di atas.
+      const blokPertama = (kunci) => {
+        const out = [];
+        for (const r of cadData.ct) {
+          const v = r[kunci];
+          if (!v) continue;
+          if (String(v).trim() === "Total") { if (out.length) break; else continue; }
+          if (kunci === "Wilayah" && r["Nama"]) continue;   // baris daftar lumbung, bukan stok
+          out.push(r);
+        }
+        return out;
+      };
+      const perJenis = blokPertama("Jenis Komoditas");
+      const perWilayah = blokPertama("Wilayah").filter(r => Number(r[cadData.kolS]) > 0);
+      if (perJenis.length) {
+        pC.appendChild(el("div", "sumber", "Per jenis komoditas"));
+        perJenis.forEach(r => pC.appendChild(el("div", "baris", `<span>${r["Jenis Komoditas"]}</span><span class="v tnum">${fmtN(Number(r[cadData.kolS]), 1)} kg</span>`)));
+      }
+      if (perWilayah.length) {
+        pC.appendChild(el("div", "sumber", "Per wilayah (yang stoknya tercatat)"));
+        perWilayah.forEach(r => pC.appendChild(el("div", "baris", `<span>${r.Wilayah}</span><span class="v tnum">${fmtN(Number(r[cadData.kolS]), 1)} kg</span>`)));
+      }
       pC.appendChild(el("div", "insight", "Cadangan inilah yang dipakai pemerintah untuk menstabilkan harga, lewat operasi pasar atau bantuan pangan, kalau status Bahaya muncul."));
     } else pC.innerHTML = `<h3>Cadangan Pangan Pemerintah</h3><div class="kosong">Data belum tersedia.</div>`;
     g2.appendChild(pC);
 
-    const pI = el("div", "panel");
-    pI.innerHTML = `<h3>Iklim &amp; Cuaca</h3><div class="sumber">NOAA (ENSO/ONI) &amp; BMKG (prakiraan per kab/kota)</div>`;
-    if (ensoAkhir) pI.innerHTML += `<div class="angka-hero">${ensoAkhir.status_enso ?? "–"}</div>
-      <div class="angka-ket">ENSO ${ensoAkhir.musim ?? ""} ${ensoAkhir.tahun ?? ""} · anomali suhu laut ${Number(ensoAkhir.anomali_nino34_c) > 0 ? "+" : ""}${ensoAkhir.anomali_nino34_c}°C</div>`;
-    if (cuacaData) cuacaData.daftarKab.forEach(r =>
-      pI.appendChild(el("div", "baris", `<span>${String(r.kabupaten_kota).replace("Kabupaten ", "Kab. ")}</span>
+    // --- Cuaca hari ini (BMKG): panel sendiri, supaya kartu "Cuaca (BMKG)" di
+    //     Ringkasan punya tujuan lompat yang jelas ---
+    const pW = el("div", "panel");
+    pW.id = "sek-cuaca";
+    if (cuacaData && cuacaData.daftarKab.length) {
+      const kab = cuacaData.daftarKab;
+      const hujanMaks = Math.max(...kab.map(r => Number(r.curah_hujan_mm) || 0));
+      const ekstrem = kab.filter(r => (Number(r.curah_hujan_mm) || 0) >= 50 || /lebat|petir|ekstrem/i.test(String(r.cuaca_desc || "")));
+      const tWaktu = kab.map(r => String(r.waktu_lokal || "")).filter(Boolean).sort().pop();
+      pW.innerHTML = `<h3>Cuaca Hari Ini (BMKG)</h3><div class="sumber">Prakiraan per kabupaten/kota · ${tWaktu ? "berlaku " + tWaktu.slice(0, 16).replace("T", " ") + " WIB" : ""}</div>
+        <div class="angka-hero">${ekstrem.length ? ekstrem.length + " wilayah" : "Kondusif"}</div>
+        <div class="angka-ket">${ekstrem.length ? "berpotensi cuaca ekstrem: " + ekstrem.map(r => String(r.kabupaten_kota).replace("Kabupaten ", "")).join(", ") : "curah hujan tertinggi " + hujanMaks + " mm, tidak ada peringatan cuaca ekstrem"}</div>`;
+      kab.forEach(r => pW.appendChild(el("div", "baris", `<span>${String(r.kabupaten_kota).replace("Kabupaten ", "Kab. ")}</span>
         <span class="v tnum">${r.suhu_c ?? "-"}°C · ${r.curah_hujan_mm ?? "-"} mm · ${r.cuaca_desc ?? "-"}</span>`)));
-    if (ensoInfo) pI.appendChild(el("div", "insight", ensoInfo.ket));
+      pW.appendChild(el("div", "insight", cuacaInfo ? cuacaInfo.ket + " Ambang yang dipakai: hujan 50 mm ke atas atau label lebat/petir/ekstrem di satu wilayah menjadi Waspada; tiga wilayah atau lebih menjadi Bahaya." :
+        "Cuaca memengaruhi panen dan distribusi; hujan lebat berhari-hari biasanya mendahului kenaikan harga sayuran dan cabai."));
+    } else pW.innerHTML = `<h3>Cuaca Hari Ini (BMKG)</h3><div class="kosong">Data belum tersedia.</div>`;
+    g2.appendChild(pW);
+
+    // --- Iklim musiman (ENSO) ---
+    const pI = el("div", "panel");
+    pI.id = "sek-enso";
+    pI.innerHTML = `<h3>Iklim Musiman (ENSO / El Niño)</h3><div class="sumber">NOAA · indeks ONI, diperbarui bulanan</div>`;
+    if (ensoAkhir) {
+      pI.innerHTML += `<div class="angka-hero">${ensoAkhir.status_enso ?? "–"}</div>
+        <div class="angka-ket">periode ${ensoAkhir.musim ?? ""} ${ensoAkhir.tahun ?? ""} · anomali suhu laut Pasifik ${Number(ensoAkhir.anomali_nino34_c) > 0 ? "+" : ""}${ensoAkhir.anomali_nino34_c}°C</div>`;
+      // riwayat ringkas: 8 periode terakhir
+      (enso || []).slice(-8).forEach(r => pI.appendChild(el("div", "baris",
+        `<span>${r.musim ?? ""} ${r.tahun ?? ""}</span><span class="v tnum">${Number(r.anomali_nino34_c) > 0 ? "+" : ""}${r.anomali_nino34_c}°C · ${r.status_enso ?? "-"}</span>`)));
+    }
+    if (ensoInfo) pI.appendChild(el("div", "insight", ensoInfo.ket + " El Niño lemah sampai moderat kami beri status Waspada, El Niño kuat Bahaya."));
     g2.appendChild(pI);
+
+    // --- Perhatian publik (Google Trends): sebelumnya hanya ada di kartu pilar,
+    //     tidak punya bagian sendiri di tab ini ---
+    const pT = el("div", "panel");
+    pT.id = "sek-trends";
+    if (trends && trends.length) {
+      const seriT = trends.slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      const lonjak = seriT.filter(r => isTrue(r.lonjakan_minat));
+      const akhir = seriT[seriT.length - 1];
+      const puncak = seriT.reduce((a, r) => (Number(r.skor_minat) || 0) > (Number(a.skor_minat) || 0) ? r : a, seriT[0]);
+      pT.innerHTML = `<h3>Perhatian Publik (Google Trends)</h3><div class="sumber">Minat pencarian soal harga/kelangkaan pangan di DIY · ${seriT.length} hari terakhir (skala 0–100)</div>
+        <div class="angka-hero tnum">${lonjak.length ? lonjak.length + " hari" : "Tenang"}</div>
+        <div class="angka-ket">${lonjak.length ? "dengan lonjakan pencarian, terakhir " + fmtTglPdk(lonjak[lonjak.length - 1].date)
+          : "tidak ada lonjakan yang terdeteksi · skor terakhir " + (akhir.skor_minat ?? "-") + " · puncak " + (puncak.skor_minat ?? "-") + " pada " + fmtTglPdk(puncak.date)}</div>
+        <div class="wadah-chart" style="height:150px;margin-top:10px"><canvas id="ch-trends"></canvas></div>`;
+      pT.appendChild(el("div", "insight", (trendsInfo ? trendsInfo.ket : "") + " Lonjakan ditandai bila skor hari itu jauh melampaui kebiasaan 14 hari sebelumnya, sehingga puncak di awal rentang data (belum punya 14 hari pembanding) tidak dihitung. Pencarian yang melonjak biasanya mengikuti, bukan mendahului, kenaikan harga; jadi pilar ini dibaca sebagai penguat, bukan peringatan dini utama."));
+      daftarChart("konteks", () => {
+        const c = document.getElementById("ch-trends");
+        if (!c) return;
+        if (!window.Chart) { pesanTanpaChart(c.parentElement); return; }
+        new Chart(c.getContext("2d"), {
+          type: "line",
+          data: { labels: seriT.map(r => r.date), datasets: [{ label: "Skor minat pencarian", data: seriT.map(r => Number(r.skor_minat) || 0),
+            borderColor: "#2f7a4c", backgroundColor: "rgba(47,122,76,.08)", borderWidth: 1.8, tension: .25, fill: true,
+            pointRadius: seriT.map(r => isTrue(r.lonjakan_minat) ? 4 : 0), pointBackgroundColor: "#a11c1c" }] },
+          options: { responsive: true, maintainAspectRatio: false, animation: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { title: it => it[0] ? fmtTgl(it[0].label) : "",
+              label: it => "skor " + it.raw + (isTrue(seriT[it.dataIndex].lonjakan_minat) ? " · lonjakan" : "") } } },
+            scales: { y: { min: 0, max: 100, ticks: { font: { size: 9 } }, grid: { color: "#efece2" } },
+                      x: { ticks: { font: { size: 9 }, maxTicksLimit: 6, callback: function (v) { return fmtTglPdk(this.getLabelForValue(v)); } }, grid: { display: false } } } },
+        });
+      });
+    } else pT.innerHTML = `<h3>Perhatian Publik (Google Trends)</h3><div class="kosong">Data belum tersedia.</div>`;
+    g2.appendChild(pT);
     sK.appendChild(g2);
     T3.appendChild(sK);
 
@@ -2081,6 +2187,7 @@ async function render() {
     /* ---------- SP2KP: sumber harga terpadat + perbandingan tiga sumber ---------- */
     if (sp2kpData) {
       const sS2 = el("section", "blok");
+      sS2.id = "sek-sp2kp";
       sS2.innerHTML = `<h2>Harga Pasar SP2KP Kemendag</h2>
         <p class="sub">Ini sumber harga ketiga, diterbitkan Kementerian Perdagangan dan menjadi dasar penghitungan Indeks Perkembangan Harga. Dua hal membuatnya berbeda: harganya dicatat sampai tingkat pasar, dan harganya paling sering bergerak: berubah kira-kira 6 dari tiap 100 hari, dibanding DPKP sekitar 5 hari dan PIHPS cuma 3 hari. Kolom sebaran menunjukkan seberapa jauh harga berbeda antarpasar pada hari yang sama; sebaran yang lebar berarti pasar belum sepakat soal harga.</p>`;
       const w2 = el("div", "tabel-wrap");
@@ -2165,6 +2272,7 @@ async function render() {
     }
 
     const sD = el("section", "blok");
+    sD.id = "sek-dpkp";
     sD.innerHTML = `<h2>Harga Rujukan DPKP DIY</h2>
       <p class="sub">Ini sumber kedua yang berdiri sendiri, yaitu pencatatan harian Dinas Pertanian dan Ketahanan Pangan DIY. Cakupannya lebih luas karena memuat komoditas yang tidak ada di PIHPS, seperti minyak goreng, beras SPHP, dan kedelai. Kolom volatilitas memakai adaptasi metode <em>Excessive Food Price Variability EWS</em> dari IFPRI, yaitu menghitung berapa hari dalam 90 hari terakhir yang kenaikan harganya ekstrem, dengan ukuran “ekstrem” diambil dari persentil ke-95 riwayat komoditas itu sendiri. Tabel diurutkan dari kenaikan 30 hari terbesar. Perlu diingat, mutu pencatatan di sumbernya tidak selalu seragam, terutama untuk sayuran.</p>`;
     if (dpkpTabel) {
@@ -2357,11 +2465,32 @@ window.setPilSampul = (teks, warna) => {
 };
 
 /* ================= navigasi tab ================= */
-function bukaTab(id, ganti) {
+function bukaTab(id, ganti, jangkar) {
   document.querySelectorAll(".tabpane").forEach(p => { p.hidden = p.id !== "tab-" + id; });
   document.querySelectorAll(".tabbtn").forEach(b => b.classList.toggle("aktif", b.dataset.tab === id));
   if (ganti) history.replaceState(null, "", "#" + id); else if (location.hash !== "#" + id) history.pushState(null, "", "#" + id);
   requestAnimationFrame(() => { jalankanChart(id); pasangReveal(document.getElementById("tab-" + id)); });
+
+  /* Lompat ke bagian tertentu di dalam tab (dipakai kartu pilar & kotak status di
+     Ringkasan). Elemen di tab yang baru dibuka belum "tampil" (animasi masuk), jadi
+     kelas tampil dipasang dulu supaya posisinya bisa dihitung, lalu disorot sebentar
+     agar mata langsung tahu bagian mana yang dimaksud. */
+  if (jangkar) {
+    const target = document.getElementById(jangkar);
+    if (target) {
+      target.closest(".masuk")?.classList.add("tampil");
+      target.classList.add("tampil");
+      requestAnimationFrame(() => {
+        const bilah = document.getElementById("navbar");
+        const tinggi = bilah ? bilah.getBoundingClientRect().height : 62;
+        const y = target.getBoundingClientRect().top + window.scrollY - tinggi - 14;
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+        target.classList.remove("sorot"); void target.offsetWidth; target.classList.add("sorot");
+        setTimeout(() => target.classList.remove("sorot"), 2600);
+      });
+      return;
+    }
+  }
 
   /* Sebelum ada sampul foto, kembali ke puncak halaman sudah benar karena kepala
      hanya setinggi beberapa baris. Sekarang puncak halaman berisi foto setinggi

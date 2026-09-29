@@ -188,6 +188,20 @@ def skor_relevansi(h, komoditas):
     return s
 
 
+KATA_PANGAN = re.compile(r"harga pangan|bahan pokok|sembako|bapok|inflasi|kebutuhan pokok|pasar tradisional", re.I)
+
+
+def relevan_pangan(h, komoditas):
+    """Judul/cuplikan harus menyebut komoditasnya (kata pertama: cabai, beras, gula,
+    telur, daging, bawang) atau jelas-jelas soal harga pangan."""
+    teks = (h.get("title", "") + " " + h.get("description", "")).lower()
+    kata = (komoditas or "").lower().split()
+    inti = [k for k in kata[:2] if len(k) >= 4]        # "cabai rawit" -> cabai, rawit
+    if any(k in teks for k in inti):
+        return True
+    return bool(KATA_PANGAN.search(teks))
+
+
 def cari_berita(query, limit=HASIL_PER_QUERY, bulan=None, komoditas=""):
     """Coba tiap sumber berurutan; kembalikan list dict hasil (bisa kosong)."""
     percobaan = [
@@ -210,9 +224,15 @@ def cari_berita(query, limit=HASIL_PER_QUERY, bulan=None, komoditas=""):
                     continue
                 sudah.add(h["url"])
                 unik.append(h)
-            unik.sort(key=lambda h: -skor_relevansi(h, komoditas))
-            catat(f"    {nama}: {len(unik)} artikel")
-            return unik[:limit]
+            # Buang artikel yang tidak menyebut komoditasnya maupun soal harga pangan
+            # (pelajaran run 29 Sep: query bulan lama mengembalikan "rujak lotis",
+            # "cokelat pedas", berita APBD). Lebih baik kosong daripada menyesatkan.
+            relevan = [h for h in unik if relevan_pangan(h, komoditas)]
+            relevan.sort(key=lambda h: -skor_relevansi(h, komoditas))
+            catat(f"    {nama}: {len(unik)} artikel, {len(relevan)} relevan")
+            if relevan:
+                return relevan[:limit]
+            continue
         catat(f"    {nama}: kosong")
     return []
 
@@ -227,6 +247,12 @@ def validasi_anomali(tanggal, komoditas, kabupaten):
     query = f"harga {komoditas.strip()} Yogyakarta {nama_bulan}"
     hasil = cari_berita(query, bulan=bulan, komoditas=komoditas)
     baris = []
+    if not hasil:
+        # Dicatat sebagai "sudah dicari, tidak ada berita relevan" supaya run berikutnya
+        # tidak mengulang pencarian yang sama; papan pantau mengabaikan baris tanpa URL.
+        return [{"tanggal": tanggal, "komoditas": komoditas.strip(), "kabupaten_kota": kabupaten, "query": query,
+                 "jumlah_berita_ditemukan": 0, "judul_teratas": "", "url_teratas": "", "ringkasan": "",
+                 "tervalidasi": False, "media": "", "tanggal_terbit": "", "peringkat": 0}]
     for i, h in enumerate(hasil, 1):
         baris.append({
             "tanggal": tanggal,
@@ -302,8 +328,8 @@ def main():
         try:
             baris = validasi_anomali(str(row["tanggal"]), str(row["komoditas"]), str(row["kabupaten_kota"]))
             tambahan.extend(baris)
-            if not baris:
-                catat("    tidak ada berita yang ditemukan.")
+            if baris and not baris[0]["url_teratas"]:
+                catat("    tidak ada berita relevan; dicatat supaya tidak dicari ulang.")
         except Exception as e:
             catat(f"  GAGAL: {type(e).__name__}: {str(e)[:160]}")
         time.sleep(JEDA_ANTAR_QUERY)
