@@ -5,188 +5,328 @@ kejadiannya -- mengikuti evidensi Bakry dkk. (2025, arXiv:2508.06497)
 bahwa fusi sinyal harga+teks jauh mengungguli model harga semata
 (AUC 0,94 vs 0,46 tanpa komponen berita).
 
-Butuh FIRECRAWL_API_KEY (daftar gratis di firecrawl.dev) karena script
-ini dijalankan di luar sesi Claude (mis. di GitHub Actions), jadi tidak
-bisa memakai tool MCP Firecrawl yang tersambung di akun Claude-mu.
+=== VERSI 2 (29 Sep 2026): TIDAK LAGI BERGANTUNG PADA FIRECRAWL ===
+Arsip kliping berhenti di 26 Agustus 2026 karena kredit Firecrawl habis
+(API menjawab 402 "low on credits"). Versi ini memakai sumber GRATIS tanpa
+kunci API, berurutan sampai ada yang memberi hasil:
+
+  1. Google News RSS  (news.google.com/rss/search)  -- stabil, tanpa kunci,
+     mendukung penyaring tanggal after:/before: sehingga berita yang diambil
+     benar-benar dari bulan terjadinya lonjakan.
+  2. Bing News RSS    (bing.com/news/search?format=rss) -- cadangan; memberi
+     tautan langsung ke media dan cuplikan isi.
+  3. Firecrawl        -- hanya bila FIRECRAWL_API_KEY masih diset dan dua
+     sumber di atas kosong.
+
+Perubahan lain:
+  * Menyimpan sampai 3 artikel per pencarian (kolom `peringkat` 1..3), bukan
+    hanya satu. Sebelumnya 3 hasil ditarik tetapi 2 dibuang, padahal itulah
+    yang membuat arsip tampak "ratusan baris tapi artikelnya itu-itu saja".
+  * Kolom baru `media` (nama media dari feed) dan `tanggal_terbit` (tanggal
+    artikel), sehingga papan pantau dapat menampilkan tanggal artikel yang
+    sebenarnya, bukan tanggal lonjakan.
+  * Hasil diurutkan menurut relevansi sederhana: judul yang menyebut nama
+    komoditas dan Yogyakarta/Jogja/DIY didahulukan.
+
+Kolom lama tetap ada dan artinya tidak berubah, jadi papan pantau versi
+lama pun masih bisa membaca berkas ini.
 
 Cara pakai:
-    export FIRECRAWL_API_KEY="fc-xxxxxxxx"
-    python news_validation.py
+    python news_validation.py                # mode pipeline (baca anomali, tambah arsip)
+    python news_validation.py --uji "harga cabai Yogyakarta"   # coba satu query, cetak hasil
+    python news_validation.py --maks 200     # dijalankan lokal: isi arsip lebih banyak dalam sekali jalan
 """
 
-import os
+import argparse
 import csv
-import requests
+import html
+import os
+import re
+import sys
+import time
+import xml.etree.ElementTree as ET
+from datetime import datetime
+from urllib.parse import urlencode
 
-API_KEY = os.environ.get("FIRECRAWL_API_KEY")
-SEARCH_URL = "https://api.firecrawl.dev/v1/search"
+import requests
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ANOMALI_PATH = os.path.join(HERE, "..", "..", "data", "gabungan_anomali.csv")
 OUTPUT_PATH = os.path.join(HERE, "..", "..", "data", "validasi_berita.csv")
 
+API_KEY = os.environ.get("FIRECRAWL_API_KEY")
+FIRECRAWL_URL = "https://api.firecrawl.dev/v1/search"
 
-def cari_berita(query: str, limit: int = 5) -> list:
+UA = {
+    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                   "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"),
+    "Accept-Language": "id-ID,id;q=0.9,en;q=0.8",
+}
+
+BULAN_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
+            "Agustus", "September", "Oktober", "November", "Desember"]
+
+KOLOM = ["tanggal", "komoditas", "kabupaten_kota", "query", "jumlah_berita_ditemukan",
+         "judul_teratas", "url_teratas", "ringkasan", "tervalidasi",
+         "media", "tanggal_terbit", "peringkat"]
+
+# Batasan kesopanan. RSS tidak punya kuota resmi, tetapi tetap diberi jeda.
+MAKS_VALIDASI = 20        # maksimal query pencarian per run
+JEDA_ANTAR_QUERY = 3      # detik
+HASIL_PER_QUERY = 3       # artikel yang disimpan per pencarian
+
+
+def catat(*a):
+    print(*a, flush=True)
+
+
+# ---------------------------------------------------------------- pembantu
+def bersih_html(s):
+    s = re.sub(r"<[^>]+>", " ", s or "")
+    return re.sub(r"\s+", " ", html.unescape(s)).strip()
+
+
+def tanggal_iso(teks):
+    """'Mon, 14 Sep 2026 03:10:00 GMT' -> '2026-09-14'. Kosong bila gagal."""
+    if not teks:
+        return ""
+    for pola in ("%a, %d %b %Y %H:%M:%S %Z", "%a, %d %b %Y %H:%M:%S %z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(teks.strip()[:31], pola).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    m = re.search(r"(\d{4}-\d{2}-\d{2})", teks)
+    return m.group(1) if m else ""
+
+
+def akhir_bulan(yyyy_mm):
+    t, b = int(yyyy_mm[:4]), int(yyyy_mm[5:7])
+    return f"{t + (b == 12):04d}-{(b % 12) + 1:02d}-01"
+
+
+# ---------------------------------------------------------------- sumber 1: Google News RSS
+def cari_google_news(query, limit, bulan=None):
+    """bulan = 'YYYY-MM' untuk membatasi ke bulan lonjakan (opsional)."""
+    q = query
+    if bulan:
+        q = f"{query} after:{bulan}-01 before:{akhir_bulan(bulan)}"
+    url = "https://news.google.com/rss/search?" + urlencode({"q": q, "hl": "id", "gl": "ID", "ceid": "ID:id"})
+    r = requests.get(url, headers=UA, timeout=30)
+    r.raise_for_status()
+    root = ET.fromstring(r.content)
+    hasil = []
+    for it in root.findall("./channel/item"):
+        judul = bersih_html(it.findtext("title"))
+        src = it.find("source")
+        media = (src.text or "").strip() if src is not None else ""
+        # Judul Google News berakhiran " - Nama Media"; dipotong supaya rapi.
+        if media and judul.endswith(" - " + media):
+            judul = judul[: -len(media) - 3].strip()
+        hasil.append({
+            "title": judul,
+            "url": (it.findtext("link") or "").strip(),
+            "description": "",                       # feed pencarian Google tidak memuat cuplikan isi
+            "media": media,
+            "tanggal_terbit": tanggal_iso(it.findtext("pubDate")),
+        })
+        if len(hasil) >= limit:
+            break
+    return hasil
+
+
+# ---------------------------------------------------------------- sumber 2: Bing News RSS
+def cari_bing_news(query, limit):
+    url = "https://www.bing.com/news/search?" + urlencode({"q": query, "format": "rss", "setlang": "id", "cc": "ID"})
+    r = requests.get(url, headers=UA, timeout=30)
+    r.raise_for_status()
+    root = ET.fromstring(r.content)
+    ns = {"News": "https://www.bing.com/news/search?q=&format=rss"}
+    hasil = []
+    for it in root.findall("./channel/item"):
+        src = it.find("News:Source", ns)
+        hasil.append({
+            "title": bersih_html(it.findtext("title")),
+            "url": (it.findtext("link") or "").strip(),
+            "description": bersih_html(it.findtext("description")),
+            "media": (src.text or "").strip() if src is not None else "",
+            "tanggal_terbit": tanggal_iso(it.findtext("pubDate")),
+        })
+        if len(hasil) >= limit:
+            break
+    return hasil
+
+
+# ---------------------------------------------------------------- sumber 3: Firecrawl (opsional)
+def cari_firecrawl(query, limit):
     if not API_KEY:
-        raise RuntimeError("FIRECRAWL_API_KEY belum diset di environment variable.")
-    resp = requests.post(
-        SEARCH_URL,
-        headers={"Authorization": f"Bearer {API_KEY}"},
-        json={"query": query, "limit": limit},
-        timeout=30,
-    )
+        return []
+    resp = requests.post(FIRECRAWL_URL, headers={"Authorization": f"Bearer {API_KEY}"},
+                         json={"query": query, "limit": limit}, timeout=30)
     resp.raise_for_status()
     data = resp.json()
-    # Bentuk respons Firecrawl /v1/search TERBUKTI (run 30 Agt 2026, setelah
-    # rate-limit teratasi): {"success": true, "data": [ ...daftar hasil... ]}
-    # -- "data" adalah LIST langsung. Kode lama mengira "data" adalah dict
-    # berisi kunci "web", sehingga SEMUA query gagal dengan
-    # "'list' object has no attribute 'get'". Penanganan di bawah menerima
-    # kedua bentuk (list langsung, maupun dict {"web": [...]}), supaya tahan
-    # kalau Firecrawl mengubah format lagi.
     isi = data.get("data") if isinstance(data, dict) else data
     if isinstance(isi, dict):
         isi = isi.get("web") or isi.get("results") or []
-    return isi if isinstance(isi, list) else []
+    hasil = []
+    for h in (isi if isinstance(isi, list) else []):
+        hasil.append({"title": h.get("title", ""), "url": h.get("url", ""),
+                      "description": h.get("description") or h.get("snippet") or "",
+                      "media": "", "tanggal_terbit": ""})
+    return hasil[:limit]
 
 
-def validasi_anomali(tanggal: str, komoditas: str, kabupaten: str) -> dict:
-    """Bangun query pencarian dari konteks anomali, kembalikan hasil berita
-    teratas sebagai bukti pendukung (atau list kosong kalau tidak ada)."""
-    bulan_tahun = tanggal[:7]  # 'YYYY-MM'
-    query = f"harga {komoditas} {kabupaten} {bulan_tahun} naik turun"
-    hasil = cari_berita(query, limit=3)
-    teratas = hasil[0] if hasil else {}
-    # "description" = cuplikan/ringkasan singkat artikel dari hasil pencarian
-    # Firecrawl -- dipakai dashboard untuk menampilkan kliping berita yang
-    # layak baca (judul + media + ringkasan), bukan sekadar tautan.
-    ringkasan = str(teratas.get("description") or teratas.get("snippet") or "").strip()
-    return {
-        "tanggal": tanggal,
-        "komoditas": komoditas,
-        "kabupaten_kota": kabupaten,
-        "query": query,
-        "jumlah_berita_ditemukan": len(hasil),
-        "judul_teratas": teratas.get("title", ""),
-        "url_teratas": teratas.get("url", ""),
-        "ringkasan": ringkasan[:400],
-        "tervalidasi": len(hasil) > 0,
-    }
+# ---------------------------------------------------------------- gabungan
+def skor_relevansi(h, komoditas):
+    """Judul yang menyebut komoditasnya dan wilayah DIY diutamakan."""
+    teks = (h.get("title", "") + " " + h.get("description", "")).lower()
+    kata = komoditas.lower().split()[0] if komoditas else ""
+    s = 0
+    if kata and kata in teks:
+        s += 2
+    if re.search(r"yogya|jogja|\bdiy\b|sleman|bantul|kulon progo|gunungkidul", teks):
+        s += 1
+    return s
 
 
-# Batasan supaya ramah kuota API gratis Firecrawl. Run 30 Agt 2026 mencoba
-# memvalidasi SEMUA 360 anomali sekaligus tanpa jeda -> hampir semua ditolak
-# "429 Too Many Requests" -> nol hasil tersimpan. Untuk sistem peringatan
-# dini, yang paling bernilai divalidasi adalah anomali TERBARU -- histori lama
-# tidak perlu diverifikasi ulang tiap run.
-MAKS_VALIDASI = 20        # maksimal query pencarian per run
-JEDA_ANTAR_QUERY = 7      # detik -- di bawah ~10 request/menit (batas tier gratis)
-MAKS_429_BERUNTUN = 3     # kalau tetap ditolak berkali-kali, berhenti sopan
+def cari_berita(query, limit=HASIL_PER_QUERY, bulan=None, komoditas=""):
+    """Coba tiap sumber berurutan; kembalikan list dict hasil (bisa kosong)."""
+    percobaan = [
+        ("Google News RSS (bulan lonjakan)", lambda: cari_google_news(query, limit * 3, bulan) if bulan else []),
+        ("Google News RSS", lambda: cari_google_news(query, limit * 3)),
+        ("Bing News RSS", lambda: cari_bing_news(query, limit * 3)),
+        ("Firecrawl", lambda: cari_firecrawl(query, limit * 2)),
+    ]
+    for nama, fn in percobaan:
+        try:
+            hasil = [h for h in fn() if h.get("url")]
+        except Exception as e:
+            catat(f"    {nama}: gagal ({type(e).__name__}: {str(e)[:120]})")
+            continue
+        if hasil:
+            # buang duplikat URL, lalu urutkan menurut relevansi (stabil: urutan feed dipertahankan)
+            unik, sudah = [], set()
+            for h in hasil:
+                if h["url"] in sudah:
+                    continue
+                sudah.add(h["url"])
+                unik.append(h)
+            unik.sort(key=lambda h: -skor_relevansi(h, komoditas))
+            catat(f"    {nama}: {len(unik)} artikel")
+            return unik[:limit]
+        catat(f"    {nama}: kosong")
+    return []
+
+
+def validasi_anomali(tanggal, komoditas, kabupaten):
+    """Bangun query dari konteks anomali; kembalikan daftar baris (satu per artikel)."""
+    bulan = str(tanggal)[:7]
+    try:
+        nama_bulan = BULAN_ID[int(bulan[5:7]) - 1] + " " + bulan[:4]
+    except (ValueError, IndexError):
+        nama_bulan = bulan
+    query = f"harga {komoditas.strip()} Yogyakarta {nama_bulan}"
+    hasil = cari_berita(query, bulan=bulan, komoditas=komoditas)
+    baris = []
+    for i, h in enumerate(hasil, 1):
+        baris.append({
+            "tanggal": tanggal,
+            "komoditas": komoditas.strip(),
+            "kabupaten_kota": kabupaten,
+            "query": query,
+            "jumlah_berita_ditemukan": len(hasil),
+            "judul_teratas": h.get("title", ""),
+            "url_teratas": h.get("url", ""),
+            "ringkasan": str(h.get("description", ""))[:400],
+            "tervalidasi": True,
+            "media": h.get("media", ""),
+            "tanggal_terbit": h.get("tanggal_terbit", ""),
+            "peringkat": i,
+        })
+    return baris
 
 
 def main():
-    if not os.path.isfile(ANOMALI_PATH):
-        print(f"Belum ada {ANOMALI_PATH} -- jalankan merge_and_detect.py dulu.")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--uji", help="coba satu query lalu berhenti (untuk memeriksa sumber dari log Actions)")
+    ap.add_argument("--maks", type=int, default=MAKS_VALIDASI,
+                    help=f"maksimal pencarian per run (default {MAKS_VALIDASI}; naikkan bila dijalankan lokal untuk mengisi arsip)")
+    args = ap.parse_args()
+    maks = max(1, args.maks)
+
+    if args.uji:
+        catat(f"Uji query: {args.uji}")
+        for h in cari_berita(args.uji, limit=5, komoditas=args.uji):
+            catat(f"  [{h.get('tanggal_terbit') or '?'}] {h.get('media') or '-'} | {h.get('title')}\n     {h.get('url')}")
         return
 
-    import time
+    if not os.path.isfile(ANOMALI_PATH):
+        catat(f"Belum ada {ANOMALI_PATH} -- jalankan merge_and_detect.py dulu.")
+        return
+
     import pandas as pd
     df = pd.read_csv(ANOMALI_PATH)
-    anomali = df[df.get("anomali_harga", False) == True]
-
+    anomali = df[df.get("anomali_harga", False).astype(str).str.lower() == "true"]
     if anomali.empty:
-        print("Tidak ada anomali untuk divalidasi.")
+        catat("Tidak ada anomali untuk divalidasi.")
         return
 
-    # Prioritaskan anomali TERBARU, dan jangan mengulang query yang identik
-    # (banyak anomali jatuh di komoditas & bulan yang sama -> 1 pencarian
-    # berita cukup mewakili semuanya).
     anomali = anomali.sort_values("tanggal", ascending=False)
     total_kandidat = len(anomali)
 
-    # Kliping yang SUDAH terkumpul dari run-run sebelumnya. Versi lama membuka
-    # berkas keluaran dengan mode "w", jadi tiap run menimpa habis isinya dan
-    # jumlah kliping mentok di MAKS_VALIDASI selamanya. Lebih buruk lagi:
-    # karena urutannya selalu dari anomali terbaru, kuota pencarian habis untuk
-    # MENGULANG komoditas-bulan yang sudah divalidasi kemarin, bukan menambah
-    # cakupan. Sekarang hasil lama dibaca dulu, lalu ditumpuk.
+    # Arsip lama dibaca dulu lalu DITAMBAH, tidak pernah ditimpa atau menyusut.
     lama = []
     if os.path.isfile(OUTPUT_PATH):
         try:
             with open(OUTPUT_PATH, newline="", encoding="utf-8") as f:
                 lama = list(csv.DictReader(f))
-            print(f"{len(lama)} kliping berita sudah terkumpul dari run sebelumnya.")
+            catat(f"{len(lama)} baris kliping sudah terkumpul dari run sebelumnya.")
         except Exception as e:
-            print(f"Kliping lama tidak terbaca ({type(e).__name__}), mulai dari kosong.")
+            catat(f"Kliping lama tidak terbaca ({type(e).__name__}), mulai dari kosong.")
 
-    sudah = {f"{r.get('komoditas')}|{str(r.get('tanggal'))[:7]}" for r in lama}
+    kunci = lambda r: f"{str(r.get('komoditas', '')).strip()}|{str(r.get('tanggal', ''))[:7]}"
+    sudah = {kunci(r) for r in lama}
 
-    hasil_semua = []
-    query_terpakai = set(sudah)      # jangan ulang yang sudah punya kliping
-    beruntun_429 = 0
+    tambahan = []
     percobaan = 0
     for _, row in anomali.iterrows():
-        # PENTING: batas dihitung dari PERCOBAAN, bukan dari yang berhasil.
-        # Versi sebelumnya menghitung len(hasil_semua) -- kalau semua query
-        # gagal (mis. format respons berubah), hitungan tak pernah naik dan
-        # loop menggiling SELURUH ratusan anomali x 7 detik (~40 menit sia-sia
-        # di run 30 Agt 2026). Sekarang: maksimal MAKS_VALIDASI percobaan,
-        # titik, apapun hasilnya.
-        if percobaan >= MAKS_VALIDASI:
-            print(f"Batas {MAKS_VALIDASI} percobaan validasi per run tercapai "
-                  f"(dari {total_kandidat} kandidat) -- sisanya dilewati, "
-                  f"run berikutnya akan memvalidasi anomali baru lagi.")
+        if percobaan >= maks:
+            catat(f"Batas {maks} pencarian per run tercapai (dari {total_kandidat} kandidat); "
+                  "sisanya dilanjutkan run berikutnya.")
             break
-        kunci_query = f"{row['komoditas']}|{str(row['tanggal'])[:7]}"
-        if kunci_query in query_terpakai:
+        k = kunci(row)
+        if k in sudah:
             continue
         percobaan += 1
-        query_terpakai.add(kunci_query)
-        print(f"Validasi: {row['tanggal']} - {row['komoditas']} - {row['kabupaten_kota']}")
+        sudah.add(k)
+        catat(f"Validasi: {row['tanggal']} - {row['komoditas']} - {row['kabupaten_kota']}")
         try:
-            hasil = validasi_anomali(row["tanggal"], row["komoditas"], row["kabupaten_kota"])
-            hasil_semua.append(hasil)
-            beruntun_429 = 0
+            baris = validasi_anomali(str(row["tanggal"]), str(row["komoditas"]), str(row["kabupaten_kota"]))
+            tambahan.extend(baris)
+            if not baris:
+                catat("    tidak ada berita yang ditemukan.")
         except Exception as e:
-            print(f"  GAGAL: {e}")
-            if "429" in str(e):
-                beruntun_429 += 1
-                if beruntun_429 >= MAKS_429_BERUNTUN:
-                    print(f"{MAKS_429_BERUNTUN}x ditolak rate-limit beruntun -- "
-                          "berhenti untuk run ini, hasil yang sudah ada tetap disimpan.")
-                    break
+            catat(f"  GAGAL: {type(e).__name__}: {str(e)[:160]}")
         time.sleep(JEDA_ANTAR_QUERY)
 
-    if not hasil_semua:
-        print("\nTidak ada kliping baru pada run ini; berkas lama dibiarkan apa adanya.")
+    if not tambahan:
+        catat("\nTidak ada kliping baru pada run ini; berkas lama dibiarkan apa adanya.")
         return
 
-    # Arsip lama dipertahankan APA ADANYA; hasil baru hanya ditambahkan.
-    #
-    # Versi sebelumnya menyaring gabungan lama+baru dengan kunci komoditas+bulan,
-    # sehingga baris lama yang kebetulan sekunci ikut terbuang. Akibatnya arsip
-    # MENYUSUT: 20 baris jadi 17 pada run 31 Agt, karena run itu cuma berhasil
-    # menambah sedikit (kuota Firecrawl gratis membatasi) tetapi membuang lebih
-    # banyak. Arsip kliping tidak boleh mengecil karena alasan apa pun.
-    kolom = list(hasil_semua[0].keys())
-    kunci_lama = {f"{r.get('komoditas')}|{str(r.get('tanggal'))[:7]}" for r in lama}
-    tambahan = [r for r in hasil_semua
-                if f"{r.get('komoditas')}|{str(r.get('tanggal'))[:7]}" not in kunci_lama]
-    gabung = [{c: r.get(c, "") for c in kolom} for r in (tambahan + lama)]
+    gabung = [{c: r.get(c, "") for c in KOLOM} for r in (tambahan + lama)]
+    # Urutan: tanggal lonjakan terbaru dulu; di dalam tanggal yang sama, peringkat 1 dulu.
+    gabung.sort(key=lambda r: int(r.get("peringkat") or 1))
     gabung.sort(key=lambda r: str(r.get("tanggal", "")), reverse=True)
     assert len(gabung) >= len(lama), "arsip kliping tidak boleh menyusut"
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=kolom)
-        writer.writeheader()
-        writer.writerows(gabung)
+        w = csv.DictWriter(f, fieldnames=KOLOM)
+        w.writeheader()
+        w.writerows(gabung)
 
-    tervalidasi = sum(1 for h in hasil_semua if h["tervalidasi"])
-    print(f"\n{tervalidasi}/{len(hasil_semua)} anomali baru menemukan berita pendukung.")
-    print(f"Arsip kliping: {len(lama)} + {len(tambahan)} baru = {len(gabung)} baris, "
-          f"disimpan ke {OUTPUT_PATH}")
+    catat(f"\n{len(tambahan)} artikel baru dari {percobaan} pencarian.")
+    catat(f"Arsip kliping: {len(lama)} + {len(tambahan)} = {len(gabung)} baris, disimpan ke {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

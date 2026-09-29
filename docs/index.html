@@ -388,7 +388,47 @@
   .art-judul a { color: var(--ink); text-decoration: none; }
   .art-judul a:hover { color: var(--hijau-700); text-decoration: underline; }
   .art-ringkas { font-size: .77rem; color: var(--ink-2); line-height: 1.5; }
-  .art-kom { margin-top: auto; padding-top: 6px; }
+  .art-kom { margin-top: auto; padding-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .art-rujuk { font-weight: 600; color: var(--anomali); }
+
+  /* ===== Tab Berita: kliping per komoditas =====
+     Arsip kliping berisi ratusan baris (satu baris = satu lonjakan yang dicarikan
+     beritanya), tetapi artikel uniknya lebih sedikit karena satu artikel sering
+     dirujuk banyak lonjakan sekaligus. Tab ini menampilkan SEMUA artikel unik,
+     dikelompokkan per komoditas supaya mudah ditelusuri. */
+  .berita-stat { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: .78rem; color: var(--ink-2); margin: 4px 0 12px; }
+  .berita-stat b { display: block; color: var(--hijau-900); font-family: var(--font-judul); font-size: 1.15rem; line-height: 1.1; }
+  .berita-alat { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 12px; }
+  .kel-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .kel { font: 600 .8rem var(--font-isi); padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+         background: var(--surface); color: var(--ink-2); cursor: pointer; display: inline-flex; gap: 6px; align-items: center;
+         transition: background .14s ease, border-color .14s ease; }
+  .kel:hover { border-color: var(--hijau-500); color: var(--hijau-900); }
+  .kel.aktif { background: var(--hijau-900); color: #fff; border-color: var(--hijau-900); }
+  .kel .jml { font-size: .68rem; font-weight: 700; padding: 1px 6px; border-radius: 999px; background: rgba(0,0,0,.06); }
+  .kel.aktif .jml { background: rgba(255,255,255,.22); }
+  .kel:focus-visible { outline: 3px solid var(--hijau-500); outline-offset: 2px; }
+  .berita-cari { flex: 1; min-width: 200px; padding: 8px 12px; border-radius: 9px; border: 1px solid var(--border);
+                 background: #fff; font: 500 .85rem var(--font-isi); color: var(--ink); }
+  .berita-cari:focus { outline: 2px solid var(--hijau-500); border-color: var(--hijau-500); }
+  .hasil-ket { font-size: .78rem; color: var(--ink-2); margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+  .hasil-ket button { font: 600 .74rem var(--font-isi); padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border);
+                      background: var(--surface-2); color: var(--ink-2); cursor: pointer; }
+  .linimasa-wrap { margin: 2px 0 14px; }
+  .linimasa { display: flex; align-items: flex-end; gap: 2px; height: 46px; }
+  .linimasa i { flex: 1; min-width: 4px; background: var(--border-2); border-radius: 2px 2px 0 0; min-height: 2px; cursor: pointer; }
+  .linimasa i.ada { background: var(--hijau-500); }
+  .linimasa i:hover { background: var(--hijau-900); }
+  .linimasa i.aktif { background: var(--anomali); }
+  .linimasa-label { display: flex; justify-content: space-between; font-size: .66rem; color: var(--ink-3); margin-top: 3px; }
+  .btn-muat, .btn-tautan { display: inline-block; font: 600 .84rem var(--font-isi); padding: 9px 18px; border-radius: 999px;
+                            border: 1px solid var(--hijau-600); background: var(--surface); color: var(--hijau-700); cursor: pointer;
+                            transition: background .14s ease; }
+  .btn-muat { display: block; margin: 14px auto 0; }
+  .btn-tautan { margin-top: 12px; }
+  .btn-muat:hover, .btn-tautan:hover { background: var(--hijau-100); }
+  .mchip.tombol { cursor: pointer; }
+  .mchip.tombol:hover { background: var(--hijau-100); color: var(--hijau-900); }
 
   /* ===== Tabel ===== */
   table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: .8rem; }
@@ -455,6 +495,7 @@ document.documentElement.classList.add("anim");
       <button class="tabbtn" data-tab="status">Status Komoditas <span class="bulat" id="nb-status"></span></button>
       <button class="tabbtn" data-tab="prakiraan">Prakiraan Risiko</button>
       <button class="tabbtn" data-tab="konteks">Konteks &amp; Pasokan</button>
+      <button class="tabbtn" data-tab="berita">Berita <span class="bulat" id="nb-berita"></span></button>
       <button class="tabbtn" data-tab="data">Data &amp; Tren</button>
       <button class="tabbtn" data-tab="metodologi">Metodologi</button>
     </div></nav>
@@ -492,6 +533,7 @@ document.documentElement.classList.add("anim");
   <div class="tabpane" id="tab-status" hidden></div>
   <div class="tabpane" id="tab-prakiraan" hidden></div>
   <div class="tabpane" id="tab-konteks" hidden></div>
+  <div class="tabpane" id="tab-berita" hidden></div>
   <div class="tabpane" id="tab-data" hidden></div>
   <div class="tabpane" id="tab-metodologi" hidden></div>
 </main>
@@ -579,6 +621,8 @@ const KELAS = { BAHAYA: "bahaya", ANOMALI: "anomali", WASPADA: "waspada", AMAN: 
 const NAMA_ST = { DATA: "TIDAK DAPAT DINILAI" };
 const tagStatus = (st, teks) => `<span class="tag ${KELAS[st] || "netral"}">${IKON[st] || ""} ${teks || NAMA_ST[st] || st}</span>`;
 const domainDari = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
+// Teks dari CSV (judul berita, nama media) bisa memuat tanda < > " &; diamankan sebelum masuk HTML.
+const escHtml = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 /* ===== grafik: registry lazy per tab (chart di tab tersembunyi berukuran 0) ===== */
 const antreanChart = {};
@@ -683,12 +727,17 @@ function analisisTipologi(gab, berita) {
   gab.forEach(r => { if (isTrue(r.anomali_harga)) anomPerTgl[r.tanggal] = (anomPerTgl[r.tanggal] || 0) + 1; });
   const tglMassal = new Set(Object.entries(anomPerTgl).filter(([, n]) => n >= 8).map(([t]) => t));
 
+  // Satu kliping terbaru per komoditas untuk lencana di kartu status. Sejak arsip
+  // menyimpan sampai 3 artikel per pencarian (kolom `peringkat`), yang dipakai
+  // adalah peringkat 1. Nama komoditas dirapikan (PIHPS kadang menyisakan spasi).
   const beritaPerKom = {};
   (berita || []).forEach(b => {
-    if (isTrue(b.tervalidasi) && b.komoditas) {
-      const ada = beritaPerKom[b.komoditas];
-      if (!ada || new Date(b.tanggal) > new Date(ada.tanggal)) beritaPerKom[b.komoditas] = b;
-    }
+    if (!isTrue(b.tervalidasi) || !b.komoditas) return;
+    const p = Number(b.peringkat || 1);
+    if (p > 1) return;
+    const k = String(b.komoditas).trim();
+    const ada = beritaPerKom[k];
+    if (!ada || new Date(b.tanggal) > new Date(ada.tanggal)) beritaPerKom[k] = b;
   });
 
   const hasil = [];
@@ -719,7 +768,7 @@ function analisisTipologi(gab, berita) {
     hasil.push({ kom, seri, h, ubah7, ubah30, z, zMaks7, status, serentak,
                  tglAnom: anom7.length ? anom7[anom7.length - 1].tanggal : null,
                  massal: anom7.length > 0 && tglMassal.has(anom7[anom7.length - 1].tanggal),
-                 berita: beritaPerKom[kom] || null });
+                 berita: beritaPerKom[String(kom).trim()] || null });
   }
   hasil.sort((a, b) => Math.abs(b.ubah7) - Math.abs(a.ubah7));
   return { hasil, tglMassal, tMaks, anomPerTgl };
@@ -1052,10 +1101,12 @@ async function render() {
 
   let beritaInfo = null;
   if (berita && berita.length) {
-    const val = berita.filter(b => isTrue(b.tervalidasi));
-    beritaInfo = { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi",
-      lv: "AMAN", baca: val.length + " kliping", bacaKet: "liputan media untuk lonjakan terbaru",
-      ket: "Pencarian berita otomatis untuk tiap lonjakan, sebagai bukti pendukung yang <strong>belum dikurasi manusia</strong>. Kliping yang cocok memperkuat sinyal, tetapi jumlah kliping saja belum berarti lonjakannya sudah terverifikasi.", tab: "konteks" };
+    const val = berita.filter(b => isTrue(b.tervalidasi) && b.url_teratas);
+    const nArtikel = new Set(val.map(b => String(b.url_teratas).trim())).size;
+    const tglBerita = val.map(b => String(b.tanggal)).sort().pop();
+    beritaInfo = { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi", tgl: tglBerita,
+      lv: "AMAN", baca: nArtikel + " artikel", bacaKet: `dari ${val.length} lonjakan yang dicarikan beritanya`,
+      ket: "Tiap lonjakan yang terdeteksi otomatis dicarikan pemberitaannya, sebagai bukti pendukung yang <strong>belum disaring manusia</strong>. Berita yang cocok memperkuat sinyal, tetapi banyaknya berita saja belum berarti lonjakannya sudah terbukti. Semua artikel bisa ditelusuri per komoditas di tab Berita.", tab: "berita" };
   }
 
   const pilar = kondisiPilar({ tip, sp2kpInfo, dpkpInfo, simoInfo, cadInfo, cuacaInfo, ensoInfo, trendsInfo, beritaInfo });
@@ -1182,7 +1233,8 @@ async function render() {
           if (d.serentak >= 8)
             chips.push(`<span class="mchip" title="Lonjakan ${fmtTglPdk(d.tglAnom)} terjadi bersamaan di ${d.serentak} komoditas sekaligus. Ini ciri khas pembaruan data acuan PIHPS, bukan gejolak pasar">serentak ${d.serentak} kom.</span>`);
           if (d.berita && d.berita.url_teratas)
-            chips.push(`<span class="mchip" title="${String(d.berita.judul_teratas || "").replace(/"/g, "&quot;")}">📰 <a href="${d.berita.url_teratas}" target="_blank" rel="noopener">liputan media</a></span>`);
+            chips.push(`<span class="mchip" title="${String(d.berita.judul_teratas || "").replace(/"/g, "&quot;")}">📰 <a href="${d.berita.url_teratas}" target="_blank" rel="noopener">liputan media</a></span>`
+              + `<span class="mchip tombol" data-berita="${String(d.kom).replace(/"/g, "&quot;")}" title="Buka semua kliping berita untuk kelompok komoditas ini di tab Berita">semua kliping ›</span>`);
           if (d.ubah7 !== null && Math.abs(d.ubah7) < 0.05)
             chips.push(`<span class="mchip" title="Angka harga tidak berubah sama sekali selama sepekan terakhir">harga tetap /7 hr</span>`);
           if (d.ubah30 !== null && Math.abs(d.ubah30) >= 0.05 && Math.abs(d.ubah30 - (d.ubah7 || 0)) >= 0.5)
@@ -1394,7 +1446,7 @@ async function render() {
                 backgroundColor: "rgba(161,28,28,.07)", borderWidth: 1, borderDash: [4, 3], pointRadius: 0, fill: "+3", tension: .1 },
               { label: "Batas atas 80%", data: seri(p1 && p1.hi80, p4.hi80), borderColor: "rgba(176,83,10,.45)",
                 backgroundColor: "rgba(176,83,10,.10)", borderWidth: 1, pointRadius: 0, fill: "+1", tension: .1 },
-              { label: "Penduga titik (harga kini)", data: seri(p1 && p1.titik, p4.titik), borderColor: "#1c4a2e",
+              { label: "Tebakan utama (harga kini)", data: seri(p1 && p1.titik, p4.titik), borderColor: "#1c4a2e",
                 borderWidth: 2, borderDash: [5, 4], pointRadius: 0, fill: false, tension: .1 },
               { label: "Batas bawah 80%", data: seri(p1 && p1.lo80, p4.lo80), borderColor: "rgba(176,83,10,.45)",
                 borderWidth: 1, pointRadius: 0, fill: false, tension: .1 },
@@ -1785,29 +1837,243 @@ async function render() {
     sB.innerHTML = `<h2>Sinyal Media Pendukung</h2>
       <p class="sub">Untuk tiap lonjakan yang tercatat, sistem otomatis mencari pemberitaannya sebagai lapisan pengecekan kedua. Menggabungkan sinyal harga dengan teks berita terbukti lebih tajam daripada mengandalkan angka harga saja (Bakry dkk., 2025).</p>`;
     if (berita && berita.length) {
+      // Di sini cukup enam artikel terbaru sebagai cuplikan. Arsip lengkapnya,
+      // dikelompokkan per komoditas, ada di tab Berita.
       const unik = [];
       const sudah = new Set();
       berita.slice().sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal)).forEach(b => {
-        if (!b.url_teratas || sudah.has(b.url_teratas)) return;
-        sudah.add(b.url_teratas); unik.push(b);
+        const u = String(b.url_teratas || "").trim();
+        if (!u || sudah.has(u)) return;
+        sudah.add(u); unik.push(b);
       });
       const grid = el("div", "kliping");
-      unik.slice(0, 9).forEach(b => {
-        const dom = domainDari(b.url_teratas);
+      unik.slice(0, 6).forEach(b => {
+        const media = String(b.media || "").trim() || domainDari(b.url_teratas) || "media";
         const ringkas = String(b.ringkasan || "").trim();
+        const tgl = b.tanggal_terbit ? fmtTglPdk(b.tanggal_terbit) : "lonjakan " + fmtTglPdk(b.tanggal);
         const art = el("div", "artikel");
         art.innerHTML = `
-          <div class="art-meta"><span class="art-media">${dom || "media"}</span><span>·</span><span>${fmtTglPdk(b.tanggal)}</span></div>
-          <div class="art-judul"><a href="${b.url_teratas}" target="_blank" rel="noopener">${b.judul_teratas || "(tanpa judul)"}</a></div>
-          ${ringkas ? `<div class="art-ringkas">${ringkas.slice(0, 220)}${ringkas.length > 220 ? "…" : ""}</div>` : ""}
-          <div class="art-kom"><span class="mchip">${b.komoditas || ""}</span></div>`;
+          <div class="art-meta"><span class="art-media">${escHtml(media)}</span><span>·</span><span>${tgl}</span></div>
+          <div class="art-judul"><a href="${escHtml(b.url_teratas)}" target="_blank" rel="noopener">${escHtml(b.judul_teratas || "(tanpa judul)")}</a></div>
+          ${ringkas ? `<div class="art-ringkas">${escHtml(ringkas.slice(0, 220))}${ringkas.length > 220 ? "…" : ""}</div>` : ""}
+          <div class="art-kom"><span class="mchip">${escHtml(String(b.komoditas || "").trim())}</span></div>`;
         grid.appendChild(art);
       });
       sB.appendChild(grid);
-      if (!unik.some(b => b.ringkasan)) sB.appendChild(el("p", "sub", "Ringkasan artikel akan muncul otomatis pada pembaruan data berikutnya."));
+      const btn = el("button", "btn-tautan", `Lihat semua ${unik.length} artikel, dikelompokkan per komoditas →`);
+      btn.addEventListener("click", () => bukaTab("berita"));
+      sB.appendChild(btn);
     } else sB.appendChild(el("div", "kosong", "Belum ada hasil verifikasi berita."));
     T3.appendChild(sB);
   } catch (e) { T3.appendChild(seksiGagal("Konteks & pasokan", e)); }
+
+  /* ================= TAB 3b: BERITA (kliping per komoditas) =================
+     Masalah yang diselesaikan tab ini: arsip validasi_berita.csv berisi ratusan
+     baris, tetapi papan pantau lama hanya menampilkan 9 artikel. Satu baris arsip
+     = satu lonjakan (komoditas x tanggal) yang dicarikan beritanya, dan banyak
+     lonjakan merujuk artikel yang sama. Di sini semua artikel UNIK dikumpulkan,
+     dihitung berapa lonjakan yang merujuknya, lalu dikelompokkan per komoditas
+     (semua jenis cabai jadi "Cabai", dst.) supaya mudah ditelusuri. */
+  const TB = document.getElementById("tab-berita");
+  try {
+    const KELOMPOK = [
+      ["Cabai", "🌶️", /cabai|cabe/i], ["Bawang Merah", "🧅", /bawang merah/i], ["Bawang Putih", "🧄", /bawang putih/i],
+      ["Beras", "🌾", /beras/i], ["Telur Ayam", "🥚", /telur/i], ["Daging Ayam", "🍗", /daging ayam|ayam ras|ayam/i],
+      ["Daging Sapi", "🥩", /sapi/i], ["Gula Pasir", "🍬", /gula/i], ["Minyak Goreng", "🫙", /minyak/i],
+      ["Kedelai", "🫘", /kedelai/i], ["Bawang Bombai", "🧅", /bombai|bombay/i],
+    ];
+    const kelompokDari = nm => {
+      const s = String(nm || "").trim();
+      const k = KELOMPOK.find(([, , re]) => re.test(s));
+      return k ? k[0] : (s.replace(/\s*\(.*?\)/g, "").split(/\s+/).slice(0, 2).join(" ") || "Lainnya");
+    };
+    const ikonKel = nm => { const k = KELOMPOK.find(([n]) => n === nm); return k ? k[1] : "📰"; };
+    const fmtTglThn = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }); };
+    const fmtBulan = ym => { const d = new Date(ym + "-01"); return isNaN(d) ? ym : d.toLocaleDateString("id-ID", { month: "short", year: "numeric" }); };
+
+    // ---- kumpulkan artikel unik ----
+    const perUrl = {};
+    (berita || []).forEach(b => {
+      const url = String(b.url_teratas || "").trim();
+      if (!url || !isTrue(b.tervalidasi)) return;
+      const kom = String(b.komoditas || "").trim();
+      const a = (perUrl[url] ||= { url, judul: String(b.judul_teratas || "").trim() || "(tanpa judul)",
+        media: String(b.media || "").trim() || domainDari(url) || "media", ringkas: "", terbit: "",
+        rujukan: [], kelompok: new Set(), koms: new Set() });
+      if (!a.ringkas && b.ringkasan) a.ringkas = String(b.ringkasan).trim();
+      if (!a.terbit && b.tanggal_terbit) a.terbit = String(b.tanggal_terbit).slice(0, 10);
+      a.rujukan.push({ tgl: String(b.tanggal).slice(0, 10), kom });
+      if (kom) { a.kelompok.add(kelompokDari(kom)); a.koms.add(kom); }
+    });
+    // Unggahan media sosial (Instagram dll.) ikut terjaring pencarian otomatis lama.
+    // Ditandai supaya pembaca bisa membedakannya dari media berita, dan bisa disembunyikan.
+    const SOSIAL = /instagram\.com|facebook\.com|tiktok\.com|youtube\.com|youtu\.be|twitter\.com|x\.com|threads\.net/i;
+    const artikel = Object.values(perUrl).map(a => {
+      const tgls = a.rujukan.map(r => r.tgl).sort();
+      return { ...a, n: a.rujukan.length, tglAwal: tgls[0], tglAkhir: tgls[tgls.length - 1], sosial: SOSIAL.test(a.url),
+               urut: a.terbit || tgls[tgls.length - 1], bulan: (a.terbit || tgls[tgls.length - 1]).slice(0, 7) };
+    });
+    document.getElementById("nb-berita").textContent = artikel.length || "";
+
+    const s = el("section", "blok");
+    s.innerHTML = `<h2>Kliping Berita per Komoditas</h2>
+      <p class="sub">Setiap kali sistem mendeteksi lonjakan harga, ia otomatis mencari pemberitaannya. Semua hasil pencarian itu dikumpulkan di sini dan dikelompokkan per komoditas: pilih kelompoknya, lalu saring lagi dengan kata kunci kalau perlu. Ini hasil pencarian otomatis yang belum disaring manusia, jadi perlakukan sebagai petunjuk awal, bukan bukti final.</p>`;
+    if (!artikel.length) {
+      s.appendChild(el("div", "kosong", "Belum ada kliping berita."));
+      TB.appendChild(s);
+    } else {
+      // ---- ringkasan angka ----
+      const nMedia = new Set(artikel.map(a => a.media.toLowerCase())).size;
+      const nLonjakan = artikel.reduce((x, a) => x + a.n, 0);
+      const semuaBulan = artikel.map(a => a.bulan).sort();
+      const stat = el("div", "berita-stat");
+      stat.innerHTML = `<span><b class="tnum">${artikel.length}</b>artikel unik</span>
+        <span><b class="tnum">${nLonjakan}</b>lonjakan yang dicarikan beritanya</span>
+        <span><b class="tnum">${nMedia}</b>media</span>
+        <span><b>${fmtBulan(semuaBulan[0])} – ${fmtBulan(semuaBulan[semuaBulan.length - 1])}</b>rentang arsip</span>`;
+      s.appendChild(stat);
+
+      // ---- keadaan saring ----
+      const F = { kel: "Semua", kom: "", cari: "", bulan: "", urut: "terbaru", tampil: 12, sosial: true };
+      const nSosial = artikel.filter(a => a.sosial).length;
+
+      // ---- alat saring: dibuat SEKALI supaya kotak pencarian tidak kehilangan fokus ----
+      const alat = el("div", "berita-alat");
+      const chips = el("div", "kel-chips");
+      alat.appendChild(chips);
+      const cari = el("input", "berita-cari");
+      cari.type = "search"; cari.placeholder = "Cari judul, media, atau kata kunci…"; cari.setAttribute("aria-label", "Cari kliping");
+      alat.appendChild(cari);
+      const pilihKom = document.createElement("select"); pilihKom.setAttribute("aria-label", "Jenis komoditas");
+      alat.appendChild(pilihKom);
+      const pilihUrut = document.createElement("select"); pilihUrut.setAttribute("aria-label", "Urutan");
+      pilihUrut.innerHTML = `<option value="terbaru">Terbaru dulu</option><option value="terlama">Terlama dulu</option><option value="rujukan">Paling banyak dirujuk</option>`;
+      alat.appendChild(pilihUrut);
+      if (nSosial) {
+        const lbl = document.createElement("label");
+        lbl.style.cssText = "font-size:.78rem;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px;cursor:pointer";
+        lbl.innerHTML = `<input type="checkbox" id="cek-sosial" checked> tampilkan unggahan media sosial (${nSosial})`;
+        alat.appendChild(lbl);
+      }
+      s.appendChild(alat);
+
+      const liniWrap = el("div", "linimasa-wrap");
+      s.appendChild(liniWrap);
+      const ket = el("div", "hasil-ket");
+      s.appendChild(ket);
+      const grid = el("div", "kliping");
+      s.appendChild(grid);
+      const btnMuat = el("button", "btn-muat", "");
+      s.appendChild(btnMuat);
+      TB.appendChild(s);
+
+      const hitungKel = () => {
+        const c = {};
+        artikel.filter(a => F.sosial || !a.sosial).forEach(a => a.kelompok.forEach(k => { c[k] = (c[k] || 0) + 1; }));
+        return c;
+      };
+      const gambarChips = () => {
+        const c = hitungKel();
+        const urutan = [...KELOMPOK.map(k => k[0]), ...Object.keys(c).filter(k => !KELOMPOK.some(x => x[0] === k)).sort()]
+          .filter(k => c[k]);
+        const nSemua = artikel.filter(a => F.sosial || !a.sosial).length;
+        chips.innerHTML = [["Semua", nSemua], ...urutan.map(k => [k, c[k]])].map(([k, n]) =>
+          `<button class="kel${F.kel === k ? " aktif" : ""}" data-kel="${escHtml(k)}">${k === "Semua" ? "📚" : ikonKel(k)} ${escHtml(k)} <span class="jml tnum">${n}</span></button>`).join("");
+      };
+      const gambarPilihKom = () => {
+        const koms = new Set();
+        artikel.forEach(a => { if (F.kel === "Semua" || a.kelompok.has(F.kel)) a.koms.forEach(k => { if (F.kel === "Semua" || kelompokDari(k) === F.kel) koms.add(k); }); });
+        const daftar = [...koms].sort();
+        pilihKom.innerHTML = `<option value="">${F.kel === "Semua" ? "Semua jenis" : "Semua jenis " + escHtml(F.kel.toLowerCase())}</option>` +
+          daftar.map(k => `<option value="${escHtml(k)}"${F.kom === k ? " selected" : ""}>${escHtml(k)}</option>`).join("");
+        pilihKom.style.display = daftar.length > 1 ? "" : "none";
+      };
+      const saring = (abaikanBulan) => {
+        const q = F.cari.trim().toLowerCase();
+        return artikel.filter(a =>
+          (F.kel === "Semua" || a.kelompok.has(F.kel)) &&
+          (!F.kom || a.koms.has(F.kom)) &&
+          (F.sosial || !a.sosial) &&
+          (abaikanBulan || !F.bulan || a.bulan === F.bulan) &&
+          (!q || (a.judul + " " + a.media + " " + a.ringkas + " " + [...a.koms].join(" ")).toLowerCase().includes(q)));
+      };
+      const gambarLinimasa = () => {
+        // Deret bulan dari awal sampai akhir arsip (dalam saringan kelompok/kata kunci, tanpa saringan bulan)
+        const dasar = saring(true);
+        const perBulan = {};
+        dasar.forEach(a => { perBulan[a.bulan] = (perBulan[a.bulan] || 0) + 1; });
+        const bulanAda = Object.keys(perBulan).sort();
+        if (!bulanAda.length) { liniWrap.innerHTML = ""; return; }
+        const [y0, m0] = bulanAda[0].split("-").map(Number);
+        const [y1, m1] = bulanAda[bulanAda.length - 1].split("-").map(Number);
+        const semua = [];
+        for (let y = y0, m = m0; y < y1 || (y === y1 && m <= m1); m === 12 ? (m = 1, y++) : m++) semua.push(`${y}-${String(m).padStart(2, "0")}`);
+        const maks = Math.max(...Object.values(perBulan));
+        liniWrap.innerHTML = `<div class="linimasa">${semua.map(b => {
+          const n = perBulan[b] || 0;
+          return `<i class="${n ? "ada" : ""}${F.bulan === b ? " aktif" : ""}" data-bulan="${b}" style="height:${n ? Math.max(14, n / maks * 100) : 4}%" title="${fmtBulan(b)}: ${n} artikel${n ? " (klik untuk menyaring)" : ""}"></i>`;
+        }).join("")}</div><div class="linimasa-label"><span>${fmtBulan(semua[0])}</span><span>artikel per bulan · klik batang untuk menyaring bulan</span><span>${fmtBulan(semua[semua.length - 1])}</span></div>`;
+      };
+      const gambarDaftar = () => {
+        const hasil = saring(false);
+        hasil.sort((a, b) => F.urut === "terlama" ? a.urut.localeCompare(b.urut) :
+                             F.urut === "rujukan" ? (b.n - a.n) || b.urut.localeCompare(a.urut) :
+                             b.urut.localeCompare(a.urut));
+        const potong = hasil.slice(0, F.tampil);
+        const label = [F.kel !== "Semua" ? F.kel : "", F.kom, F.bulan ? fmtBulan(F.bulan) : "", F.cari.trim() ? `“${F.cari.trim()}”` : ""].filter(Boolean).join(" · ");
+        ket.innerHTML = `<span>Menampilkan <strong>${potong.length}</strong> dari <strong>${hasil.length}</strong> artikel${label ? " · " + escHtml(label) : ""}</span>` +
+          (label ? `<button type="button" data-reset="1">✕ hapus saringan</button>` : "");
+        grid.innerHTML = potong.map(a => {
+          const koms = [...a.koms].sort();
+          const tgl = a.terbit ? fmtTglThn(a.terbit) : `dicari untuk lonjakan ${fmtTglThn(a.tglAkhir)}`;
+          return `<div class="artikel">
+            <div class="art-meta"><span class="art-media">${escHtml(a.media)}</span>${a.sosial ? `<span class="mchip" style="font-size:.62rem;padding:0 6px" title="Ini unggahan media sosial, bukan artikel media berita">media sosial</span>` : ""}<span>·</span><span>${tgl}</span>${
+              a.n > 1 ? `<span>·</span><span class="art-rujuk" title="Artikel ini muncul sebagai hasil teratas untuk ${a.n} lonjakan berbeda (${fmtTglPdk(a.tglAwal)} – ${fmtTglThn(a.tglAkhir)})">dirujuk ${a.n} lonjakan</span>` : ""}</div>
+            <div class="art-judul"><a href="${escHtml(a.url)}" target="_blank" rel="noopener">${escHtml(a.judul)}</a></div>
+            ${a.ringkas ? `<div class="art-ringkas">${escHtml(a.ringkas.slice(0, 240))}${a.ringkas.length > 240 ? "…" : ""}</div>` : ""}
+            <div class="art-kom">${koms.slice(0, 3).map(k => `<span class="mchip tombol" data-kom="${escHtml(k)}" title="Saring jenis ${escHtml(k)}">${escHtml(k)}</span>`).join("")}${
+              koms.length > 3 ? `<span class="mchip" title="${escHtml(koms.slice(3).join(", "))}">+${koms.length - 3} jenis</span>` : ""}</div>
+          </div>`;
+        }).join("") || `<div class="kosong" style="grid-column:1/-1">Tidak ada kliping yang cocok. Coba kelompok lain, atau kosongkan kata kunci.</div>`;
+        btnMuat.style.display = hasil.length > potong.length ? "" : "none";
+        btnMuat.textContent = `Tampilkan ${Math.min(12, hasil.length - potong.length)} artikel lagi (${hasil.length - potong.length} tersisa)`;
+      };
+      const gambarSemua = () => { gambarChips(); gambarPilihKom(); gambarLinimasa(); gambarDaftar(); };
+
+      chips.addEventListener("click", e => {
+        const b = e.target.closest(".kel"); if (!b) return;
+        F.kel = b.dataset.kel; F.kom = ""; F.bulan = ""; F.tampil = 12; gambarSemua();
+      });
+      pilihKom.addEventListener("change", e => { F.kom = e.target.value; F.tampil = 12; gambarDaftar(); gambarLinimasa(); });
+      pilihUrut.addEventListener("change", e => { F.urut = e.target.value; gambarDaftar(); });
+      cari.addEventListener("input", e => { F.cari = e.target.value; F.tampil = 12; gambarLinimasa(); gambarDaftar(); });
+      liniWrap.addEventListener("click", e => {
+        const i = e.target.closest("i[data-bulan]"); if (!i) return;
+        F.bulan = F.bulan === i.dataset.bulan ? "" : i.dataset.bulan; F.tampil = 12; gambarLinimasa(); gambarDaftar();
+      });
+      ket.addEventListener("click", e => {
+        if (!e.target.closest("[data-reset]")) return;
+        F.kel = "Semua"; F.kom = ""; F.cari = ""; F.bulan = ""; F.tampil = 12; cari.value = ""; gambarSemua();
+      });
+      grid.addEventListener("click", e => {
+        const c = e.target.closest(".mchip[data-kom]"); if (!c) return;
+        const kom = c.dataset.kom;
+        F.kel = kelompokDari(kom); F.kom = kom; F.bulan = ""; F.tampil = 12; gambarSemua();
+      });
+      btnMuat.addEventListener("click", () => { F.tampil += 12; gambarDaftar(); });
+      const cekSosial = document.getElementById("cek-sosial");
+      if (cekSosial) cekSosial.addEventListener("change", e => { F.sosial = e.target.checked; F.tampil = 12; gambarChips(); gambarLinimasa(); gambarDaftar(); });
+
+      // Dipanggil dari kartu status ("semua kliping ›"): buka tab ini dengan saringan
+      // kelompok komoditas yang bersangkutan sudah terpasang.
+      window.bukaBerita = (kom) => {
+        F.kel = kelompokDari(kom); F.kom = ""; F.bulan = ""; F.cari = ""; F.tampil = 12; cari.value = "";
+        gambarSemua();
+        bukaTab("berita");
+      };
+      gambarSemua();
+    }
+  } catch (e) { TB.appendChild(seksiGagal("Berita", e)); }
 
   /* ================= TAB 4: DATA & TREN ================= */
   const T4 = document.getElementById("tab-data");
@@ -2025,7 +2291,7 @@ async function render() {
 
   /* ---------- aktifkan tab awal ---------- */
   const awal = (location.hash || "#ringkasan").slice(1);
-  bukaTab(["ringkasan", "status", "prakiraan", "konteks", "data", "metodologi"].includes(awal) ? awal : "ringkasan", true);
+  bukaTab(["ringkasan", "status", "prakiraan", "konteks", "berita", "data", "metodologi"].includes(awal) ? awal : "ringkasan", true);
 }
 
 /* ================= animasi masuk =================
@@ -2111,6 +2377,12 @@ function bukaTab(id, ganti) {
 document.getElementById("navtabs").addEventListener("click", e => {
   const b = e.target.closest(".tabbtn");
   if (b) bukaTab(b.dataset.tab);
+});
+// Lencana "semua kliping ›" di kartu status membuka tab Berita dengan saringan
+// kelompok komoditasnya. Didelegasikan ke <main> karena kartu digambar belakangan.
+document.querySelector("main").addEventListener("click", e => {
+  const c = e.target.closest(".mchip[data-berita]");
+  if (c && window.bukaBerita) window.bukaBerita(c.dataset.berita);
 });
 window.addEventListener("popstate", () => {
   const id = (location.hash || "#ringkasan").slice(1);
