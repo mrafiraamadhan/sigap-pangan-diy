@@ -45,7 +45,7 @@ import re
 import sys
 import time
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urlencode
 
 import requests
@@ -68,7 +68,7 @@ BULAN_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
 
 KOLOM = ["tanggal", "komoditas", "kabupaten_kota", "query", "jumlah_berita_ditemukan",
          "judul_teratas", "url_teratas", "ringkasan", "tervalidasi",
-         "media", "tanggal_terbit", "peringkat"]
+         "media", "tanggal_terbit", "peringkat", "diambil_pada_utc"]
 
 # Batasan kesopanan. RSS tidak punya kuota resmi, tetapi tetap diberi jeda.
 MAKS_VALIDASI = 20        # maksimal query pencarian per run
@@ -239,6 +239,7 @@ def cari_berita(query, limit=HASIL_PER_QUERY, bulan=None, komoditas=""):
 
 def validasi_anomali(tanggal, komoditas, kabupaten):
     """Bangun query dari konteks anomali; kembalikan daftar baris (satu per artikel)."""
+    diambil = datetime.now(timezone.utc).isoformat()
     bulan = str(tanggal)[:7]
     try:
         nama_bulan = BULAN_ID[int(bulan[5:7]) - 1] + " " + bulan[:4]
@@ -252,7 +253,7 @@ def validasi_anomali(tanggal, komoditas, kabupaten):
         # tidak mengulang pencarian yang sama; papan pantau mengabaikan baris tanpa URL.
         return [{"tanggal": tanggal, "komoditas": komoditas.strip(), "kabupaten_kota": kabupaten, "query": query,
                  "jumlah_berita_ditemukan": 0, "judul_teratas": "", "url_teratas": "", "ringkasan": "",
-                 "tervalidasi": False, "media": "", "tanggal_terbit": "", "peringkat": 0}]
+                 "tervalidasi": False, "media": "", "tanggal_terbit": "", "peringkat": 0, "diambil_pada_utc": diambil}]
     for i, h in enumerate(hasil, 1):
         baris.append({
             "tanggal": tanggal,
@@ -267,6 +268,7 @@ def validasi_anomali(tanggal, komoditas, kabupaten):
             "media": h.get("media", ""),
             "tanggal_terbit": h.get("tanggal_terbit", ""),
             "peringkat": i,
+            "diambil_pada_utc": diambil,
         })
     return baris
 

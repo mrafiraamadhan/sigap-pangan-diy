@@ -33,13 +33,16 @@ def main():
     d["harga"] = pd.to_numeric(d["harga"], errors="coerce")
     d = d.dropna(subset=["harga"]).query("harga > 0")
 
-    r = (d.groupby(["tanggal", "varian"])
-           .agg(harga=("harga", "mean"),
-                sebaran_pasar=("harga", "std"),
-                n_pasar=("harga", "size"),
-                satuan=("satuan", "first"),
-                komoditas=("komoditas", "first"))
-           .reset_index())
+    agg = dict(harga=("harga", "mean"),
+               sebaran_pasar=("harga", "std"),
+               n_pasar=("harga", "size"),
+               satuan=("satuan", "first"),
+               komoditas=("komoditas", "first"))
+    # Jam pengambilan ikut dibawa (nilai terbaru per hari) supaya tabel
+    # "Riwayat Pembaruan Data" di papan pantau bisa menampilkannya.
+    if "diambil_pada_utc" in d.columns:
+        agg["diambil_pada_utc"] = ("diambil_pada_utc", "max")
+    r = d.groupby(["tanggal", "varian"]).agg(**agg).reset_index()
     r["harga"] = r["harga"].round(0)
     r["sebaran_pasar"] = r["sebaran_pasar"].round(1)
 

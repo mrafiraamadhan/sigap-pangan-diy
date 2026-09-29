@@ -149,6 +149,10 @@ def main():
         return
 
     result = pd.concat(all_frames, ignore_index=True).drop_duplicates()
+    # Jam pengambilan, untuk tabel "Riwayat Pembaruan Data" di papan pantau.
+    # Baris lama yang belum punya kolom ini tetap dibiarkan kosong.
+    from datetime import datetime, timezone
+    result["diambil_pada_utc"] = datetime.now(timezone.utc).isoformat()
 
     # --- PEMBERSIHAN DATA (penting -- database sumbernya punya masalah kualitas
     # data nyata: sebagian tanggal '0000-00-00' / kosong, sebagian harga = 0) ---
@@ -184,6 +188,8 @@ def main():
     if os.path.isfile(OUTPUT_PATH):
         lama = pd.read_csv(OUTPUT_PATH)
         lama.columns = [str(c).strip() for c in lama.columns]
+        if "diambil_pada_utc" not in lama.columns:
+            lama["diambil_pada_utc"] = None
         gabungan = pd.concat([lama, result], ignore_index=True)
         komoditas_col = next((c for c in gabungan.columns if "omoditas" in str(c).lower()), None)
         kunci = ([tanggal_col, komoditas_col] if (tanggal_col and komoditas_col
