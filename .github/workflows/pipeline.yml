@@ -37,11 +37,13 @@ on:
 
 jobs:
   run-pipeline:
-    runs-on: ubuntu-latest
+    # Dipatok ke 24.04: label ubuntu-latest berpindah ke Ubuntu 26 mulai 19 Okt 2026
+    # (hari presentasi); patokan ini mencegah perubahan lingkungan tak terduga.
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
