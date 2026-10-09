@@ -127,6 +127,23 @@ def main():
                              for r in per_kab_terakhir.itertuples()],
     }
 
+    # ---------- 1b. kemarau tahun berjalan: Juni s.d. bulan data terakhir, diperingkat sejak 1991 ----------
+    th_kini, bl_kini = int(terakhir["tahun"]), int(terakhir["bulan"])
+    kemarau_berjalan = None
+    if 6 <= bl_kini <= 11:
+        bulan_kb = list(range(6, bl_kini + 1))
+        tot = hujan[hujan["bulan"].isin(bulan_kb)].groupby("tahun")["hujan_mm"].agg(["sum", "count"])
+        tot = tot[(tot["count"] == len(bulan_kb)) & (tot.index >= NORMAL_AWAL)]
+        if th_kini in tot.index:
+            urut = tot["sum"].sort_values()
+            peringkat = int(list(urut.index).index(th_kini)) + 1
+            norm_kb = float(sum(normal.get(b, 0) for b in bulan_kb))
+            kemarau_berjalan = {"bulan": f"{NAMA_BULAN[5]}-{NAMA_BULAN[bl_kini - 1]} {th_kini}", "mm": round(float(tot.loc[th_kini, 'sum']), 0),
+                                "normal": round(norm_kb, 0), "anomali_pct": int(round((tot.loc[th_kini, "sum"] - norm_kb) / norm_kb * 100)),
+                                "peringkat_terkering": peringkat, "n_tahun": int(len(urut)),
+                                "terkering": [{"tahun": int(t), "mm": round(float(v), 0)} for t, v in urut.head(5).items()]}
+    hasil["hujan"]["kemarau_berjalan"] = kemarau_berjalan
+
     # ---------- 2. ONI vs hujan per bulan kalender ----------
     th_akhir_penuh = int(hujan["tahun"].max()) - 1
     basis = hujan[(hujan["tahun"] >= NORMAL_AWAL) & (hujan["tahun"] <= th_akhir_penuh)]
@@ -200,6 +217,11 @@ def main():
         arah = "lebih sedikit" if t["anomali_pct"] < 0 else "lebih banyak"
         teks.append(f"Hujan {NAMA_BULAN[int(t['ym'][5:7]) - 1]} {t['ym'][:4]} di DIY rata-rata {t['mm']:.0f} mm, "
                     f"{abs(t['anomali_pct'])}% {arah} dari normalnya ({t['normal']:.0f} mm).")
+    kb = hasil["hujan"].get("kemarau_berjalan")
+    if kb:
+        teks.append(f"Kemarau tahun ini ({kb['bulan']}) baru {kb['mm']:.0f} mm, {abs(kb['anomali_pct'])}% "
+                    f"{'di bawah' if kb['anomali_pct'] < 0 else 'di atas'} normal ({kb['normal']:.0f} mm), "
+                    f"peringkat ke-{kb['peringkat_terkering']} terkering dari {kb['n_tahun']} tahun sejak {NORMAL_AWAL}.")
     if r_k is not None:
         kuat = "kuat" if abs(r_k) >= 0.5 else "sedang" if abs(r_k) >= 0.3 else "lemah"
         teks.append(f"Dalam {n_k} tahun ({NORMAL_AWAL}-{th_akhir_penuh}), makin tinggi ONI Agustus-Oktober, makin sedikit hujan Juni-November di DIY "
@@ -216,8 +238,16 @@ def main():
                         f"{abs(on_e - on_l):.1f} bulan.")
     if hasil.get("hujan_vs_panen") and hasil["hujan_vs_panen"]["terbaik"]:
         b = hasil["hujan_vs_panen"]["terbaik"]
-        teks.append(f"Pada data SIMOTANDI ({hasil['simotandi']['n_bulan']} bulan), luas panen paling sejalan dengan hujan {b['jeda_bulan']} bulan sebelumnya "
-                    f"(r = {b['r']:+.2f}): irama hujan -> tanam -> panen. Deretnya masih pendek, jadi ini gambaran musiman, bukan bukti sebab-akibat.")
+        teks.append(f"Pada data SIMOTANDI ({hasil['simotandi']['n_bulan']} bulan), luas panen bergerak searah dengan hujan "
+                    f"{'bulan yang sama' if b['jeda_bulan'] == 0 else str(b['jeda_bulan']) + ' bulan sebelumnya'} (r = {b['r']:+.2f}): "
+                    f"panen raya DIY jatuh di tengah musim hujan (Februari-Maret), sehingga keduanya naik-turun bersama. "
+                    f"Jeda tanam-ke-panen 3-4 bulan tidak tampak sebagai korelasi karena sawah irigasi DIY tetap ditanami di musim kemarau. "
+                    f"Deretnya masih pendek, jadi ini gambaran irama musiman, bukan bukti sebab-akibat.")
+    if hasil.get("oni_vs_panen") and hasil["oni_vs_panen"]["terbaik"]:
+        b = hasil["oni_vs_panen"]["terbaik"]
+        if abs(b["r"]) < 0.3:
+            teks.append(f"Pengaruh langsung El Niño ke luas panen belum terdeteksi pada {b['n']} bulan data (r terbesar {b['r']:+.2f}); "
+                        f"deret SIMOTANDI baru memuat satu siklus El Niño, jadi jalur yang terbaca adalah El Niño -> hujan, dan hujan -> panen.")
     hasil["ringkasan_teks"] = " ".join(teks)
 
     with open(P_OUT, "w", encoding="utf-8") as f:

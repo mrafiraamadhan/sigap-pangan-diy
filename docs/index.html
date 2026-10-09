@@ -2056,6 +2056,8 @@ async function render() {
         <div class="angka-hero tnum">${fmtN(t.mm, 0)} mm</div>
         <div class="angka-ket">${fmtYmPjg(t.ym)} · normal ${fmtN(t.normal, 0)} mm${anom === null || anom === undefined ? "" : ` · <strong>${anom > 0 ? "+" : ""}${anom}%</strong> dari normal`}</div>
         <div class="wadah-chart" style="height:190px;margin-top:10px"><canvas id="ch-hujan"></canvas></div>`;
+      const KB = H.hujan.kemarau_berjalan;
+      if (KB) p1.appendChild(el("div", "baris", `<span>Kemarau berjalan (${escHtml(KB.bulan)})</span><span class="v tnum">${fmtN(KB.mm, 0)} mm · ${KB.anomali_pct > 0 ? "+" : ""}${KB.anomali_pct}% dari normal · <span title="Peringkat total hujan periode yang sama sejak 1991; 1 = paling kering. Lima terkering: ${escHtml((KB.terkering || []).map(x => x.tahun + " (" + fmtN(x.mm, 0) + " mm)").join(", "))}">ke-${KB.peringkat_terkering} terkering dari ${KB.n_tahun} th</span></span>`));
       if (H.hujan.per_kab_terakhir && H.hujan.per_kab_terakhir.length) {
         p1.appendChild(el("div", "sumber", `Per kabupaten/kota, ${fmtYmPjg(t.ym)} (normal dalam kurung)`));
         H.hujan.per_kab_terakhir.forEach(k => p1.appendChild(el("div", "baris", `<span>${escHtml(k.kab)}</span><span class="v tnum">${fmtN(k.mm, 0)} mm <span class="catatan-kecil">(${isFinite(k.normal) ? fmtN(k.normal, 0) : "–"})</span></span>`)));
@@ -2105,7 +2107,7 @@ async function render() {
       } else {
         p3.innerHTML = `<h3>Irama Hujan → Tanam → Panen (SIMOTANDI)</h3><div class="kosong">Data SIMOTANDI bulanan belum tersedia.</div>`;
       }
-      p3.appendChild(el("div", "insight", `<strong>Cara membaca.</strong> ${escHtml(H.ringkasan_teks || "")} Hubungan ONI–hujan dihitung dari ${km.n || "–"} tahun sehingga cukup kokoh; hubungan hujan–panen baru dari ${SM ? SM.n_bulan : "–"} bulan SIMOTANDI, jadi dibaca sebagai irama musiman, bukan bukti sebab-akibat. Implikasinya untuk harga: El Niño kuat → kemarau lebih kering dan hujan terlambat → tanam mundur → panen Februari–Maret berisiko mundur, sehingga pemantauan beras perlu dimajukan sebelum harga bergerak.`));
+      p3.appendChild(el("div", "insight", `<strong>Cara membaca.</strong> ${escHtml(H.ringkasan_teks || "")} <strong>Implikasinya untuk harga:</strong> El Niño kuat → kemarau lebih kering dan hujan terlambat → tanam musim hujan mundur → panen raya Februari–Maret berisiko mundur, sehingga pemantauan beras perlu dimajukan sebelum harga bergerak.`));
       sH.appendChild(p3);
 
       daftarChart("konteks", () => {

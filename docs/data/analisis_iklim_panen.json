@@ -1,5 +1,5 @@
 {
- "dibuat_utc": "2026-10-09T02:16:25.866864+00:00",
+ "dibuat_utc": "2026-10-09T02:21:14.782816+00:00",
  "sumber": {
   "hujan": "Open-Meteo Historical Weather API (reanalisis ERA5/ERA5-Land ECMWF), rata-rata 5 titik kab/kota DIY",
   "oni": "NOAA CPC Oceanic Nino Index",
@@ -403,7 +403,37 @@
     "mm": 18.8,
     "normal": 71.9
    }
-  ]
+  ],
+  "kemarau_berjalan": {
+   "bulan": "Jun-Sep 2026",
+   "mm": 92.0,
+   "normal": 249.0,
+   "anomali_pct": -63,
+   "peringkat_terkering": 11,
+   "n_tahun": 36,
+   "terkering": [
+    {
+     "tahun": 1994,
+     "mm": 16.0
+    },
+    {
+     "tahun": 2019,
+     "mm": 40.0
+    },
+    {
+     "tahun": 1991,
+     "mm": 42.0
+    },
+    {
+     "tahun": 2006,
+     "mm": 52.0
+    },
+    {
+     "tahun": 2002,
+     "mm": 58.0
+    }
+   ]
+  }
  },
  "oni_vs_hujan": {
   "periode": "1991-2025",
@@ -412,63 +442,63 @@
     "bulan": 1,
     "nama": "Jan",
     "r": -0.028,
-    "p": 0.8733,
+    "p": 0.8723,
     "n": 35
    },
    {
     "bulan": 2,
     "nama": "Feb",
     "r": 0.254,
-    "p": 0.1426,
+    "p": 0.1417,
     "n": 35
    },
    {
     "bulan": 3,
     "nama": "Mar",
     "r": 0.254,
-    "p": 0.1424,
+    "p": 0.1415,
     "n": 35
    },
    {
     "bulan": 4,
     "nama": "Apr",
     "r": 0.255,
-    "p": 0.1407,
+    "p": 0.1398,
     "n": 35
    },
    {
     "bulan": 5,
     "nama": "Mei",
     "r": -0.223,
-    "p": 0.2004,
+    "p": 0.1988,
     "n": 35
    },
    {
     "bulan": 6,
     "nama": "Jun",
     "r": -0.289,
-    "p": 0.0926,
+    "p": 0.0924,
     "n": 35
    },
    {
     "bulan": 7,
     "nama": "Jul",
     "r": -0.397,
-    "p": 0.0175,
+    "p": 0.0183,
     "n": 35
    },
    {
     "bulan": 8,
     "nama": "Agu",
     "r": -0.281,
-    "p": 0.1019,
+    "p": 0.1016,
     "n": 35
    },
    {
     "bulan": 9,
     "nama": "Sep",
     "r": -0.525,
-    "p": 0.001,
+    "p": 0.0012,
     "n": 35
    },
    {
@@ -482,14 +512,14 @@
     "bulan": 11,
     "nama": "Nov",
     "r": -0.576,
-    "p": 0.0002,
+    "p": 0.0003,
     "n": 35
    },
    {
     "bulan": 12,
     "nama": "Des",
     "r": -0.058,
-    "p": 0.7435,
+    "p": 0.7417,
     "n": 35
    }
   ],
@@ -785,7 +815,7 @@
    {
     "jeda_bulan": 0,
     "r": 0.486,
-    "p": 0.005,
+    "p": 0.0056,
     "n": 31
    },
    {
@@ -797,31 +827,31 @@
    {
     "jeda_bulan": 2,
     "r": 0.472,
-    "p": 0.0067,
+    "p": 0.0073,
     "n": 31
    },
    {
     "jeda_bulan": 3,
     "r": 0.22,
-    "p": 0.236,
+    "p": 0.2337,
     "n": 31
    },
    {
     "jeda_bulan": 4,
     "r": -0.253,
-    "p": 0.1719,
+    "p": 0.1704,
     "n": 31
    },
    {
     "jeda_bulan": 5,
     "r": -0.338,
-    "p": 0.0628,
+    "p": 0.0631,
     "n": 31
    },
    {
     "jeda_bulan": 6,
     "r": -0.409,
-    "p": 0.0216,
+    "p": 0.0224,
     "n": 31
    }
   ],
@@ -837,38 +867,38 @@
    {
     "jeda_bulan": 0,
     "r": -0.21,
-    "p": 0.259,
+    "p": 0.2565,
     "n": 31
    },
    {
     "jeda_bulan": 1,
     "r": -0.196,
-    "p": 0.2933,
+    "p": 0.2906,
     "n": 31
    },
    {
     "jeda_bulan": 2,
     "r": -0.255,
-    "p": 0.1683,
+    "p": 0.1669,
     "n": 31
    },
    {
     "jeda_bulan": 3,
     "r": -0.304,
-    "p": 0.0963,
+    "p": 0.096,
     "n": 31
    },
    {
     "jeda_bulan": 4,
     "r": -0.211,
-    "p": 0.2564,
+    "p": 0.254,
     "n": 31
    }
   ],
   "terbaik": {
    "jeda_bulan": 3,
    "r": -0.304,
-   "p": 0.0963,
+   "p": 0.096,
    "n": 31
   }
  },
@@ -877,50 +907,50 @@
    {
     "jeda_bulan": 0,
     "r": 0.133,
-    "p": 0.4773,
+    "p": 0.4741,
     "n": 31
    },
    {
     "jeda_bulan": 1,
     "r": 0.117,
-    "p": 0.5336,
+    "p": 0.5304,
     "n": 31
    },
    {
     "jeda_bulan": 2,
     "r": 0.126,
-    "p": 0.5036,
+    "p": 0.5003,
     "n": 31
    },
    {
     "jeda_bulan": 3,
     "r": 0.108,
-    "p": 0.5663,
+    "p": 0.5632,
     "n": 31
    },
    {
     "jeda_bulan": 4,
     "r": 0.057,
-    "p": 0.7626,
+    "p": 0.7606,
     "n": 31
    },
    {
     "jeda_bulan": 5,
     "r": -0.007,
-    "p": 0.9712,
+    "p": 0.971,
     "n": 31
    },
    {
     "jeda_bulan": 6,
     "r": -0.061,
-    "p": 0.7446,
+    "p": 0.7425,
     "n": 31
    }
   ],
   "terbaik": {
    "jeda_bulan": 0,
    "r": 0.133,
-   "p": 0.4773,
+   "p": 0.4741,
    "n": 31
   }
  },
@@ -1086,5 +1116,5 @@
    }
   ]
  },
- "ringkasan_teks": "Hujan Sep 2026 di DIY rata-rata 15 mm, 75% lebih sedikit dari normalnya (60 mm). Dalam 35 tahun (1991-2025), makin tinggi ONI Agustus-Oktober, makin sedikit hujan Juni-November di DIY (r = -0.70, hubungan kuat, signifikan). Pada tahun El Niño, hujan Juni-November rata-rata 401 mm dibanding 1110 mm pada tahun La Niña dan 833 mm pada tahun netral. Musim hujan (bulan pertama >= 150 mm) rata-rata datang pada bulan ke-11.2 saat El Niño dan ke-9.9 saat La Niña (9 = September, 10 = Oktober, 11 = November); El Niño menunda hujan sekitar 1.3 bulan. Pada data SIMOTANDI (31 bulan), luas panen paling sejalan dengan hujan 1 bulan sebelumnya (r = +0.64): irama hujan -> tanam -> panen. Deretnya masih pendek, jadi ini gambaran musiman, bukan bukti sebab-akibat."
+ "ringkasan_teks": "Hujan Sep 2026 di DIY rata-rata 15 mm, 75% lebih sedikit dari normalnya (60 mm). Kemarau tahun ini (Jun-Sep 2026) baru 92 mm, 63% di bawah normal (249 mm), peringkat ke-11 terkering dari 36 tahun sejak 1991. Dalam 35 tahun (1991-2025), makin tinggi ONI Agustus-Oktober, makin sedikit hujan Juni-November di DIY (r = -0.70, hubungan kuat, signifikan). Pada tahun El Niño, hujan Juni-November rata-rata 401 mm dibanding 1110 mm pada tahun La Niña dan 833 mm pada tahun netral. Musim hujan (bulan pertama >= 150 mm) rata-rata datang pada bulan ke-11.2 saat El Niño dan ke-9.9 saat La Niña (9 = September, 10 = Oktober, 11 = November); El Niño menunda hujan sekitar 1.3 bulan. Pada data SIMOTANDI (31 bulan), luas panen bergerak searah dengan hujan 1 bulan sebelumnya (r = +0.64): panen raya DIY jatuh di tengah musim hujan (Februari-Maret), sehingga keduanya naik-turun bersama. Jeda tanam-ke-panen 3-4 bulan tidak tampak sebagai korelasi karena sawah irigasi DIY tetap ditanami di musim kemarau. Deretnya masih pendek, jadi ini gambaran irama musiman, bukan bukti sebab-akibat. Pengaruh langsung El Niño ke luas panen belum terdeteksi pada 31 bulan data (r terbesar +0.13); deret SIMOTANDI baru memuat satu siklus El Niño, jadi jalur yang terbaca adalah El Niño -> hujan, dan hujan -> panen."
 }
