@@ -2,14 +2,16 @@ name: Pipeline Deteksi Anomali Pangan DIY
 
 on:
   schedule:
-    # BMKG: tiap 6 jam (cuaca berubah beberapa kali sehari)
-    - cron: "0 */6 * * *"
-    # PIHPS: tiap hari jam 06:30 WIB (23:30 UTC hari sebelumnya)
-    - cron: "30 23 * * *"
-    # SIMOTANDI: tiap Senin, cukup untuk menangkap update dasarian baru
-    - cron: "0 1 * * 1"
-    # Google Trends (proksi kepanikan publik): tiap hari, jeda dari job lain
-    - cron: "0 2 * * *"
+    # Tiga run tetap per hari, dipilih agar hasilnya siap pada jam kerja kantor
+    # (WIB = UTC+7). Semua sumber otomatis diambil di SETIAP run, supaya kolom
+    # "dicek" di papan pantau kompak untuk semua pilar.
+    #   06.05 WIB -> siap sebelum jam masuk kantor
+    - cron: "5 23 * * *"
+    #   10.05 WIB -> menangkap harga PIHPS hari berjalan (terbit ~08.00-09.00 WIB)
+    - cron: "5 3 * * *"
+    #   13.05 WIB -> selesai sebelum jam istirahat berakhir, siap untuk rapat sore
+    - cron: "5 6 * * *"
+    # Catatan: GitHub menjalankan jadwal "sebisanya"; mulai bisa mundur 5-30 menit.
   workflow_dispatch:      # bisa dipicu manual dari tab Actions -- isi 2 kotak di
                           # bawah kalau mau ISI HISTORI sekali (biarkan default
                           # kalau cuma mau jalan seperti biasa)
@@ -52,6 +54,10 @@ jobs:
         run: python src/sources/bmkg_cuaca.py
         continue-on-error: true
 
+      - name: Ambil riwayat curah hujan bulanan DIY (Open-Meteo ERA5, 1991-kini)
+        run: python src/sources/curah_hujan_openmeteo.py
+        continue-on-error: true
+
       - name: Ambil data PIHPS
         run: python src/sources/pihps_scraper.py --hari-mundur "${{ github.event.inputs.hari_backfill_pihps || 0 }}"
         continue-on-error: true
@@ -69,7 +75,7 @@ jobs:
         continue-on-error: true
 
       - name: Ambil data cadangan pangan DIY
-        run: python src/sources/cadangan_pangan_scraper.py --semua-tahun
+        run: python src/sources/cadangan_pangan_scraper.py
         continue-on-error: true
 
       - name: Ambil sinyal Google Trends (proksi kepanikan publik)
@@ -78,6 +84,10 @@ jobs:
 
       - name: Ambil indeks ENSO/El Nino (NOAA ONI)
         run: python src/sources/enso_noaa.py
+        continue-on-error: true
+
+      - name: Analisis hujan - El Nino - panen padi
+        run: python src/pipeline/analisis_iklim_panen.py
         continue-on-error: true
 
       - name: Ringkas SP2KP untuk papan pantau
@@ -92,10 +102,16 @@ jobs:
         run: python src/pipeline/forecast_harga.py
         continue-on-error: true
 
-      - name: Validasi anomali via berita (Firecrawl)
+      - name: Validasi anomali via berita (Google News RSS -> Bing RSS -> Firecrawl)
         run: python src/pipeline/news_validation.py
         env:
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+        continue-on-error: true
+
+      - name: Catat status pipeline
+        # Menulis data/status_pipeline.csv: kapan tiap sumber dicek pada run ini
+        # dan apakah berkasnya berubah. Dibaca papan pantau untuk kolom "dicek".
+        run: python src/pipeline/catat_status.py
         continue-on-error: true
 
       - name: Commit hasil
@@ -116,6 +132,7 @@ jobs:
             esac
           done
           cp -f data/*.geojson docs/data/ 2>/dev/null || true   # batas wilayah utk peta koroplet
+          cp -f data/*.json docs/data/ 2>/dev/null || true      # hasil analisis (hujan-ENSO-panen)
           git add data/ docs/data/
           git diff --cached --quiet || git commit -m "chore: update data pipeline $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           # PENTING (pelajaran run 30 Agt yang gagal setelah 1 jam): kalau ada
