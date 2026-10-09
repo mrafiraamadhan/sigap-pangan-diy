@@ -1,0 +1,1090 @@
+{
+ "dibuat_utc": "2026-10-09T02:16:25.866864+00:00",
+ "sumber": {
+  "hujan": "Open-Meteo Historical Weather API (reanalisis ERA5/ERA5-Land ECMWF), rata-rata 5 titik kab/kota DIY",
+  "oni": "NOAA CPC Oceanic Nino Index",
+  "panen": "SIMOTANDI Kementan, agregat provinsi DIY"
+ },
+ "hujan": {
+  "periode_normal": "1991-2020",
+  "normal_bulanan": [
+   {
+    "bulan": 1,
+    "nama": "Jan",
+    "mm": 333.6,
+    "sd": 76.0
+   },
+   {
+    "bulan": 2,
+    "nama": "Feb",
+    "mm": 300.4,
+    "sd": 68.3
+   },
+   {
+    "bulan": 3,
+    "nama": "Mar",
+    "mm": 322.8,
+    "sd": 108.4
+   },
+   {
+    "bulan": 4,
+    "nama": "Apr",
+    "mm": 263.7,
+    "sd": 77.5
+   },
+   {
+    "bulan": 5,
+    "nama": "Mei",
+    "mm": 138.9,
+    "sd": 87.7
+   },
+   {
+    "bulan": 6,
+    "nama": "Jun",
+    "mm": 100.3,
+    "sd": 94.0
+   },
+   {
+    "bulan": 7,
+    "nama": "Jul",
+    "mm": 52.7,
+    "sd": 63.3
+   },
+   {
+    "bulan": 8,
+    "nama": "Agu",
+    "mm": 36.0,
+    "sd": 65.0
+   },
+   {
+    "bulan": 9,
+    "nama": "Sep",
+    "mm": 59.6,
+    "sd": 90.8
+   },
+   {
+    "bulan": 10,
+    "nama": "Okt",
+    "mm": 168.1,
+    "sd": 140.4
+   },
+   {
+    "bulan": 11,
+    "nama": "Nov",
+    "mm": 331.0,
+    "sd": 125.7
+   },
+   {
+    "bulan": 12,
+    "nama": "Des",
+    "mm": 358.2,
+    "sd": 98.7
+   }
+  ],
+  "seri": [
+   {
+    "ym": "2023-10",
+    "mm": 46.9,
+    "normal": 168.1,
+    "anomali_pct": -72,
+    "oni": 1.74,
+    "status": "El Nino kuat"
+   },
+   {
+    "ym": "2023-11",
+    "mm": 164.7,
+    "normal": 331.0,
+    "anomali_pct": -50,
+    "oni": 1.9,
+    "status": "El Nino kuat"
+   },
+   {
+    "ym": "2023-12",
+    "mm": 160.0,
+    "normal": 358.2,
+    "anomali_pct": -55,
+    "oni": 1.99,
+    "status": "El Nino kuat"
+   },
+   {
+    "ym": "2024-01",
+    "mm": 412.0,
+    "normal": 333.6,
+    "anomali_pct": 24,
+    "oni": 1.84,
+    "status": "El Nino kuat"
+   },
+   {
+    "ym": "2024-02",
+    "mm": 288.4,
+    "normal": 300.4,
+    "anomali_pct": -4,
+    "oni": 1.53,
+    "status": "El Nino kuat"
+   },
+   {
+    "ym": "2024-03",
+    "mm": 297.4,
+    "normal": 322.8,
+    "anomali_pct": -8,
+    "oni": 1.18,
+    "status": "El Nino moderat"
+   },
+   {
+    "ym": "2024-04",
+    "mm": 320.6,
+    "normal": 263.7,
+    "anomali_pct": 22,
+    "oni": 0.77,
+    "status": "El Nino lemah"
+   },
+   {
+    "ym": "2024-05",
+    "mm": 110.6,
+    "normal": 138.9,
+    "anomali_pct": -20,
+    "oni": 0.43,
+    "status": "Netral"
+   },
+   {
+    "ym": "2024-06",
+    "mm": 73.4,
+    "normal": 100.3,
+    "anomali_pct": -27,
+    "oni": 0.18,
+    "status": "Netral"
+   },
+   {
+    "ym": "2024-07",
+    "mm": 39.7,
+    "normal": 52.7,
+    "anomali_pct": -25,
+    "oni": 0.06,
+    "status": "Netral"
+   },
+   {
+    "ym": "2024-08",
+    "mm": 25.4,
+    "normal": 36.0,
+    "anomali_pct": -29,
+    "oni": -0.04,
+    "status": "Netral"
+   },
+   {
+    "ym": "2024-09",
+    "mm": 102.0,
+    "normal": 59.6,
+    "anomali_pct": 71,
+    "oni": -0.12,
+    "status": "Netral"
+   },
+   {
+    "ym": "2024-10",
+    "mm": 100.3,
+    "normal": 168.1,
+    "anomali_pct": -40,
+    "oni": -0.19,
+    "status": "Netral"
+   },
+   {
+    "ym": "2024-11",
+    "mm": 430.3,
+    "normal": 331.0,
+    "anomali_pct": 30,
+    "oni": -0.29,
+    "status": "Netral"
+   },
+   {
+    "ym": "2024-12",
+    "mm": 424.9,
+    "normal": 358.2,
+    "anomali_pct": 19,
+    "oni": -0.43,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-01",
+    "mm": 330.0,
+    "normal": 333.6,
+    "anomali_pct": -1,
+    "oni": -0.46,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-02",
+    "mm": 304.0,
+    "normal": 300.4,
+    "anomali_pct": 1,
+    "oni": -0.22,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-03",
+    "mm": 302.1,
+    "normal": 322.8,
+    "anomali_pct": -6,
+    "oni": -0.08,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-04",
+    "mm": 218.4,
+    "normal": 263.7,
+    "anomali_pct": -17,
+    "oni": 0.02,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-05",
+    "mm": 445.9,
+    "normal": 138.9,
+    "anomali_pct": 221,
+    "oni": -0.04,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-06",
+    "mm": 166.7,
+    "normal": 100.3,
+    "anomali_pct": 66,
+    "oni": -0.02,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-07",
+    "mm": 75.6,
+    "normal": 52.7,
+    "anomali_pct": 43,
+    "oni": -0.11,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-08",
+    "mm": 142.3,
+    "normal": 36.0,
+    "anomali_pct": 295,
+    "oni": -0.26,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-09",
+    "mm": 175.0,
+    "normal": 59.6,
+    "anomali_pct": 194,
+    "oni": -0.43,
+    "status": "Netral"
+   },
+   {
+    "ym": "2025-10",
+    "mm": 365.4,
+    "normal": 168.1,
+    "anomali_pct": 117,
+    "oni": -0.57,
+    "status": "La Nina lemah"
+   },
+   {
+    "ym": "2025-11",
+    "mm": 437.0,
+    "normal": 331.0,
+    "anomali_pct": 32,
+    "oni": -0.61,
+    "status": "La Nina lemah"
+   },
+   {
+    "ym": "2025-12",
+    "mm": 198.7,
+    "normal": 358.2,
+    "anomali_pct": -45,
+    "oni": -0.6,
+    "status": "La Nina lemah"
+   },
+   {
+    "ym": "2026-01",
+    "mm": 379.9,
+    "normal": 333.6,
+    "anomali_pct": 14,
+    "oni": -0.39,
+    "status": "Netral"
+   },
+   {
+    "ym": "2026-02",
+    "mm": 349.1,
+    "normal": 300.4,
+    "anomali_pct": 16,
+    "oni": -0.21,
+    "status": "Netral"
+   },
+   {
+    "ym": "2026-03",
+    "mm": 256.9,
+    "normal": 322.8,
+    "anomali_pct": -20,
+    "oni": 0.11,
+    "status": "Netral"
+   },
+   {
+    "ym": "2026-04",
+    "mm": 317.3,
+    "normal": 263.7,
+    "anomali_pct": 20,
+    "oni": 0.46,
+    "status": "Netral"
+   },
+   {
+    "ym": "2026-05",
+    "mm": 126.5,
+    "normal": 138.9,
+    "anomali_pct": -9,
+    "oni": 0.95,
+    "status": "El Nino lemah"
+   },
+   {
+    "ym": "2026-06",
+    "mm": 52.9,
+    "normal": 100.3,
+    "anomali_pct": -47,
+    "oni": 1.39,
+    "status": "El Nino moderat"
+   },
+   {
+    "ym": "2026-07",
+    "mm": 11.7,
+    "normal": 52.7,
+    "anomali_pct": -78,
+    "oni": 1.8,
+    "status": "El Nino kuat"
+   },
+   {
+    "ym": "2026-08",
+    "mm": 12.6,
+    "normal": 36.0,
+    "anomali_pct": -65,
+    "oni": 2.16,
+    "status": "El Nino sangat kuat"
+   },
+   {
+    "ym": "2026-09",
+    "mm": 15.0,
+    "normal": 59.6,
+    "anomali_pct": -75,
+    "oni": null,
+    "status": null
+   }
+  ],
+  "terakhir": {
+   "ym": "2026-09",
+   "mm": 15.0,
+   "normal": 59.6,
+   "anomali_pct": -75
+  },
+  "per_kab_terakhir": [
+   {
+    "kab": "Bantul",
+    "mm": 5.3,
+    "normal": 63.9
+   },
+   {
+    "kab": "Gunungkidul",
+    "mm": 12.4,
+    "normal": 24.8
+   },
+   {
+    "kab": "Kota Yogyakarta",
+    "mm": 15.3,
+    "normal": 66.4
+   },
+   {
+    "kab": "Kulon Progo",
+    "mm": 23.2,
+    "normal": 71.2
+   },
+   {
+    "kab": "Sleman",
+    "mm": 18.8,
+    "normal": 71.9
+   }
+  ]
+ },
+ "oni_vs_hujan": {
+  "periode": "1991-2025",
+  "per_bulan": [
+   {
+    "bulan": 1,
+    "nama": "Jan",
+    "r": -0.028,
+    "p": 0.8733,
+    "n": 35
+   },
+   {
+    "bulan": 2,
+    "nama": "Feb",
+    "r": 0.254,
+    "p": 0.1426,
+    "n": 35
+   },
+   {
+    "bulan": 3,
+    "nama": "Mar",
+    "r": 0.254,
+    "p": 0.1424,
+    "n": 35
+   },
+   {
+    "bulan": 4,
+    "nama": "Apr",
+    "r": 0.255,
+    "p": 0.1407,
+    "n": 35
+   },
+   {
+    "bulan": 5,
+    "nama": "Mei",
+    "r": -0.223,
+    "p": 0.2004,
+    "n": 35
+   },
+   {
+    "bulan": 6,
+    "nama": "Jun",
+    "r": -0.289,
+    "p": 0.0926,
+    "n": 35
+   },
+   {
+    "bulan": 7,
+    "nama": "Jul",
+    "r": -0.397,
+    "p": 0.0175,
+    "n": 35
+   },
+   {
+    "bulan": 8,
+    "nama": "Agu",
+    "r": -0.281,
+    "p": 0.1019,
+    "n": 35
+   },
+   {
+    "bulan": 9,
+    "nama": "Sep",
+    "r": -0.525,
+    "p": 0.001,
+    "n": 35
+   },
+   {
+    "bulan": 10,
+    "nama": "Okt",
+    "r": -0.692,
+    "p": 0.0,
+    "n": 35
+   },
+   {
+    "bulan": 11,
+    "nama": "Nov",
+    "r": -0.576,
+    "p": 0.0002,
+    "n": 35
+   },
+   {
+    "bulan": 12,
+    "nama": "Des",
+    "r": -0.058,
+    "p": 0.7435,
+    "n": 35
+   }
+  ],
+  "kemarau": {
+   "r": -0.703,
+   "p": 0.0,
+   "n": 35,
+   "keterangan": "ONI Agu-Sep-Okt vs total hujan Juni-November tahun yang sama"
+  },
+  "onset": {
+   "r": 0.658,
+   "p": 0.0,
+   "n": 35,
+   "ambang_mm": 150.0,
+   "keterangan": "ONI Agu-Sep-Okt vs bulan pertama hujan >= 150 mm (9=Sep ... 12=Des, 13=baru Januari)"
+  },
+  "komposit": [
+   {
+    "kelas": "El Nino",
+    "n_tahun": 9,
+    "hujan_jun_nov_mm": 401.0,
+    "onset_rata": 11.2,
+    "tahun": [
+     1991,
+     1997,
+     2002,
+     2004,
+     2006,
+     2009,
+     2015,
+     2018,
+     2023
+    ]
+   },
+   {
+    "kelas": "Netral",
+    "n_tahun": 17,
+    "hujan_jun_nov_mm": 833.0,
+    "onset_rata": 10.4,
+    "tahun": [
+     1992,
+     1993,
+     1994,
+     1996,
+     2000,
+     2001,
+     2003,
+     2005,
+     2008,
+     2012,
+     2013,
+     2014,
+     2016,
+     2017,
+     2019,
+     2024,
+     2025
+    ]
+   },
+   {
+    "kelas": "La Nina",
+    "n_tahun": 9,
+    "hujan_jun_nov_mm": 1110.0,
+    "onset_rata": 9.9,
+    "tahun": [
+     1995,
+     1998,
+     1999,
+     2007,
+     2010,
+     2011,
+     2020,
+     2021,
+     2022
+    ]
+   }
+  ],
+  "tahunan": [
+   {
+    "tahun": 1991,
+    "hujan_jun_nov": 446.0,
+    "oni_aso": 0.72,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 1992,
+    "hujan_jun_nov": 1323.0,
+    "oni_aso": -0.15,
+    "onset_bulan": 9
+   },
+   {
+    "tahun": 1993,
+    "hujan_jun_nov": 659.0,
+    "oni_aso": 0.2,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 1994,
+    "hujan_jun_nov": 290.0,
+    "oni_aso": 0.47,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 1995,
+    "hujan_jun_nov": 1192.0,
+    "oni_aso": -0.81,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 1996,
+    "hujan_jun_nov": 1013.0,
+    "oni_aso": -0.3,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 1997,
+    "hujan_jun_nov": 215.0,
+    "oni_aso": 2.04,
+    "onset_bulan": 12
+   },
+   {
+    "tahun": 1998,
+    "hujan_jun_nov": 1653.0,
+    "oni_aso": -1.02,
+    "onset_bulan": 9
+   },
+   {
+    "tahun": 1999,
+    "hujan_jun_nov": 759.0,
+    "oni_aso": -1.0,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 2000,
+    "hujan_jun_nov": 1047.0,
+    "oni_aso": -0.42,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 2001,
+    "hujan_jun_nov": 881.0,
+    "oni_aso": -0.15,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 2002,
+    "hujan_jun_nov": 272.0,
+    "oni_aso": 0.78,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2003,
+    "hujan_jun_nov": 456.0,
+    "oni_aso": 0.23,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2004,
+    "hujan_jun_nov": 669.0,
+    "oni_aso": 0.58,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2005,
+    "hujan_jun_nov": 868.0,
+    "oni_aso": -0.11,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 2006,
+    "hujan_jun_nov": 208.0,
+    "oni_aso": 0.54,
+    "onset_bulan": 12
+   },
+   {
+    "tahun": 2007,
+    "hujan_jun_nov": 514.0,
+    "oni_aso": -1.05,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2008,
+    "hujan_jun_nov": 702.0,
+    "oni_aso": -0.25,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 2009,
+    "hujan_jun_nov": 504.0,
+    "oni_aso": 0.66,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2010,
+    "hujan_jun_nov": 1410.0,
+    "oni_aso": -1.43,
+    "onset_bulan": 9
+   },
+   {
+    "tahun": 2011,
+    "hujan_jun_nov": 659.0,
+    "oni_aso": -0.76,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2012,
+    "hujan_jun_nov": 510.0,
+    "oni_aso": 0.37,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2013,
+    "hujan_jun_nov": 722.0,
+    "oni_aso": -0.32,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2014,
+    "hujan_jun_nov": 527.0,
+    "oni_aso": 0.24,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2015,
+    "hujan_jun_nov": 306.0,
+    "oni_aso": 2.02,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2016,
+    "hujan_jun_nov": 1781.0,
+    "oni_aso": -0.42,
+    "onset_bulan": 9
+   },
+   {
+    "tahun": 2017,
+    "hujan_jun_nov": 1043.0,
+    "oni_aso": -0.23,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 2018,
+    "hujan_jun_nov": 597.0,
+    "oni_aso": 0.52,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2019,
+    "hujan_jun_nov": 200.0,
+    "oni_aso": 0.31,
+    "onset_bulan": 12
+   },
+   {
+    "tahun": 2020,
+    "hujan_jun_nov": 1004.0,
+    "oni_aso": -0.77,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 2021,
+    "hujan_jun_nov": 1279.0,
+    "oni_aso": -0.64,
+    "onset_bulan": 10
+   },
+   {
+    "tahun": 2022,
+    "hujan_jun_nov": 1524.0,
+    "oni_aso": -0.87,
+    "onset_bulan": 9
+   },
+   {
+    "tahun": 2023,
+    "hujan_jun_nov": 388.0,
+    "oni_aso": 1.5,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2024,
+    "hujan_jun_nov": 771.0,
+    "oni_aso": -0.12,
+    "onset_bulan": 11
+   },
+   {
+    "tahun": 2025,
+    "hujan_jun_nov": 1362.0,
+    "oni_aso": -0.43,
+    "onset_bulan": 9
+   }
+  ]
+ },
+ "hujan_vs_panen": {
+  "per_jeda": [
+   {
+    "jeda_bulan": 0,
+    "r": 0.486,
+    "p": 0.005,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 1,
+    "r": 0.643,
+    "p": 0.0001,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 2,
+    "r": 0.472,
+    "p": 0.0067,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 3,
+    "r": 0.22,
+    "p": 0.236,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 4,
+    "r": -0.253,
+    "p": 0.1719,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 5,
+    "r": -0.338,
+    "p": 0.0628,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 6,
+    "r": -0.409,
+    "p": 0.0216,
+    "n": 31
+   }
+  ],
+  "terbaik": {
+   "jeda_bulan": 1,
+   "r": 0.643,
+   "p": 0.0001,
+   "n": 31
+  }
+ },
+ "hujan_vs_tanam": {
+  "per_jeda": [
+   {
+    "jeda_bulan": 0,
+    "r": -0.21,
+    "p": 0.259,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 1,
+    "r": -0.196,
+    "p": 0.2933,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 2,
+    "r": -0.255,
+    "p": 0.1683,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 3,
+    "r": -0.304,
+    "p": 0.0963,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 4,
+    "r": -0.211,
+    "p": 0.2564,
+    "n": 31
+   }
+  ],
+  "terbaik": {
+   "jeda_bulan": 3,
+   "r": -0.304,
+   "p": 0.0963,
+   "n": 31
+  }
+ },
+ "oni_vs_panen": {
+  "per_jeda": [
+   {
+    "jeda_bulan": 0,
+    "r": 0.133,
+    "p": 0.4773,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 1,
+    "r": 0.117,
+    "p": 0.5336,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 2,
+    "r": 0.126,
+    "p": 0.5036,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 3,
+    "r": 0.108,
+    "p": 0.5663,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 4,
+    "r": 0.057,
+    "p": 0.7626,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 5,
+    "r": -0.007,
+    "p": 0.9712,
+    "n": 31
+   },
+   {
+    "jeda_bulan": 6,
+    "r": -0.061,
+    "p": 0.7446,
+    "n": 31
+   }
+  ],
+  "terbaik": {
+   "jeda_bulan": 0,
+   "r": 0.133,
+   "p": 0.4773,
+   "n": 31
+  }
+ },
+ "simotandi": {
+  "bulan_awal": "2024-01",
+  "bulan_akhir": "2026-07",
+  "n_bulan": 31,
+  "seri": [
+   {
+    "ym": "2024-01",
+    "tanam_ha": 7004.0,
+    "panen_ha": 11617.0
+   },
+   {
+    "ym": "2024-02",
+    "tanam_ha": 6979.0,
+    "panen_ha": 18989.0
+   },
+   {
+    "ym": "2024-03",
+    "tanam_ha": 6777.0,
+    "panen_ha": 14742.0
+   },
+   {
+    "ym": "2024-04",
+    "tanam_ha": 5477.0,
+    "panen_ha": 8422.0
+   },
+   {
+    "ym": "2024-05",
+    "tanam_ha": 6323.0,
+    "panen_ha": 7467.0
+   },
+   {
+    "ym": "2024-06",
+    "tanam_ha": 4446.0,
+    "panen_ha": 7277.0
+   },
+   {
+    "ym": "2024-07",
+    "tanam_ha": 6288.0,
+    "panen_ha": 9196.0
+   },
+   {
+    "ym": "2024-08",
+    "tanam_ha": 9474.0,
+    "panen_ha": 4220.0
+   },
+   {
+    "ym": "2024-09",
+    "tanam_ha": 8030.0,
+    "panen_ha": 4323.0
+   },
+   {
+    "ym": "2024-10",
+    "tanam_ha": 26825.0,
+    "panen_ha": 3955.0
+   },
+   {
+    "ym": "2024-11",
+    "tanam_ha": 6166.0,
+    "panen_ha": 6447.0
+   },
+   {
+    "ym": "2024-12",
+    "tanam_ha": 7459.0,
+    "panen_ha": 9751.0
+   },
+   {
+    "ym": "2025-01",
+    "tanam_ha": 11454.0,
+    "panen_ha": 10373.0
+   },
+   {
+    "ym": "2025-02",
+    "tanam_ha": 7921.0,
+    "panen_ha": 20773.0
+   },
+   {
+    "ym": "2025-03",
+    "tanam_ha": 12606.0,
+    "panen_ha": 9605.0
+   },
+   {
+    "ym": "2025-04",
+    "tanam_ha": 5946.0,
+    "panen_ha": 9932.0
+   },
+   {
+    "ym": "2025-05",
+    "tanam_ha": 5884.0,
+    "panen_ha": 9250.0
+   },
+   {
+    "ym": "2025-06",
+    "tanam_ha": 5406.0,
+    "panen_ha": 14120.0
+   },
+   {
+    "ym": "2025-07",
+    "tanam_ha": 11046.0,
+    "panen_ha": 7570.0
+   },
+   {
+    "ym": "2025-08",
+    "tanam_ha": 10237.0,
+    "panen_ha": 4595.0
+   },
+   {
+    "ym": "2025-09",
+    "tanam_ha": 11497.0,
+    "panen_ha": 5389.0
+   },
+   {
+    "ym": "2025-10",
+    "tanam_ha": 8848.0,
+    "panen_ha": 7251.0
+   },
+   {
+    "ym": "2025-11",
+    "tanam_ha": 8855.0,
+    "panen_ha": 11766.0
+   },
+   {
+    "ym": "2025-12",
+    "tanam_ha": 12902.0,
+    "panen_ha": 8763.0
+   },
+   {
+    "ym": "2026-01",
+    "tanam_ha": 8960.0,
+    "panen_ha": 12493.0
+   },
+   {
+    "ym": "2026-02",
+    "tanam_ha": 5607.0,
+    "panen_ha": 10550.0
+   },
+   {
+    "ym": "2026-03",
+    "tanam_ha": 5257.0,
+    "panen_ha": 11012.0
+   },
+   {
+    "ym": "2026-04",
+    "tanam_ha": 5447.0,
+    "panen_ha": 13114.0
+   },
+   {
+    "ym": "2026-05",
+    "tanam_ha": 6168.0,
+    "panen_ha": 7882.0
+   },
+   {
+    "ym": "2026-06",
+    "tanam_ha": 5431.0,
+    "panen_ha": 6625.0
+   },
+   {
+    "ym": "2026-07",
+    "tanam_ha": 11669.0,
+    "panen_ha": 4187.0
+   }
+  ]
+ },
+ "ringkasan_teks": "Hujan Sep 2026 di DIY rata-rata 15 mm, 75% lebih sedikit dari normalnya (60 mm). Dalam 35 tahun (1991-2025), makin tinggi ONI Agustus-Oktober, makin sedikit hujan Juni-November di DIY (r = -0.70, hubungan kuat, signifikan). Pada tahun El Niño, hujan Juni-November rata-rata 401 mm dibanding 1110 mm pada tahun La Niña dan 833 mm pada tahun netral. Musim hujan (bulan pertama >= 150 mm) rata-rata datang pada bulan ke-11.2 saat El Niño dan ke-9.9 saat La Niña (9 = September, 10 = Oktober, 11 = November); El Niño menunda hujan sekitar 1.3 bulan. Pada data SIMOTANDI (31 bulan), luas panen paling sejalan dengan hujan 1 bulan sebelumnya (r = +0.64): irama hujan -> tanam -> panen. Deretnya masih pendek, jadi ini gambaran musiman, bukan bukti sebab-akibat."
+}
