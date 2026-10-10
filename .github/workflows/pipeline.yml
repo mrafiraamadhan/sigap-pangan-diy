@@ -80,6 +80,10 @@ jobs:
         run: python src/sources/cadangan_pangan_scraper.py
         continue-on-error: true
 
+      - name: Susun deret cadangan per komoditas & wilayah
+        run: python src/pipeline/seri_cadangan.py
+        continue-on-error: true
+
       - name: Ambil sinyal Google Trends (proksi kepanikan publik)
         run: python src/sources/google_trends_panik.py
         continue-on-error: true
