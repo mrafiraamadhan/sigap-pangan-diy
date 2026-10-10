@@ -863,6 +863,8 @@ async function render() {
   const prakiraan = await ambilCsv("prakiraan_harga.csv");
   // Pembanding manual stok beras Bulog (dari pemberitaan resmi); opsional.
   const bulog = await ambilCsv("cadangan_bulog_manual.csv");
+  // Deret per komoditas / per wilayah hasil rekonstruksi (src/pipeline/seri_cadangan.py); opsional.
+  const cadSeri = await ambilCsv("cadangan_pangan_seri.csv");
   // Analisis hujan-ENSO-panen (dibuat src/pipeline/analisis_iklim_panen.py); opsional.
   const iklim = await ambilJson("analisis_iklim_panen.json");
   // Status tiap langkah pipeline (kapan sumber dicek, berubah/tidak). Opsional:
@@ -1090,9 +1092,25 @@ async function render() {
     const kolS = Object.keys(cad[0] || {}).find(c => /stok/i.test(c)) || "Jumlah Stok (Kg)";
     const isTotal = r => String(r.Wilayah || "").trim() === "Total";
     const keTglIso = v => { if (!v) return ""; const d = v instanceof Date ? v : new Date(v); return isNaN(d) ? String(v).slice(0, 10) : d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }); };
-    const riwayat = cad.filter(r => isTotal(r) && r.diambil_pada_utc)
+    // Angka "Total" portal = jumlah kg SEMUA komoditas (beras + gabah + kedelai + kacang).
+    // Itu apel ditambah jeruk, jadi tidak dipakai sebagai dasar status. Dasar status
+    // adalah SETARA BERAS = beras medium + beras premium + 0,6274 x GKG (rendemen BPS),
+    // dari deret per komoditas yang direkonstruksi pipeline (cadangan_pangan_seri.csv).
+    // Komoditas lain ditampilkan sendiri-sendiri, tidak dijumlahkan.
+    const riwayatTotal = cad.filter(r => isTotal(r) && r.diambil_pada_utc)
       .map(r => ({ t: new Date(r.diambil_pada_utc), ton: (Number(r[kolS]) || 0) / 1000, tglData: keTglIso(r.tanggal_data) }))
       .filter(p => !isNaN(p.t) && p.ton >= 0).sort((a, b) => a.t - b.t);
+    const seri = {};            // nama -> [{t, ton, tglData, asal}], dari cadangan_pangan_seri.csv
+    const seriJenis = {};       // nama -> "komoditas" | "wilayah" | "turunan"
+    (cadSeri || []).forEach(r => {
+      const t = new Date(r.waktu_utc); if (isNaN(t) || !r.nama) return;
+      (seri[r.nama] ||= []).push({ t, ton: (Number(r.kg) || 0) / 1000, tglData: keTglIso(r.tanggal_data), asal: String(r.asal || "") });
+      seriJenis[r.nama] = String(r.jenis || "");
+    });
+    Object.values(seri).forEach(a => a.sort((x, y) => x.t - y.t));
+    const adaSeri = !!(seri["Setara beras"] && seri["Setara beras"].length);
+    const riwayat = adaSeri ? seri["Setara beras"] : riwayatTotal;
+    const dasar = adaSeri ? "setara beras" : "jumlah semua komoditas (angka portal)";
     if (riwayat.length) {
       const terbaru = riwayat[riwayat.length - 1];
       // Riwayat disimpan "hanya perubahan" per baris, jadi keadaan terkini tiap
@@ -1129,17 +1147,18 @@ async function render() {
       const basah = umurData !== null && umurData <= 45;    // portal masih diperbarui
       const acuan = tipikal14 !== null ? tipikal14 : terbaru.ton;
       const lv = !basah ? "DATA" : acuan >= 200 ? "AMAN" : "WASPADA";
-      cadData = { kolS, ct, riwayat, terbaru, tglData, puncakHarian, hariUrut, puncak14, tipikal14, min30, maks30,
+      const totalTerbaru = riwayatTotal.length ? riwayatTotal[riwayatTotal.length - 1].ton : null;
+      cadData = { kolS, ct, riwayat, riwayatTotal, seri, seriJenis, adaSeri, dasar, terbaru, totalTerbaru, tglData, puncakHarian, hariUrut, puncak14, tipikal14, min30, maks30,
                   cadDicek, umurData, basah, acuan, lv, nHari14: puncak14.length };
       const ketCad = !basah
         ? `Portal cadangan pangan DIY terakhir memuat data per ${fmtTgl(tglData)} (${umurData} hari lalu). Karena sudah lebih dari 45 hari tidak ada pembaruan, pilar ini <strong>tidak kami masukkan ke skala Aman sampai Bahaya</strong>: kondisinya tidak diketahui, bukan diketahui buruk.`
         : (acuan >= 200
-          ? `Stok yang dilaporkan lembaga pengelola ke portal DIY biasanya ${fmtN(acuan, 0)} ton per hari pelaporan dalam 14 hari terakhir (median puncak harian dari ${puncak14.length} hari), di atas ambang indikatif 200 ton. Angka portal hanya memuat laporan tanggal data terakhir, sehingga naik-turun harian (kisaran 30 hari ${fmtN(min30, 0)}–${fmtN(maks30, 0)} ton) wajar dan bukan tanda stok habis.`
-          : `Stok yang dilaporkan ke portal DIY biasanya ${fmtN(acuan, 0)} ton per hari pelaporan dalam 14 hari terakhir, di bawah ambang indikatif 200 ton. Karena portal hanya memuat laporan tanggal data terakhir, angka rendah bisa berarti stok menipis <em>atau</em> baru sedikit lembaga yang melapor; perlu konfirmasi ke DPKP DIY sebelum disimpulkan.`);
+          ? `Stok ${dasar} yang dilaporkan lembaga pengelola ke portal DIY biasanya ${fmtN(acuan, 0)} ton per hari pelaporan dalam 14 hari terakhir (median puncak harian dari ${puncak14.length} hari), di atas ambang indikatif 200 ton. Angka portal hanya memuat laporan tanggal data terakhir, sehingga naik-turun harian (kisaran 30 hari ${fmtN(min30, 0)}–${fmtN(maks30, 0)} ton) wajar dan bukan tanda stok habis. Komoditas lain (kedelai, kacang) dipantau terpisah dan tidak dijumlahkan.`
+          : `Stok ${dasar} yang dilaporkan ke portal DIY biasanya ${fmtN(acuan, 0)} ton per hari pelaporan dalam 14 hari terakhir, di bawah ambang indikatif 200 ton. Karena portal hanya memuat laporan tanggal data terakhir, angka rendah bisa berarti stok menipis <em>atau</em> baru sedikit lembaga yang melapor; perlu konfirmasi ke DPKP DIY sebelum disimpulkan.`);
       cadInfo = { nama: "Cadangan Pangan Pemerintah", sumber: "Portal cadangan pangan DPKP DIY",
         tgl: tglData, tglTeks: `data portal per ${fmtTgl(tglData)}` + (cadDicek ? ` · dicek ${fmtTgl(cadDicek)}` : ""),
         lv, baca: basah ? fmtN(terbaru.ton, 1) + " ton" : "tidak dapat dinilai",
-        bacaKet: basah ? "stok terlapor pada tanggal data terakhir" : "portal tidak diperbarui",
+        bacaKet: basah ? (adaSeri ? "setara beras terlapor pada tanggal data terakhir" : "stok terlapor (semua komoditas) pada tanggal data terakhir") : "portal tidak diperbarui",
         ket: ketCad, tab: "konteks" };
     }
   }
@@ -1915,14 +1934,39 @@ async function render() {
       const fmtStok = kg => kg >= 1000 ? fmtN(kg / 1000, 1) + " ton" : fmtN(kg, 0) + " kg";
       const fmtJam = t => new Date(t).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" }) + " WIB";
       pC.innerHTML = `<h3>Cadangan Pangan Pemerintah</h3><div class="sumber">Sistem Informasi Cadangan Pangan DIY (DPKP DIY) · 94 lembaga pelapor: instansi pemerintah, Gapoktan PUPM, LDPM · data per ${fmtTgl(C.tglData)} · dicek ${C.cadDicek ? fmtJam(C.cadDicek) : "–"}</div>
-        <div class="angka-hero tnum">${fmtN(C.terbaru.ton, 1)} ton</div><div class="angka-ket">stok semua komoditas yang terlapor pada tanggal data terakhir</div>`;
+        <div class="angka-hero tnum">${fmtN(C.terbaru.ton, 1)} ton</div><div class="angka-ket">${C.adaSeri ? "setara beras" : "semua komoditas"} yang terlapor pada tanggal data terakhir${C.adaSeri && C.totalTerbaru !== null ? ` · angka portal (jumlah semua komoditas): ${fmtN(C.totalTerbaru, 1)} ton` : ""}</div>`;
       const hariAwal = C.riwayat[0].t;
+      if (C.adaSeri) {
+        const akhir = nm => { const a = C.seri[nm]; return a && a.length ? a[a.length - 1].ton : 0; };
+        pC.appendChild(el("div", "angka-ket", `Setara beras = beras medium ${fmtN(akhir("Beras Medium"), 1)} + beras premium ${fmtN(akhir("Beras Premium"), 1)} + 0,6274 × GKG ${fmtN(akhir("Gabah Kering Giling (GKG)"), 1)} ton (rendemen gabah ke beras menurut BPS). Kedelai, kacang, dan jagung tidak ikut dijumlahkan.`)).style.cssText = "margin:4px 0 8px";
+      }
       pC.appendChild(el("div", "baris", `<span>Tipikal puncak harian, 14 hari</span><span class="v tnum">${C.tipikal14 !== null ? fmtN(C.tipikal14, 1) + " ton" : "–"}</span>`));
       pC.appendChild(el("div", "baris", `<span>Kisaran snapshot 30 hari</span><span class="v tnum">${C.min30 !== null ? fmtN(C.min30, 1) + " – " + fmtN(C.maks30, 1) + " ton" : "–"}</span>`));
       pC.appendChild(el("div", "baris", `<span>Snapshot tersimpan</span><span class="v tnum">${C.riwayat.length} sejak ${fmtTglPdk(hariAwal)}</span>`));
-      pC.appendChild(el("div", "wadah-chart", `<canvas id="ch-cadangan"></canvas>`)).style.cssText = "height:150px;margin-top:10px";
+      // Pemilih deret: komoditas tidak boleh dijumlahkan lintas jenis (beras + kacang),
+      // jadi grafik menampilkan satu deret per pilihan, atau beberapa garis sekaligus.
+      if (C.adaSeri) {
+        const namaKom = Object.keys(C.seri).filter(n => C.seriJenis[n] === "komoditas");
+        const namaWil = Object.keys(C.seri).filter(n => C.seriJenis[n] === "wilayah");
+        const urutKom = ["Beras Medium", "Beras Premium", "Gabah Kering Giling (GKG)", "Jagung", "Kedelai", "Kacang Tanah", "Kacang Hijau"];
+        namaKom.sort((a, b) => (urutKom.indexOf(a) + 1 || 99) - (urutKom.indexOf(b) + 1 || 99));
+        const maksTon = nm => Math.max(...C.seri[nm].map(p => p.ton));
+        namaWil.sort((a, b) => maksTon(b) - maksTon(a));
+        const opsi = (v, t) => `<option value="${escHtml(v)}">${escHtml(t)}</option>`;
+        const pilih = el("div", "sumber", `<label style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;text-transform:none;letter-spacing:0;font-weight:600">Tampilkan deret:
+          <select id="pilih-seri-cadangan" aria-label="Pilih deret cadangan" style="font:inherit;font-size:.78rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--ink)">
+            <optgroup label="Beras dan gabah">${opsi("Setara beras", "Setara beras (dasar status)")}${namaKom.filter(n => /beras|gkg/i.test(n)).map(n => opsi(n, n)).join("")}</optgroup>
+            <optgroup label="Komoditas lain (tidak dijumlahkan)">${namaKom.filter(n => !/beras|gkg/i.test(n)).map(n => opsi(n, n)).join("")}</optgroup>
+            <optgroup label="Per wilayah (semua komoditas, kg)">${namaWil.map(n => opsi("wil:" + n, n)).join("")}</optgroup>
+            <optgroup label="Beberapa garis sekaligus">${opsi("multi:komoditas", "Semua komoditas, satu garis tiap komoditas")}${opsi("multi:wilayah", "Semua wilayah, satu garis tiap wilayah")}</optgroup>
+            <optgroup label="Angka portal">${opsi("total", "Jumlah semua komoditas, seperti ditampilkan portal (apel + jeruk; hanya untuk rujukan)")}</optgroup>
+          </select></label>`);
+        pilih.style.marginTop = "12px";
+        pC.appendChild(pilih);
+      }
+      pC.appendChild(el("div", "wadah-chart", `<canvas id="ch-cadangan"></canvas>`)).style.cssText = "height:170px;margin-top:8px";
       pC.appendChild(el("div", "insight",
-        `<strong>Cara membaca angka ini.</strong> Portal hanya menampilkan laporan pada tanggal data terakhir, dan lembaga pengelola melapor bergiliran. Karena itu angkanya naik sepanjang hari pelaporan lalu turun begitu tanggal data berganti (lihat gigi gergaji di grafik). Yang kami pakai untuk status adalah <em>median puncak harian 14 hari</em>, bukan angka sesaat. Ambang 200 ton bersifat indikatif.`));
+        `<strong>Cara membaca angka ini.</strong> Portal hanya menampilkan laporan pada tanggal data terakhir, dan lembaga pengelola melapor bergiliran. Karena itu angkanya naik sepanjang hari pelaporan lalu turun begitu tanggal data berganti (lihat gigi gergaji di grafik). Yang kami pakai untuk status adalah <em>median puncak harian 14 hari</em> dari <em>setara beras</em>, bukan angka sesaat; komoditas berbeda (beras, kedelai, kacang) tidak dijumlahkan, karena apel tidak bisa ditambah jeruk. Nilai yang tidak tercatat pada suatu jam diturunkan dari nilai terakhirnya dengan kendala jumlah per wilayah = jumlah per komoditas = angka portal. Ambang 200 ton bersifat indikatif.`));
       // Rincian keadaan terkini = nilai terakhir per jenis / per wilayah.
       const perJenis = C.ct.perJenis.filter(r => Number(r[C.kolS]) > 0);
       const perWilayah = C.ct.perWilayah.filter(r => Number(r[C.kolS]) > 0);
@@ -1952,17 +1996,46 @@ async function render() {
         const c = document.getElementById("ch-cadangan");
         if (!c) return;
         if (!window.Chart) { pesanTanpaChart(c.parentElement); return; }
-        new Chart(c.getContext("2d"), {
-          type: "line",
-          data: { labels: C.riwayat.map(p => p.t.toISOString()), datasets: [{ label: "Stok terlapor (ton)", data: C.riwayat.map(p => Math.round(p.ton * 10) / 10),
-            borderColor: "#2f7a4c", backgroundColor: "rgba(47,122,76,.08)", borderWidth: 1.6, tension: 0, fill: true, stepped: false,
-            pointRadius: 2.5, pointBackgroundColor: "#2f7a4c" }] },
-          options: { responsive: true, maintainAspectRatio: false, animation: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: { title: it => it[0] ? fmtJam(it[0].label) : "",
-              label: it => fmtN(it.raw, 1) + " ton" + (C.riwayat[it.dataIndex].tglData ? " · data per " + fmtTglPdk(C.riwayat[it.dataIndex].tglData) : "") } } },
-            scales: { y: { min: 0, ticks: { font: { size: 9 }, callback: v => fmtN(v, 0) }, grid: { color: "#efece2" } },
-                      x: { ticks: { font: { size: 9 }, maxTicksLimit: 6, callback: function (v) { return fmtTglPdk(this.getLabelForValue(v)); } }, grid: { display: false } } } },
-        });
+        const WARNA = ["#2f7a4c", "#1f4d8c", "#c8731f", "#a11c1c", "#6b4ba1", "#0f8a8a", "#8a6d1f"];
+        let chartCad = null;
+        // Susun dataset sesuai pilihan. Semua deret memakai sumbu waktu yang sama
+        // (waktu pengambilan), jadi label diambil dari deret "Setara beras" bila ada.
+        const dasarWaktu = C.adaSeri ? C.seri["Setara beras"] : C.riwayatTotal;
+        const labels = dasarWaktu.map(p => p.t.toISOString());
+        const nilaiPada = (arr, i) => { const p = arr[i]; return p ? Math.round(p.ton * 10) / 10 : null; };
+        const dataset = (nama, arr, warna, tebal) => ({ label: nama, data: labels.map((_, i) => nilaiPada(arr, i)),
+          borderColor: warna, backgroundColor: warna + "14", borderWidth: tebal ? 2 : 1.4, tension: 0, fill: tebal, pointRadius: tebal ? 2.5 : 1.5, pointBackgroundColor: warna, spanGaps: true });
+        const susun = (pilihan) => {
+          if (!C.adaSeri || pilihan === "total") return { ds: [dataset("Jumlah semua komoditas (angka portal)", C.riwayatTotal, "#5b6472", true)], satuan: "ton (semua komoditas)" };
+          if (pilihan === "multi:komoditas") {
+            const nm = Object.keys(C.seri).filter(n => C.seriJenis[n] === "komoditas" && Math.max(...C.seri[n].map(p => p.ton)) > 0);
+            return { ds: nm.map((n, i) => dataset(n, C.seri[n], WARNA[i % WARNA.length], false)), satuan: "ton per komoditas" };
+          }
+          if (pilihan === "multi:wilayah") {
+            const nm = Object.keys(C.seri).filter(n => C.seriJenis[n] === "wilayah" && Math.max(...C.seri[n].map(p => p.ton)) > 0);
+            return { ds: nm.map((n, i) => dataset(n, C.seri[n], WARNA[i % WARNA.length], false)), satuan: "ton per wilayah (semua komoditas)" };
+          }
+          const nama = pilihan.startsWith("wil:") ? pilihan.slice(4) : pilihan;
+          const arr = C.seri[nama] || C.seri["Setara beras"];
+          return { ds: [dataset(nama, arr, nama === "Setara beras" ? "#2f7a4c" : "#1f4d8c", true)], satuan: pilihan.startsWith("wil:") ? "ton (semua komoditas di wilayah ini)" : "ton" };
+        };
+        const gambar = (pilihan) => {
+          if (chartCad) { chartCad.destroy(); chartCad = null; }
+          const { ds, satuan } = susun(pilihan);
+          chartCad = new Chart(c.getContext("2d"), {
+            type: "line",
+            data: { labels, datasets: ds },
+            options: { responsive: true, maintainAspectRatio: false, animation: false,
+              plugins: { legend: { display: ds.length > 1, position: "bottom", labels: { font: { size: 9 }, boxWidth: 10 } },
+                tooltip: { callbacks: { title: it => it[0] ? fmtJam(it[0].label) : "",
+                  label: it => { const p = dasarWaktu[it.dataIndex]; return it.dataset.label + ": " + (it.raw === null ? "–" : fmtN(it.raw, 1) + " " + satuan.split(" ")[0]) + (p && p.tglData ? " · data per " + fmtTglPdk(p.tglData) : ""); } } } },
+              scales: { y: { min: 0, ticks: { font: { size: 9 }, callback: v => fmtN(v, 0) }, grid: { color: "#efece2" }, title: { display: true, text: satuan, font: { size: 9 } } },
+                        x: { ticks: { font: { size: 9 }, maxTicksLimit: 6, callback: function (v) { return fmtTglPdk(this.getLabelForValue(v)); } }, grid: { display: false } } } },
+          });
+        };
+        gambar(C.adaSeri ? "Setara beras" : "total");
+        const sel = document.getElementById("pilih-seri-cadangan");
+        if (sel) sel.addEventListener("change", e => gambar(e.target.value));
       });
     } else pC.innerHTML = `<h3>Cadangan Pangan Pemerintah</h3><div class="kosong">Data belum tersedia.</div>`;
     g2.appendChild(pC);
@@ -2601,7 +2674,7 @@ async function render() {
       <p>${tagStatus("ANOMALI")} Ada lonjakan statistik yang belum terkonfirmasi, termasuk lonjakan yang serentak di 8 komoditas atau lebih pada tanggal yang sama. <strong>Temuan riset kami:</strong> pola berulang di akhir bulan itu adalah siklus pembaruan data acuan PIHPS, bukan gejolak pasar. Yang dibutuhkan di sini verifikasi lapangan, bukan kepanikan.</p>
       <p>${tagStatus("WASPADA")} Naik 5% atau lebih per minggu, turun 10% atau lebih per minggu (karena ini harga di tingkat petani, penurunan tajam berarti pendapatan petani tertekan), |z| ≥ 1,5, atau harga sedang berada di titik tertinggi 30 hari.</p>
       <p>${tagStatus("AMAN")} Semua keadaan selain ketiga hal di atas.</p>
-      <p class="catatan"><strong>Ambang tiap pilar.</strong> <em>Cuaca:</em> ada wilayah dengan hujan ≥50&nbsp;mm atau berlabel ekstrem menjadi Waspada; tiga wilayah atau lebih menjadi Bahaya. <em>ENSO:</em> El&nbsp;Niño atau La&nbsp;Niña lemah sampai moderat menjadi Waspada, yang kuat menjadi Bahaya. <em>Cadangan:</em> dasar penilaian adalah <em>median puncak harian 14 hari</em> dari snapshot portal cadangan pangan DIY (angka portal = laporan pada tanggal data terakhir, jadi tally terbesar tiap hari dianggap laporan terlengkap hari itu); 200&nbsp;ton ke atas Aman, di bawah 200 ton Waspada (ambang indikatif). Pilar ini tidak pernah kami beri Bahaya sendirian, karena angka rendah di portal bisa berarti baru sedikit lembaga yang melapor. Kalau tanggal data portal lebih dari 45 hari tidak bergerak, pilar ditandai "tidak dapat dinilai". <strong>Koreksi 8 Okt 2026:</strong> versi sebelumnya menyebut portal ini tidak diperbarui 8 tahun; itu salah baca di pihak kami (filter tahun diabaikan server, pemisah ribuan terbaca desimal), sudah diperbaiki dan riwayat sejak 30 Agustus 2026 dihitung ulang dalam kilogram. <em>Pasokan SIMOTANDI:</em> rasio lahan generatif ditambah panen 12% ke atas Aman, 6 sampai 12% Waspada, di bawah 6% Bahaya. <em>Trends:</em> ada lonjakan pencarian menjadi Waspada. <em>SP2KP:</em> ada varian naik lebih dari 10% dalam 30 hari menjadi Waspada. <em>DPKP:</em> ada komoditas naik lebih dari 10% dalam 30 hari menjadi Waspada, dan Waspada adalah level tertinggi yang kami berikan untuk pilar ini karena mutu pencatatan di sumbernya tidak selalu seragam.</p>
+      <p class="catatan"><strong>Ambang tiap pilar.</strong> <em>Cuaca:</em> ada wilayah dengan hujan ≥50&nbsp;mm atau berlabel ekstrem menjadi Waspada; tiga wilayah atau lebih menjadi Bahaya. <em>ENSO:</em> El&nbsp;Niño atau La&nbsp;Niña lemah sampai moderat menjadi Waspada, yang kuat menjadi Bahaya. <em>Cadangan:</em> dasar penilaian adalah <em>median puncak harian 14 hari</em> dari <em>setara beras</em> (beras medium + beras premium + 0,6274 × GKG, rendemen BPS) pada snapshot portal cadangan pangan DIY; komoditas lain (kedelai, kacang, jagung) tidak dijumlahkan dengan beras dan dipantau terpisah. Angka portal = laporan pada tanggal data terakhir, jadi tally terbesar tiap hari dianggap laporan terlengkap hari itu. Nilai per komoditas/wilayah yang tidak tercatat pada suatu jam diturunkan dari nilai terakhirnya dengan kendala jumlah per wilayah = jumlah per komoditas = angka portal (skrip <code>seri_cadangan.py</code>); 200&nbsp;ton ke atas Aman, di bawah 200 ton Waspada (ambang indikatif). Pilar ini tidak pernah kami beri Bahaya sendirian, karena angka rendah di portal bisa berarti baru sedikit lembaga yang melapor. Kalau tanggal data portal lebih dari 45 hari tidak bergerak, pilar ditandai "tidak dapat dinilai". <strong>Koreksi 8 Okt 2026:</strong> versi sebelumnya menyebut portal ini tidak diperbarui 8 tahun; itu salah baca di pihak kami (filter tahun diabaikan server, pemisah ribuan terbaca desimal), sudah diperbaiki dan riwayat sejak 30 Agustus 2026 dihitung ulang dalam kilogram. <em>Pasokan SIMOTANDI:</em> rasio lahan generatif ditambah panen 12% ke atas Aman, 6 sampai 12% Waspada, di bawah 6% Bahaya. <em>Trends:</em> ada lonjakan pencarian menjadi Waspada. <em>SP2KP:</em> ada varian naik lebih dari 10% dalam 30 hari menjadi Waspada. <em>DPKP:</em> ada komoditas naik lebih dari 10% dalam 30 hari menjadi Waspada, dan Waspada adalah level tertinggi yang kami berikan untuk pilar ini karena mutu pencatatan di sumbernya tidak selalu seragam.</p>
       <p class="catatan"><strong>Prakiraan risiko harga (tab Prakiraan):</strong> uji-mundur <em>rolling-origin</em> atas 14 komoditas DPKP, 228 minggu (Apr 2022–Agu 2026), membandingkan delapan pendekatan: naif atau <em>random walk</em>, drift, SES, Theta, Holt teredam, ARIMA(1,1,1), naif musiman, dan regresi Ridge lag+musim. Hasil: <strong>tidak ada model yang mengalahkan penduga naif</strong> pada horizon 1 minggu (MASE terbaik = 1,000), dan pada horizon 1 bulan naif tetap unggul rata-rata (SES menang di 5 dari 14 komoditas dan ARIMA di 7 dari 14, tetapi keduanya kalah pada rerata lintas komoditas). Hasil ini sejalan dengan sifat harga komoditas jangka pendek yang mendekati <em>martingale</em>. Karena itu penduga titik dipertahankan sebagai harga terkini, dan yang diprakirakan adalah <strong>ketidakpastiannya</strong>: interval dari kuantil empiris nonparametrik perubahan h-langkah tiap komoditas. Kalibrasi teruji: cakupan interval 80% tercapai 76,0% (h=1 minggu) dan 82,7% (h=1 bulan); interval 95% tercapai 94,5% dan 94,1%. Prakiraan peluang menembus ambang memiliki <em>Brier skill</em> +10,3% terhadap acuan iklim. Pengondisian pada bulan kalender diuji dan <strong>dilaporkan tidak membantu</strong> (skill turun ke +4,8%) sehingga tidak dipakai. Deret PIHPS tidak dipakai untuk prakiraan karena berbentuk fungsi tangga (9 nilai unik dalam 260 hari).</p>
       <p class="catatan"><strong>Hujan, El Niño, dan panen (tab Konteks &amp; Pasokan):</strong> hujan bulanan 1991–kini diambil dari Open-Meteo (reanalisis ERA5/ERA5-Land ECMWF) pada lima titik kabupaten/kota lalu dirata-rata, karena arsip stasiun BMKG tidak terbuka untuk mesin; normal memakai 1991–2020. Hubungan El Niño–kemarau diuji dengan korelasi Pearson antara ONI Agu–Okt dan total hujan Juni–November tiap tahun (±35 tahun), ditambah komposit tahun El Niño (ONI ≥ +0,5), netral, dan La Niña (≤ −0,5) serta bulan datangnya musim hujan (bulan pertama ≥ 150 mm setelah Agustus). Hubungan hujan–tanam–panen memakai luas tanam/panen SIMOTANDI provinsi per bulan dengan jeda 0–6 bulan; deretnya baru ±30 bulan, jadi hasilnya deskriptif (irama musiman), bukan bukti kausal.</p>
       <p class="catatan"><strong>Uji volatilitas berlebih (data DPKP):</strong> adaptasi metode <em>Excessive Food Price Variability Early Warning System</em> (IFPRI / Food Security Portal), dengan ambang nonparametrik pada persentil ke-95 kenaikan harian historis tiap komoditas, lalu jumlah hari ekstrem dalam jendela 90 hari dibandingkan dengan harapan statistiknya (5% observasi): melebihi dua kali lipat → tinggi, melebihi harapan → sedang. Diterapkan pada deret DPKP yang bergerak harian; deret PIHPS provinsi terlalu bertangga untuk uji ini. Kesesuaian hasil kedua metode (tipologi &amp; volatilitas) menjadi validasi silang.</p>
