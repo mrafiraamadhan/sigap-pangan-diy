@@ -129,6 +129,9 @@ def muat_deret(jalur: str, nama_sumber: str, awalan: tuple) -> dict:
     for kom, s in df.groupby("komoditas"):
         y = (s.sort_values("tanggal").drop_duplicates("tanggal")
               .set_index("tanggal")["harga"].resample("W").last().ffill().dropna())
+        # Label minggu dari resample("W") adalah hari Minggu penutup minggu itu, yang
+        # bisa jatuh SETELAH hari ini. Simpan tanggal pengamatan asli untuk dilaporkan.
+        y.attrs["tgl_asli"] = s["tanggal"].max()
         if layak_diprakirakan(y):
             deret[str(kom)] = y
     return deret
@@ -306,7 +309,8 @@ def main():
         print(f"  {nama_sumber}: {len(deret)} deret layak diprakirakan.", flush=True)
 
         for kom, y in sorted(deret.items()):
-            tgl_akhir = y.index[-1].date().isoformat()
+            t_asli = pd.Timestamp(y.attrs.get("tgl_asli", y.index[-1]))
+            tgl_akhir = t_asli.date().isoformat()
             for label, h in HORIZON.items():
                 r = prakirakan(y, h)
                 if not r:
@@ -315,7 +319,7 @@ def main():
                     "sumber": nama_sumber,
                     "komoditas": kom, "horizon": label, "horizon_minggu": h,
                     "tanggal_data_terakhir": tgl_akhir,
-                    "tanggal_target": (y.index[-1] + pd.Timedelta(weeks=h)).date().isoformat(),
+                    "tanggal_target": (t_asli + pd.Timedelta(weeks=h)).date().isoformat(),
                     **r,
                     "metode": "penduga bergerbang + kuantil empiris berpenskala volatilitas",
                     "diambil_pada_utc": diambil,
