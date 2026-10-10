@@ -16,6 +16,11 @@ tepat sama dengan Total. Hasil tiap nilai diberi label asalnya:
     diturunkan      = carry-forward dari nilai terakhir
     nol_diturunkan  = dinolkan agar jumlah = Total (menandai pergantian tanggal data)
 
+Wilayah disajikan pada tingkat kabupaten/kota: lembaga yang melapor dengan
+wilayah "Kecamatan X" digabungkan ke kabupaten/kota induknya (peta kapanewon/
+kemantren DIY di bawah). "Provinsi DI Yogyakarta" (instansi tingkat provinsi)
+tetap berdiri sendiri.
+
 Komoditas tidak dijumlahkan lintas jenis (beras tidak ditambah kacang). Yang
 dijumlahkan hanya yang setara: setara beras = Beras Medium + Beras Premium +
 0,6274 x GKG (rendemen GKG ke beras menurut BPS). Nilai ini juga ditulis sebagai
@@ -34,6 +39,46 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 P_IN = os.path.join(HERE, "..", "..", "data", "cadangan_pangan_diy.csv")
 P_OUT = os.path.join(HERE, "..", "..", "data", "cadangan_pangan_seri.csv")
 RENDEMEN_GKG = 0.6274   # BPS: konversi GKG -> beras
+
+# Kapanewon/kemantren DIY -> kabupaten/kota induk (ejaan wilayah mengikuti portal).
+_KAB = {
+    "Kabupaten Sleman": ["Berbah", "Cangkringan", "Depok", "Gamping", "Godean", "Kalasan", "Minggir", "Mlati", "Moyudan",
+                         "Ngaglik", "Ngemplak", "Pakem", "Prambanan", "Seyegan", "Sleman", "Tempel", "Turi"],
+    "Kabupaten Bantul": ["Bambanglipuro", "Banguntapan", "Bantul", "Dlingo", "Imogiri", "Kasihan", "Kretek", "Pajangan",
+                         "Pandak", "Piyungan", "Pleret", "Pundong", "Sanden", "Sedayu", "Sewon", "Srandakan"],
+    "Kabupaten Kulon Progo": ["Galur", "Girimulyo", "Kalibawang", "Kokap", "Lendah", "Nanggulan", "Panjatan", "Pengasih",
+                              "Samigaluh", "Sentolo", "Temon", "Wates"],
+    "Kabupaten Gunung Kidul": ["Gedangsari", "Girisubo", "Karangmojo", "Ngawen", "Nglipar", "Paliyan", "Panggang", "Patuk",
+                               "Playen", "Ponjong", "Purwosari", "Rongkop", "Saptosari", "Semanu", "Semin", "Tanjungsari",
+                               "Tepus", "Wonosari"],
+    "Kota Yogyakarta": ["Danurejan", "Gedongtengen", "Gondokusuman", "Gondomanan", "Kotagede", "Kraton", "Mantrijeron",
+                        "Mergangsan", "Ngampilan", "Pakualaman", "Tegalrejo", "Umbulharjo", "Wirobrajan"],
+}
+# "Jetis" ada di Bantul dan Kota Yogyakarta: sengaja tidak dipetakan (dibiarkan apa adanya).
+KECAMATAN_KE_KABUPATEN = {f"Kecamatan {k}": kab for kab, daftar in _KAB.items() for k in daftar}
+KECAMATAN_KE_KABUPATEN.update({f"Kapanewon {k}": kab for kab, daftar in _KAB.items() for k in daftar if not kab.startswith("Kota")})
+KECAMATAN_KE_KABUPATEN.update({f"Kemantren {k}": "Kota Yogyakarta" for k in _KAB["Kota Yogyakarta"]})
+
+
+def ke_kabupaten(nama):
+    """Nama wilayah portal -> kabupaten/kota induk (kecamatan digabung)."""
+    return KECAMATAN_KE_KABUPATEN.get(str(nama).strip(), str(nama).strip())
+
+
+def gabung_kecamatan(out):
+    """Jumlahkan seri 'Kecamatan X' ke kabupaten/kota induknya (satu wilayah, komoditas tetap campur)."""
+    w = out[out["jenis"] == "wilayah"].copy()
+    lain = out[out["jenis"] != "wilayah"]
+    w["nama"] = w["nama"].map(ke_kabupaten)
+    urut = {"tercatat_diskalakan": 0, "tercatat": 1, "diturunkan": 2, "nol_diturunkan": 3}
+    def asal_gabungan(a):
+        a = set(a)
+        if a & {"tercatat", "tercatat_diskalakan"}: return "tercatat"
+        return "diturunkan" if "diturunkan" in a else "nol_diturunkan"
+    w = (w.groupby(["waktu_utc", "tanggal_data", "jenis", "nama"], dropna=False, sort=False)
+           .agg(kg=("kg", "sum"), asal=("asal", asal_gabungan), total_portal_kg=("total_portal_kg", "first")).reset_index())
+    w["kg"] = w["kg"].round(1)
+    return pd.concat([lain, w], ignore_index=True)
 TOLERANSI_DETIK = 90    # dua tabel dalam satu run berbeda beberapa milidetik
 
 
@@ -136,6 +181,7 @@ def susun(df):
         out = pd.concat([out, pd.DataFrame([{"waktu_utc": run, "tanggal_data": g["tanggal_data"].iloc[0], "jenis": "turunan",
                                              "nama": "Setara beras", "kg": round(setara, 1), "asal": asal,
                                              "total_portal_kg": g["total_portal_kg"].iloc[0]}])], ignore_index=True)
+    out = gabung_kecamatan(out)
     return out.sort_values(["waktu_utc", "jenis", "nama"]).reset_index(drop=True)
 
 
