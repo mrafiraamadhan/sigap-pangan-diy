@@ -1211,11 +1211,23 @@ async function render() {
   if (berita && berita.length) {
     const val = berita.filter(b => isTrue(b.tervalidasi) && b.url_teratas);
     const nArtikel = new Set(val.map(b => String(b.url_teratas).trim())).size;
+    // Satu pencarian = satu komoditas x bulan sinyal (hingga 3 artikel per pencarian),
+    // jadi yang dihitung kuncinya, bukan barisnya.
+    const nCari = new Set(berita.map(b => String(b.komoditas || "").trim() + "|" + String(b.tanggal).slice(0, 7))).size;
     const tglBerita = val.map(b => String(b.tanggal)).sort().pop();
-    beritaInfo = { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi", tgl: tglBerita,
-      tglTeks: tglBerita ? "kliping s.d. lonjakan " + fmtTgl(tglBerita) : "",
-      lv: "AMAN", baca: nArtikel + " artikel", bacaKet: `dari ${val.length} lonjakan yang dicarikan beritanya`,
-      ket: "Tiap lonjakan yang terdeteksi otomatis dicarikan pemberitaannya, sebagai bukti pendukung yang <strong>belum disaring manusia</strong>. Berita yang cocok memperkuat sinyal, tetapi banyaknya berita saja belum berarti lonjakannya sudah terbukti. Semua artikel bisa ditelusuri per komoditas di bagian Kliping Berita, tab Konteks &amp; Pasokan.", tab: "konteks" };
+    // Lencana kesegaran mengikuti kapan pipeline terakhir MENCARI, bukan tanggal sinyal
+    // terakhir: bila memang tidak ada lonjakan baru, kliping tetap mutakhir.
+    const stB = statusPipe["Sinyal Media"];
+    const dicekB = stB && stB.dicek_pada_utc ? new Date(stB.dicek_pada_utc) : null;
+    const adaDicekB = dicekB && !isNaN(dicekB);
+    const nSp2kp = new Set(berita.filter(b => /^SP2KP/i.test(String(b.pemicu || "")) && String(b.tanggal) === tglBerita)
+      .map(b => String(b.komoditas || "").trim())).size;
+    beritaInfo = { nama: "Sinyal Media", sumber: "Pencarian otomatis, belum dikurasi", tgl: adaDicekB ? dicekB : tglBerita,
+      tglTeks: tglBerita ? `sinyal terakhir ${fmtTglPdk(tglBerita)}${adaDicekB ? " · dicek " + fmtTglPdk(dicekB) : ""}` : "",
+      lv: "AMAN", baca: nArtikel + " artikel", bacaKet: `dari ${fmtN(nCari, 0)} lonjakan yang dicarikan beritanya`,
+      ket: "Tiap lonjakan harga (anomali PIHPS) dan tiap varian SP2KP yang naik lebih dari 10% dalam 30 hari dicarikan beritanya, sebagai bukti pendukung yang <strong>belum disaring manusia</strong>. Banyaknya berita belum berarti lonjakannya terbukti." +
+        (nSp2kp ? ` Pencarian terbaru dipicu ${nSp2kp} varian SP2KP yang sedang naik.` : "") +
+        " Telusuri per komoditas di Kliping Berita, tab Konteks &amp; Pasokan.", tab: "konteks" };
   }
 
   const pilar = kondisiPilar({ tip, sp2kpInfo, dpkpInfo, simoInfo, cadInfo, cuacaInfo, ensoInfo, trendsInfo, beritaInfo });
@@ -2241,7 +2253,7 @@ async function render() {
     // --- kliping berita ---
     const sB = el("section", "blok");
     sB.innerHTML = `<h2>Sinyal Media Pendukung</h2>
-      <p class="sub">Untuk tiap lonjakan yang tercatat, sistem otomatis mencari pemberitaannya sebagai lapisan pengecekan kedua. Menggabungkan sinyal harga dengan teks berita terbukti lebih tajam daripada mengandalkan angka harga saja (Bakry dkk., 2025).</p>`;
+      <p class="sub">Untuk tiap lonjakan harga yang tercatat, dan tiap varian SP2KP yang naik lebih dari 10% dalam 30 hari, sistem otomatis mencari pemberitaannya sebagai lapisan pengecekan kedua. Menggabungkan sinyal harga dengan teks berita terbukti lebih tajam daripada mengandalkan angka harga saja (Bakry dkk., 2025).</p>`;
     if (berita && berita.length) {
       // Di sini cukup enam artikel sebagai cuplikan: yang menyebut DIY didahulukan,
       // lalu yang terbaru. Arsip lengkapnya, dikelompokkan per komoditas, ada di
@@ -2260,7 +2272,8 @@ async function render() {
         const ringkas = String(b.ringkasan || "").trim();
         const tgl = b.tanggal_terbit ? fmtTglPdk(b.tanggal_terbit) : "lonjakan " + fmtTglPdk(b.tanggal);
         const art = el("div", "artikel");
-        const lencana = b._diy ? `<span class="mchip" style="font-size:.62rem;padding:0 6px;color:var(--aman);background:var(--aman-bg);border-color:var(--aman-bd)" title="Menyebut DIY/kabupaten-kota di DIY">DIY</span>` : `<span class="mchip" style="font-size:.62rem;padding:0 6px" title="Tidak menyebut DIY secara khusus">nasional</span>`;
+        const lencana = (b._diy ? `<span class="mchip" style="font-size:.62rem;padding:0 6px;color:var(--aman);background:var(--aman-bg);border-color:var(--aman-bd)" title="Menyebut DIY/kabupaten-kota di DIY">DIY</span>` : `<span class="mchip" style="font-size:.62rem;padding:0 6px" title="Tidak menyebut DIY secara khusus">nasional</span>`) +
+          (/^SP2KP/i.test(String(b.pemicu || "")) ? `<span class="mchip" style="font-size:.62rem;padding:0 6px" title="${escHtml(b.pemicu)}">dipicu SP2KP</span>` : "");
         art.innerHTML = `
           <div class="art-meta"><span class="art-media">${escHtml(media)}</span>${lencana}<span>·</span><span>${tgl}</span></div>
           <div class="art-judul"><a href="${escHtml(b.url_teratas)}" target="_blank" rel="noopener">${escHtml(b.judul_teratas || "(tanpa judul)")}</a></div>
@@ -2311,10 +2324,11 @@ async function render() {
       const kom = String(b.komoditas || "").trim();
       const a = (perUrl[url] ||= { url, judul: String(b.judul_teratas || "").trim() || "(tanpa judul)",
         media: String(b.media || "").trim() || domainDari(url) || "media", ringkas: "", terbit: "",
-        rujukan: [], kelompok: new Set(), koms: new Set() });
+        rujukan: [], kelompok: new Set(), koms: new Set(), pemicu: new Set() });
       if (!a.ringkas && b.ringkasan) a.ringkas = String(b.ringkasan).trim();
       if (!a.terbit && b.tanggal_terbit) a.terbit = String(b.tanggal_terbit).slice(0, 10);
       a.rujukan.push({ tgl: String(b.tanggal).slice(0, 10), kom });
+      if (/^SP2KP/i.test(String(b.pemicu || ""))) a.pemicu.add(String(b.pemicu).trim());
       if (kom) { a.kelompok.add(kelompokDari(kom)); a.koms.add(kom); }
     });
     // Unggahan media sosial (Instagram dll.) ikut terjaring pencarian otomatis lama.
@@ -2329,14 +2343,14 @@ async function render() {
     const s = el("section", "blok");
     s.id = "sek-berita";
     s.innerHTML = `<h2>Kliping Berita per Komoditas</h2>
-      <p class="sub">Setiap kali sistem mendeteksi lonjakan harga, ia otomatis mencari pemberitaannya. Semua hasil pencarian itu dikumpulkan di sini dan dikelompokkan per komoditas: pilih kelompoknya, lalu saring lagi dengan kata kunci kalau perlu. Ini hasil pencarian otomatis yang belum disaring manusia, jadi perlakukan sebagai petunjuk awal, bukan bukti final.</p>`;
+      <p class="sub">Setiap kali sistem mendeteksi lonjakan harga (anomali PIHPS, atau varian SP2KP yang naik lebih dari 10% dalam 30 hari), ia otomatis mencari pemberitaannya. Semua hasil pencarian itu dikumpulkan di sini dan dikelompokkan per komoditas: pilih kelompoknya, lalu saring lagi dengan kata kunci kalau perlu. Ini hasil pencarian otomatis yang belum disaring manusia, jadi perlakukan sebagai petunjuk awal, bukan bukti final.</p>`;
     if (!artikel.length) {
       s.appendChild(el("div", "kosong", "Belum ada kliping berita."));
       TB.appendChild(s);
     } else {
       // ---- ringkasan angka ----
       const nMedia = new Set(artikel.map(a => a.media.toLowerCase())).size;
-      const nLonjakan = artikel.reduce((x, a) => x + a.n, 0);
+      const nLonjakan = new Set((berita || []).map(b => String(b.komoditas || "").trim() + "|" + String(b.tanggal).slice(0, 7))).size;
       const nDIY = artikel.filter(a => a.diy).length;
       const semuaBulan = artikel.map(a => a.bulan).sort();
       const stat = el("div", "berita-stat");
@@ -2449,7 +2463,7 @@ async function render() {
           const koms = [...a.koms].sort();
           const tgl = a.terbit ? fmtTglThn(a.terbit) : `dicari untuk lonjakan ${fmtTglThn(a.tglAkhir)}`;
           return `<div class="artikel">
-            <div class="art-meta"><span class="art-media">${escHtml(a.media)}</span>${a.diy ? `<span class="mchip" style="font-size:.62rem;padding:0 6px;color:var(--aman);background:var(--aman-bg);border-color:var(--aman-bd)" title="Judul/ringkasan menyebut DIY, kabupaten/kota, atau pasar di DIY (atau media lokal)">DIY</span>` : `<span class="mchip" style="font-size:.62rem;padding:0 6px" title="Tidak menyebut DIY secara khusus; kemungkinan berita nasional">nasional</span>`}${a.sosial ? `<span class="mchip" style="font-size:.62rem;padding:0 6px" title="Ini unggahan media sosial, bukan artikel media berita">media sosial</span>` : ""}<span>·</span><span>${tgl}</span>${
+            <div class="art-meta"><span class="art-media">${escHtml(a.media)}</span>${a.diy ? `<span class="mchip" style="font-size:.62rem;padding:0 6px;color:var(--aman);background:var(--aman-bg);border-color:var(--aman-bd)" title="Judul/ringkasan menyebut DIY, kabupaten/kota, atau pasar di DIY (atau media lokal)">DIY</span>` : `<span class="mchip" style="font-size:.62rem;padding:0 6px" title="Tidak menyebut DIY secara khusus; kemungkinan berita nasional">nasional</span>`}${a.sosial ? `<span class="mchip" style="font-size:.62rem;padding:0 6px" title="Ini unggahan media sosial, bukan artikel media berita">media sosial</span>` : ""}${a.pemicu.size ? `<span class="mchip" style="font-size:.62rem;padding:0 6px" title="${escHtml([...a.pemicu].join("; "))}">dipicu SP2KP</span>` : ""}<span>·</span><span>${tgl}</span>${
               a.n > 1 ? `<span>·</span><span class="art-rujuk" title="Artikel ini muncul sebagai hasil teratas untuk ${a.n} lonjakan berbeda (${fmtTglPdk(a.tglAwal)} – ${fmtTglThn(a.tglAkhir)})">dirujuk ${a.n} lonjakan</span>` : ""}</div>
             <div class="art-judul"><a href="${escHtml(a.url)}" target="_blank" rel="noopener">${escHtml(a.judul)}</a></div>
             ${a.ringkas ? `<div class="art-ringkas">${escHtml(a.ringkas.slice(0, 240))}${a.ringkas.length > 240 ? "…" : ""}</div>` : ""}
@@ -2687,7 +2701,7 @@ async function render() {
       <p class="catatan"><strong>Prakiraan risiko harga (tab Prakiraan):</strong> uji-mundur <em>rolling-origin</em> atas 14 komoditas DPKP, 228 minggu (Apr 2022–Agu 2026), membandingkan delapan pendekatan: naif atau <em>random walk</em>, drift, SES, Theta, Holt teredam, ARIMA(1,1,1), naif musiman, dan regresi Ridge lag+musim. Hasil: <strong>tidak ada model yang mengalahkan penduga naif</strong> pada horizon 1 minggu (MASE terbaik = 1,000), dan pada horizon 1 bulan naif tetap unggul rata-rata (SES menang di 5 dari 14 komoditas dan ARIMA di 7 dari 14, tetapi keduanya kalah pada rerata lintas komoditas). Hasil ini sejalan dengan sifat harga komoditas jangka pendek yang mendekati <em>martingale</em>. Karena itu penduga titik dipertahankan sebagai harga terkini, dan yang diprakirakan adalah <strong>ketidakpastiannya</strong>: interval dari kuantil empiris nonparametrik perubahan h-langkah tiap komoditas. Kalibrasi teruji: cakupan interval 80% tercapai 76,0% (h=1 minggu) dan 82,7% (h=1 bulan); interval 95% tercapai 94,5% dan 94,1%. Prakiraan peluang menembus ambang memiliki <em>Brier skill</em> +10,3% terhadap acuan iklim. Pengondisian pada bulan kalender diuji dan <strong>dilaporkan tidak membantu</strong> (skill turun ke +4,8%) sehingga tidak dipakai. Deret PIHPS tidak dipakai untuk prakiraan karena berbentuk fungsi tangga (9 nilai unik dalam 260 hari).</p>
       <p class="catatan"><strong>Hujan, El Niño, dan panen (tab Konteks &amp; Pasokan):</strong> hujan bulanan 1991–kini diambil dari Open-Meteo (reanalisis ERA5/ERA5-Land ECMWF) pada lima titik kabupaten/kota lalu dirata-rata, karena arsip stasiun BMKG tidak terbuka untuk mesin; normal memakai 1991–2020. Hubungan El Niño–kemarau diuji dengan korelasi Pearson antara ONI Agu–Okt dan total hujan Juni–November tiap tahun (±35 tahun), ditambah komposit tahun El Niño (ONI ≥ +0,5), netral, dan La Niña (≤ −0,5) serta bulan datangnya musim hujan (bulan pertama ≥ 150 mm setelah Agustus). Hubungan hujan–tanam–panen memakai luas tanam/panen SIMOTANDI provinsi per bulan dengan jeda 0–6 bulan; deretnya baru ±30 bulan, jadi hasilnya deskriptif (irama musiman), bukan bukti kausal.</p>
       <p class="catatan"><strong>Uji volatilitas berlebih (data DPKP):</strong> adaptasi metode <em>Excessive Food Price Variability Early Warning System</em> (IFPRI / Food Security Portal), dengan ambang nonparametrik pada persentil ke-95 kenaikan harian historis tiap komoditas, lalu jumlah hari ekstrem dalam jendela 90 hari dibandingkan dengan harapan statistiknya (5% observasi): melebihi dua kali lipat → tinggi, melebihi harapan → sedang. Diterapkan pada deret DPKP yang bergerak harian; deret PIHPS provinsi terlalu bertangga untuk uji ini. Kesesuaian hasil kedua metode (tipologi &amp; volatilitas) menjadi validasi silang.</p>
-      <p class="catatan"><strong>Metode &amp; rujukan:</strong> deteksi anomali z-score bergulir 14 hari; pengayaan konteks cuaca/iklim/sinyal publik; verifikasi tekstual otomatis mengikuti bukti fusi sinyal harga+berita (Bakry dkk., 2025, AUC 0,94 vs 0,46); klasifikasi volatilitas mengikuti kerangka IFPRI di atas. <strong>Yang kami akui belum beres:</strong> harga PIHPS masih rata-rata provinsi, bukan per pasar. Pilar SIMOTANDI baru setengah otomatis karena server sumbernya menolak akses dari layanan cloud yang kami pakai. Kliping berita masih indikatif, sebab berasal dari pencarian otomatis dan belum disaring manusia. Dan ini purwarupa riset, bukan produk resmi pemerintah.</p>`;
+      <p class="catatan"><strong>Metode &amp; rujukan:</strong> deteksi anomali z-score bergulir 14 hari; pengayaan konteks cuaca/iklim/sinyal publik; verifikasi tekstual otomatis mengikuti bukti fusi sinyal harga+berita (Bakry dkk., 2025, AUC 0,94 vs 0,46), dipicu oleh anomali PIHPS dan, sejak 10 Okt 2026, juga oleh varian SP2KP yang naik lebih dari 10% dalam 30 hari (anomali PIHPS hanya muncul di akhir bulan, saat datanya diperbarui); klasifikasi volatilitas mengikuti kerangka IFPRI di atas. <strong>Yang kami akui belum beres:</strong> harga PIHPS masih rata-rata provinsi, bukan per pasar. Pilar SIMOTANDI baru setengah otomatis karena server sumbernya menolak akses dari layanan cloud yang kami pakai. Kliping berita masih indikatif, sebab berasal dari pencarian otomatis dan belum disaring manusia. Dan ini purwarupa riset, bukan produk resmi pemerintah.</p>`;
     s.appendChild(at);
     T5.appendChild(s);
 

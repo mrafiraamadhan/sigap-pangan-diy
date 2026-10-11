@@ -31,6 +31,16 @@ Perubahan lain:
 Kolom lama tetap ada dan artinya tidak berubah, jadi papan pantau versi
 lama pun masih bisa membaca berkas ini.
 
+=== VERSI 3 (10 Okt 2026): PEMICU DARI SP2KP ===
+Anomali (z-score) dari merge_and_detect.py membaca PIHPS, yang hanya bergerak di
+akhir bulan (tanggal 25-29). Akibatnya kenaikan nyata di pasar di antara dua
+siklus itu tidak pernah dicarikan beritanya (contoh: cabai merah keriting naik
+60% dalam 30 hari per 9 Okt 2026 di SP2KP, sementara kliping terakhir 29 Sep).
+Kini setiap varian SP2KP yang naik > 10% dalam 30 hari (ambang yang sama dengan
+pilar SP2KP di papan pantau) ikut menjadi pemicu. Pencariannya dibatasi ke
+jendela 30 hari kenaikan itu. Kolom baru `pemicu` mencatat asal tiap baris:
+"anomali PIHPS (z-score)" atau "SP2KP naik N% dalam 30 hari".
+
 Cara pakai:
     python news_validation.py                # mode pipeline (baca anomali, tambah arsip)
     python news_validation.py --uji "harga cabai Yogyakarta"   # coba satu query, cetak hasil
@@ -52,6 +62,11 @@ import requests
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ANOMALI_PATH = os.path.join(HERE, "..", "..", "data", "gabungan_anomali.csv")
+# Versi ringkas SP2KP (rata-rata provinsi per varian per hari) hasil ringkas_sp2kp.py.
+SP2KP_PATH = os.path.join(HERE, "..", "..", "docs", "data", "harga_sp2kp_diy.csv")
+AMBANG_NAIK_SP2KP = 10.0      # persen dalam 30 hari; sama dengan ambang pilar SP2KP di papan pantau
+MIN_PENGAMATAN_SP2KP = 60     # sama dengan papan pantau: varian berderet pendek dilewati
+PEMICU_PIHPS = "anomali PIHPS (z-score)"
 OUTPUT_PATH = os.path.join(HERE, "..", "..", "data", "validasi_berita.csv")
 
 API_KEY = os.environ.get("FIRECRAWL_API_KEY")
@@ -68,7 +83,7 @@ BULAN_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
 
 KOLOM = ["tanggal", "komoditas", "kabupaten_kota", "query", "jumlah_berita_ditemukan",
          "judul_teratas", "url_teratas", "ringkasan", "tervalidasi",
-         "media", "tanggal_terbit", "peringkat", "diambil_pada_utc"]
+         "media", "tanggal_terbit", "peringkat", "diambil_pada_utc", "pemicu"]
 
 # Batasan kesopanan. RSS tidak punya kuota resmi, tetapi tetap diberi jeda.
 MAKS_VALIDASI = 20        # maksimal query pencarian per run
@@ -99,16 +114,27 @@ def tanggal_iso(teks):
     return m.group(1) if m else ""
 
 
+def ke_bulat(x, cadangan=0):
+    """'3', '3.0', 3.0 -> 3; kosong/tak terbaca -> cadangan."""
+    try:
+        return int(float(str(x).strip()))
+    except (TypeError, ValueError):
+        return cadangan
+
+
 def akhir_bulan(yyyy_mm):
     t, b = int(yyyy_mm[:4]), int(yyyy_mm[5:7])
     return f"{t + (b == 12):04d}-{(b % 12) + 1:02d}-01"
 
 
 # ---------------------------------------------------------------- sumber 1: Google News RSS
-def cari_google_news(query, limit, bulan=None):
-    """bulan = 'YYYY-MM' untuk membatasi ke bulan lonjakan (opsional)."""
+def cari_google_news(query, limit, bulan=None, rentang=None):
+    """bulan = 'YYYY-MM' untuk membatasi ke bulan lonjakan (opsional);
+    rentang = ('YYYY-MM-DD', 'YYYY-MM-DD') untuk jendela tanggal eksplisit (opsional)."""
     q = query
-    if bulan:
+    if rentang:
+        q = f"{query} after:{rentang[0]} before:{rentang[1]}"
+    elif bulan:
         q = f"{query} after:{bulan}-01 before:{akhir_bulan(bulan)}"
     url = "https://news.google.com/rss/search?" + urlencode({"q": q, "hl": "id", "gl": "ID", "ceid": "ID:id"})
     r = requests.get(url, headers=UA, timeout=30)
@@ -202,10 +228,30 @@ def relevan_pangan(h, komoditas):
     return bool(KATA_PANGAN.search(teks))
 
 
-def cari_berita(query, limit=HASIL_PER_QUERY, bulan=None, komoditas=""):
+def dalam_rentang(h, rentang, kelonggaran_hari=3):
+    """Artikel yang tanggal terbitnya diketahui harus jatuh di jendela kenaikan (± beberapa hari).
+    Yang tanggalnya tidak diketahui dibiarkan lolos (penyaring komoditas tetap berlaku)."""
+    t = h.get("tanggal_terbit") or ""
+    if not rentang or not t:
+        return True
+    from datetime import date, timedelta
+    try:
+        d = date.fromisoformat(t[:10])
+        a = date.fromisoformat(rentang[0]) - timedelta(days=kelonggaran_hari)
+        b = date.fromisoformat(rentang[1]) + timedelta(days=kelonggaran_hari)
+    except ValueError:
+        return True
+    return a <= d <= b
+
+
+def cari_berita(query, limit=HASIL_PER_QUERY, bulan=None, komoditas="", rentang=None):
     """Coba tiap sumber berurutan; kembalikan list dict hasil (bisa kosong)."""
-    percobaan = [
-        ("Google News RSS (bulan lonjakan)", lambda: cari_google_news(query, limit * 3, bulan) if bulan else []),
+    percobaan = []
+    if rentang:
+        percobaan.append(("Google News RSS (jendela kenaikan)", lambda: cari_google_news(query, limit * 3, rentang=rentang)))
+    elif bulan:
+        percobaan.append(("Google News RSS (bulan lonjakan)", lambda: cari_google_news(query, limit * 3, bulan)))
+    percobaan += [
         ("Google News RSS", lambda: cari_google_news(query, limit * 3)),
         ("Bing News RSS", lambda: cari_bing_news(query, limit * 3)),
         ("Firecrawl", lambda: cari_firecrawl(query, limit * 2)),
@@ -227,7 +273,7 @@ def cari_berita(query, limit=HASIL_PER_QUERY, bulan=None, komoditas=""):
             # Buang artikel yang tidak menyebut komoditasnya maupun soal harga pangan
             # (pelajaran run 29 Sep: query bulan lama mengembalikan "rujak lotis",
             # "cokelat pedas", berita APBD). Lebih baik kosong daripada menyesatkan.
-            relevan = [h for h in unik if relevan_pangan(h, komoditas)]
+            relevan = [h for h in unik if relevan_pangan(h, komoditas) and dalam_rentang(h, rentang)]
             relevan.sort(key=lambda h: -skor_relevansi(h, komoditas))
             catat(f"    {nama}: {len(unik)} artikel, {len(relevan)} relevan")
             if relevan:
@@ -237,23 +283,27 @@ def cari_berita(query, limit=HASIL_PER_QUERY, bulan=None, komoditas=""):
     return []
 
 
-def validasi_anomali(tanggal, komoditas, kabupaten):
-    """Bangun query dari konteks anomali; kembalikan daftar baris (satu per artikel)."""
+def validasi_anomali(tanggal, komoditas, kabupaten, pemicu=PEMICU_PIHPS, rentang=None):
+    """Bangun query dari konteks anomali; kembalikan daftar baris (satu per artikel).
+    rentang = jendela tanggal kenaikan (untuk pemicu SP2KP); tanpa rentang dipakai bulan lonjakan."""
     diambil = datetime.now(timezone.utc).isoformat()
     bulan = str(tanggal)[:7]
     try:
         nama_bulan = BULAN_ID[int(bulan[5:7]) - 1] + " " + bulan[:4]
     except (ValueError, IndexError):
         nama_bulan = bulan
-    query = f"harga {komoditas.strip()} Yogyakarta {nama_bulan}"
-    hasil = cari_berita(query, bulan=bulan, komoditas=komoditas)
+    # Dengan jendela tanggal, nama bulan tidak ditulis di query (kenaikan 30 hari bisa
+    # melintasi dua bulan; penyaring after:/before: yang membatasi waktunya).
+    query = f"harga {komoditas.strip()} Yogyakarta" + ("" if rentang else f" {nama_bulan}")
+    hasil = cari_berita(query, bulan=bulan, komoditas=komoditas, rentang=rentang)
     baris = []
     if not hasil:
         # Dicatat sebagai "sudah dicari, tidak ada berita relevan" supaya run berikutnya
         # tidak mengulang pencarian yang sama; papan pantau mengabaikan baris tanpa URL.
         return [{"tanggal": tanggal, "komoditas": komoditas.strip(), "kabupaten_kota": kabupaten, "query": query,
                  "jumlah_berita_ditemukan": 0, "judul_teratas": "", "url_teratas": "", "ringkasan": "",
-                 "tervalidasi": False, "media": "", "tanggal_terbit": "", "peringkat": 0, "diambil_pada_utc": diambil}]
+                 "tervalidasi": False, "media": "", "tanggal_terbit": "", "peringkat": 0, "diambil_pada_utc": diambil,
+                 "pemicu": pemicu}]
     for i, h in enumerate(hasil, 1):
         baris.append({
             "tanggal": tanggal,
@@ -269,8 +319,48 @@ def validasi_anomali(tanggal, komoditas, kabupaten):
             "tanggal_terbit": h.get("tanggal_terbit", ""),
             "peringkat": i,
             "diambil_pada_utc": diambil,
+            "pemicu": pemicu,
         })
     return baris
+
+
+def pemicu_sp2kp():
+    """Varian SP2KP yang naik > AMBANG_NAIK_SP2KP % dalam 30 hari pada tanggal data terakhirnya.
+    Rumusnya sama dengan pilar SP2KP di papan pantau: harga terakhir dibanding pengamatan
+    terakhir yang <= 30 hari sebelumnya; varian dengan < 60 pengamatan dilewati.
+    Kembalikan list dict {tanggal, komoditas, kabupaten_kota, pemicu, rentang}."""
+    if not os.path.isfile(SP2KP_PATH):
+        catat(f"SP2KP ringkas belum ada ({SP2KP_PATH}); pemicu SP2KP dilewati.")
+        return []
+    import pandas as pd
+    d = pd.read_csv(SP2KP_PATH)
+    d["harga"] = pd.to_numeric(d["harga"], errors="coerce")
+    d["t"] = pd.to_datetime(d["tanggal"], errors="coerce")
+    d = d.dropna(subset=["t", "harga"]).query("harga > 0")
+    if d.empty:
+        return []
+    t_maks = d["t"].max()
+    keluar = []
+    for varian, g in d.groupby("varian"):
+        g = g.sort_values("t")
+        if len(g) < MIN_PENGAMATAN_SP2KP:
+            continue
+        akhir = g.iloc[-1]
+        if (t_maks - akhir["t"]).days > 7:          # varian yang sudah tidak dilaporkan
+            continue
+        batas = akhir["t"] - pd.Timedelta(days=30)
+        dulu = g[g["t"] <= batas]
+        if dulu.empty:
+            continue
+        h30 = float(dulu.iloc[-1]["harga"])
+        naik = (float(akhir["harga"]) - h30) / h30 * 100
+        if naik > AMBANG_NAIK_SP2KP:
+            keluar.append({"tanggal": akhir["t"].date().isoformat(), "komoditas": str(varian).strip(),
+                           "kabupaten_kota": "DI Yogyakarta", "naik": naik,
+                           "pemicu": f"SP2KP naik {naik:.0f}% dalam 30 hari",
+                           "rentang": (batas.date().isoformat(), (akhir["t"] + pd.Timedelta(days=1)).date().isoformat())})
+    keluar.sort(key=lambda r: -r["naik"])
+    return keluar
 
 
 def main():
@@ -294,12 +384,23 @@ def main():
     import pandas as pd
     df = pd.read_csv(ANOMALI_PATH)
     anomali = df[df.get("anomali_harga", False).astype(str).str.lower() == "true"]
-    if anomali.empty:
-        catat("Tidak ada anomali untuk divalidasi.")
-        return
-
     anomali = anomali.sort_values("tanggal", ascending=False)
-    total_kandidat = len(anomali)
+
+    # Kandidat = pemicu SP2KP (kenaikan yang sedang berlangsung, didahulukan) lalu
+    # anomali PIHPS dari yang terbaru. Kunci komoditas|bulan mencegah pencarian ganda.
+    kandidat = []
+    sp = pemicu_sp2kp()
+    if sp:
+        catat(f"{len(sp)} varian SP2KP naik > {AMBANG_NAIK_SP2KP:.0f}% dalam 30 hari: "
+              + ", ".join(f"{r['komoditas']} ({r['naik']:+.0f}%)" for r in sp))
+    kandidat.extend(sp)
+    for _, row in anomali.iterrows():
+        kandidat.append({"tanggal": str(row["tanggal"]), "komoditas": str(row["komoditas"]),
+                         "kabupaten_kota": str(row["kabupaten_kota"]), "pemicu": PEMICU_PIHPS, "rentang": None})
+    if not kandidat:
+        catat("Tidak ada anomali maupun kenaikan SP2KP untuk divalidasi.")
+        return
+    total_kandidat = len(kandidat)
 
     # Arsip lama dibaca dulu lalu DITAMBAH, tidak pernah ditimpa atau menyusut.
     lama = []
@@ -316,7 +417,7 @@ def main():
 
     tambahan = []
     percobaan = 0
-    for _, row in anomali.iterrows():
+    for row in kandidat:
         if percobaan >= maks:
             catat(f"Batas {maks} pencarian per run tercapai (dari {total_kandidat} kandidat); "
                   "sisanya dilanjutkan run berikutnya.")
@@ -326,9 +427,10 @@ def main():
             continue
         percobaan += 1
         sudah.add(k)
-        catat(f"Validasi: {row['tanggal']} - {row['komoditas']} - {row['kabupaten_kota']}")
+        catat(f"Validasi: {row['tanggal']} - {row['komoditas']} - {row['kabupaten_kota']} [{row['pemicu']}]")
         try:
-            baris = validasi_anomali(str(row["tanggal"]), str(row["komoditas"]), str(row["kabupaten_kota"]))
+            baris = validasi_anomali(str(row["tanggal"]), str(row["komoditas"]), str(row["kabupaten_kota"]),
+                                     pemicu=row["pemicu"], rentang=row["rentang"])
             tambahan.extend(baris)
             if baris and not baris[0]["url_teratas"]:
                 catat("    tidak ada berita relevan; dicatat supaya tidak dicari ulang.")
@@ -340,9 +442,19 @@ def main():
         catat("\nTidak ada kliping baru pada run ini; berkas lama dibiarkan apa adanya.")
         return
 
+    # Baris lama (sebelum kolom `pemicu` ada) seluruhnya berasal dari anomali PIHPS.
+    for r in lama:
+        if not str(r.get("pemicu") or "").strip():
+            r["pemicu"] = PEMICU_PIHPS
     gabung = [{c: r.get(c, "") for c in KOLOM} for r in (tambahan + lama)]
+    # Angka bulat bisa tersimpan sebagai "1.0" bila berkas pernah ditulis ulang lewat
+    # pandas (unggahan 29 Sep 2026). int("1.0") gagal, dan karena langkah ini
+    # continue-on-error, seluruh hasil run ikut hilang tanpa terlihat. Dinormalkan di sini.
+    for r in gabung:
+        for c in ("peringkat", "jumlah_berita_ditemukan"):
+            r[c] = ke_bulat(r.get(c), "")
     # Urutan: tanggal lonjakan terbaru dulu; di dalam tanggal yang sama, peringkat 1 dulu.
-    gabung.sort(key=lambda r: int(r.get("peringkat") or 1))
+    gabung.sort(key=lambda r: ke_bulat(r.get("peringkat"), 1) or 1)
     gabung.sort(key=lambda r: str(r.get("tanggal", "")), reverse=True)
     assert len(gabung) >= len(lama), "arsip kliping tidak boleh menyusut"
 
