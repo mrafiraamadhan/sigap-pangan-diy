@@ -18,12 +18,24 @@ Bentuk berkas Excel yang dikenali (satu lembar, ~84 baris untuk DIY):
 Hanya baris KECAMATAN (KDKC terisi) yang disimpan, sama seperti riwayat.
 Berkas yang tidak difilter DIY (38 provinsi) ditolak dengan pesan jelas.
 
+Bentuk kedua (16 Okt 2026): "tabel web" per kecamatan, mis. hasil salin tabel
+situs atau unduhan yang dibuka-simpan ulang di aplikasi lembar kerja:
+  baris 0..2 : header (No | Wilayah | fase ... | Luas Baku Sawah)
+  baris data : "Daerah Istimewa Yogyakarta", "↳ Kabupaten", "N kecamatan", "• Kecamatan"
+  nilai      : dibulatkan ke hektare, "-" = 0, dan PEMISAH RIBUAN TERBACA DESIMAL
+               ("3.250" tersimpan 3,25; "2.000" tersimpan 2).
+Periode diambil dari nama berkas. Angka dipulihkan: nilai berdesimal dikali 1.000;
+nilai bulat 1..999 yang ambigu diputuskan dengan dua kendala tiap baris,
+  jumlah 8 fase = luas baku sawah   dan   standing crop = tanam + veg1 + veg2 + gen1 + gen2,
+lalu jumlah kecamatan dicocokkan dengan baris kabupaten. Kode wilayah diambil dari riwayat.
+
 Cara pakai:
     python src/sources/simotandi_dari_excel.py "Data_Tabular_17 - 28 Agustus 2026_*.xlsx" ...
     python src/sources/simotandi_dari_excel.py folder_unduhan/*.xlsx
 """
 
 import glob
+import itertools
 import os
 import re
 import sys
@@ -119,6 +131,12 @@ def baca_excel(path):
             kec.append((provinsi, kabupaten, r))
     if not kec:
         prov = {str(r[4]) for r in data if r[4]}
+        n_kab = sum(1 for r in data if r[1] is None and r[2] is not None)
+        if len(prov) == 1 and n_kab:
+            # Contoh 16 Okt 2026: berkas DIY hanya berisi 1 baris provinsi + 5 baris kabupaten.
+            raise ValueError(f"{os.path.basename(path)}: berkas sudah difilter ke {next(iter(prov))}, tetapi hanya "
+                             f"sampai tingkat KABUPATEN ({n_kab} baris). Riwayat disimpan per KECAMATAN (78 baris); "
+                             f"unduh ulang dengan rincian kecamatan (tabel ±84 baris), atau unduh per kabupaten.")
         raise ValueError(f"{os.path.basename(path)}: tidak ada baris kecamatan. Berkas ini tampaknya "
                          f"belum difilter ke DI Yogyakarta ({len(prov)} provinsi). Unduh ulang dengan filter provinsi.")
     mulai, selesai = parse_periode(label)
@@ -149,6 +167,101 @@ def baca_excel(path):
     return df[KOLOM_KELUARAN]
 
 
+SUMBER_TABEL_WEB = "simotandi.pertanian.go.id/data-tabular (tabel web, dibulatkan ke ha)"
+TOLERANSI_HA = 8.0   # galat pembulatan wajar untuk jumlah 5-8 sel yang masing-masing dibulatkan
+
+
+def adalah_tabel_web(path):
+    ws = openpyxl.load_workbook(path, read_only=True).worksheets[0]
+    r0 = next(ws.iter_rows(max_row=1, values_only=True), ())
+    return len(r0) > 1 and str(r0[0]).strip().lower() == "no" and str(r0[1]).strip().lower() == "wilayah"
+
+
+def _pulihkan_baris(nilai):
+    """nilai: 10 angka mentah (8 fase, standing crop, luas baku). Kembalikan (angka pulih, galat, n_dikali)."""
+    dasar, ambigu = [], []
+    for i, v in enumerate(nilai):
+        if v is None or (isinstance(v, str) and v.strip() in ("-", "")):
+            dasar.append(0.0)
+        elif isinstance(v, str):
+            dasar.append(float(v.replace(".", "").replace(",", ".")))
+        elif float(v).is_integer():
+            dasar.append(float(v))
+            if 1 <= v <= 999:
+                ambigu.append(i)
+        else:
+            dasar.append(round(float(v) * 1000))      # "3.250" -> 3,25 -> 3250
+    terbaik = None
+    for komb in itertools.product((1, 1000), repeat=len(ambigu)):
+        x = list(dasar)
+        for i, f in zip(ambigu, komb):
+            x[i] = dasar[i] * f
+        galat = abs(sum(x[:8]) - x[9]) + abs(x[8] - sum(x[2:7]))
+        skor = (max(galat - TOLERANSI_HA, 0), sum(f == 1000 for f in komb), galat)
+        if terbaik is None or skor < terbaik[0]:
+            terbaik = (skor, x)
+    return terbaik[1], terbaik[0][2], terbaik[0][1]
+
+
+def baca_tabel_web(path, kode_lookup):
+    nama = os.path.basename(path)
+    m = re.search(r"Data[_ ]Tabular[_ ](.+?)[_ ](\d{8})[_ ](\d{6})", nama)
+    if not m:
+        raise ValueError(f"{nama}: periode tidak terbaca dari nama berkas (pola 'Data_Tabular_<periode>_<tgl>_<jam>')")
+    label = re.sub(r"\s+", " ", m.group(1).replace("_", " ")).strip()
+    try:
+        diambil = (datetime.strptime(m.group(2) + m.group(3), "%Y%m%d%H%M%S") - timedelta(hours=7)).replace(tzinfo=timezone.utc)
+    except ValueError:
+        diambil = datetime.now(timezone.utc)
+    mulai, selesai = parse_periode(label)
+    ws = openpyxl.load_workbook(path, read_only=True).worksheets[0]
+    provinsi, kabupaten, kab_baris, kec, catatan = None, None, {}, [], []
+    for r in ws.iter_rows(min_row=4, values_only=True):
+        if not r or r[1] is None:
+            continue
+        nm = str(r[1]).strip()
+        if re.match(r"^\d+\s+kecamatan$", nm, re.I):
+            continue
+        angka, galat, n_kali = _pulihkan_baris(list(r[2:12]))
+        if nm.startswith("↳"):
+            kabupaten = nm.lstrip("↳ ").strip(); kab_baris[kabupaten] = angka
+        elif nm.startswith("•"):
+            kec.append((kabupaten, nm.lstrip("• ").strip(), angka))
+        elif r[0] is not None:
+            provinsi = nm
+        if galat > TOLERANSI_HA:
+            catatan.append(f"{nm}: kendala baris meleset {galat:.0f} ha")
+    if not kec:
+        raise ValueError(f"{nama}: tabel web tanpa baris kecamatan")
+    out = []
+    for kab, kc, a in kec:
+        kode = kode_lookup.get((kab, kc))
+        if kode is None:
+            raise ValueError(f"{nama}: kecamatan {kc} ({kab}) tidak ada di riwayat, kode wilayah tidak diketahui")
+        out.append({
+            "periode": label, "periode_kode": kode_periode(mulai),
+            "periode_mulai": mulai.isoformat(), "periode_selesai": selesai.isoformat(),
+            "provinsi": provinsi or "Daerah Istimewa Yogyakarta", "kabupaten_kota": kab, "kecamatan": kc,
+            "kode_wilayah": int(kode),
+            "bera_ha": a[0], "persiapan_lahan_ha": a[1], "tanam_ha": a[2], "vegetatif_1_ha": a[3],
+            "vegetatif_2_ha": a[4], "generatif_1_ha": a[5], "generatif_2_ha": a[6], "panen_ha": a[7],
+            "standing_crop_ha": a[8], "luas_baku_sawah_ha": a[9],
+            "sumber_layer": SUMBER_TABEL_WEB, "diambil_pada_utc": diambil.isoformat(),
+        })
+    df = pd.DataFrame(out)
+    df["total_luas_ha"] = df[KOLOM_FASE].sum(axis=1).round(2)
+    # Pemeriksaan silang: jumlah kecamatan vs baris kabupaten (keduanya dibulatkan per sel).
+    for kab, a in kab_baris.items():
+        sub = df[df.kabupaten_kota == kab]
+        for kol, j in (("luas_baku_sawah_ha", 9), ("panen_ha", 7), ("standing_crop_ha", 8)):
+            sel = abs(sub[kol].sum() - a[j])
+            if sel > 0.6 * len(sub) + 1:
+                catatan.append(f"{kab}: jumlah {kol} kecamatan {sub[kol].sum():.0f} vs baris kabupaten {a[j]:.0f}")
+    for c in catatan:
+        print(f"  PERINGATAN {label}: {c}")
+    return df[KOLOM_KELUARAN]
+
+
 def main(argv):
     berkas = []
     for pola in argv:
@@ -161,7 +274,12 @@ def main(argv):
     baru = []
     for f in sorted(berkas):
         try:
-            df = baca_excel(f)
+            if adalah_tabel_web(f):
+                kode_lookup = {(str(k), str(c)): w for k, c, w in
+                               lama[["kabupaten_kota", "kecamatan", "kode_wilayah"]].drop_duplicates().itertuples(index=False)}
+                df = baca_tabel_web(f, kode_lookup)
+            else:
+                df = baca_excel(f)
         except ValueError as e:
             print(f"DILEWATI: {e}"); continue
         asing = sorted(set(df.kecamatan) - kec_dikenal) if kec_dikenal else []

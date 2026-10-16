@@ -622,6 +622,8 @@ const maksWaktu = arr => (arr || []).filter(Boolean).map(v => new Date(v)).filte
 // dilihat pada 29 Sep pagi terbaca "kemarin", bukan "hari ini".
 const tglWIB = t => { const d = new Date(t); return isNaN(d) ? null : d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }); };
 const hariKalender = t => { const a = tglWIB(t), b = tglWIB(Date.now()); return a && b ? Math.round((Date.parse(b) - Date.parse(a)) / 864e5) : null; };
+// Lantai signifikansi ekonomi untuk uji volatilitas berlebih (paper subbab 4.12).
+const LANTAI_EKONOMI = 2;   // persen
 const lencanaSegar = t => { const n = hariKalender(t); if (n === null) return "";
   return `<span class="lencana-segar ${n <= 2 ? "baru" : n <= 10 ? "sedang" : "lama"}" title="Selisih hari kalender (WIB) sejak data/pengambilan terakhir">${n <= 0 ? "hari ini" : n === 1 ? "kemarin" : n + " hari lalu"}</span>`; };
 function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; }
@@ -920,19 +922,29 @@ async function render() {
         // melampaui harapan statistik (5% observasi), volatilitas dinilai
         // berlebih. Dipasang pada data DPKP karena bergerak harian; deret
         // PIHPS provinsi terlalu bertangga untuk metode ini.
+        //
+        // Rumus mengikuti paper (subbab 3.11 dan 4.12): persentil ke-95 dihitung dari
+        // SEMUA perubahan harian (termasuk hari tanpa perubahan), lalu ambang efektif =
+        // nilai terbesar antara persentil itu dan LANTAI SIGNIFIKANSI EKONOMI 2%. Tanpa
+        // lantai, deret yang jarang berubah (beras premium: persentil 0,36%) membuat
+        // kenaikan Rp50 tercatat "ekstrem". Uji kepekaan: lantai 1,5% s.d. 6% memberi
+        // kesimpulan yang sama; 2% dipilih sebagai nilai terendah yang stabil.
         let vol = null, volDetail = "";
         if (arr.length >= 120) {
           const rets = [];
           for (let i = 1; i < arr.length; i++)
             rets.push({ t: arr[i].t, r: (arr[i].h - arr[i - 1].h) / arr[i - 1].h * 100 });
-          const pos = rets.map(x => x.r).filter(r => r > 0).sort((a, b) => a - b);
-          if (pos.length >= 30) {
-            const p95 = pos[Math.min(pos.length - 1, Math.floor(0.95 * pos.length))];
+          const urut = rets.map(x => x.r).sort((a, b) => a - b);
+          if (urut.length >= 30) {
+            const pos = 0.95 * (urut.length - 1), lo = Math.floor(pos);   // interpolasi linear, sama dengan numpy
+            const p95 = urut[lo] + (urut[Math.min(lo + 1, urut.length - 1)] - urut[lo]) * (pos - lo);
+            const ambang = Math.max(p95, LANTAI_EKONOMI);
             const win = rets.filter(x => +new Date(x.t) >= +new Date(tMaks) - 90 * 864e5);
-            const ekstrem = win.filter(x => x.r > p95).length;
+            const ekstrem = win.filter(x => x.r > ambang).length;
             const harap = 0.05 * win.length;
-            vol = ekstrem > Math.max(2 * harap, 3) ? "TINGGI" : ekstrem > harap ? "SEDANG" : "RENDAH";
-            volDetail = `${ekstrem} hari ekstrem dari ${win.length} observasi 90 hari (ambang kenaikan harian: +${p95.toFixed(1)}%)`;
+            vol = ekstrem > 2 * harap ? "TINGGI" : ekstrem > harap ? "SEDANG" : "RENDAH";
+            volDetail = `${ekstrem} hari ekstrem dari ${win.length} observasi 90 hari (ambang kenaikan: +${fmtN(ambang, 1)}%` +
+              (p95 < LANTAI_EKONOMI ? `; persentil ke-95 hanya ${fmtN(p95, 2)}%, dinaikkan ke lantai ekonomi ${LANTAI_EKONOMI}%)` : `, persentil ke-95)`);
           }
         }
         daftar.push({ k, h: akhir.h, ubah30: h30 ? (akhir.h - h30) / h30 * 100 : null, vol, volDetail });
@@ -2608,7 +2620,7 @@ async function render() {
     const sD = el("section", "blok");
     sD.id = "sek-dpkp";
     sD.innerHTML = `<h2>Harga Rujukan DPKP DIY</h2>
-      <p class="sub">Ini sumber kedua yang berdiri sendiri, yaitu pencatatan harian Dinas Pertanian dan Ketahanan Pangan DIY. Cakupannya lebih luas karena memuat komoditas yang tidak ada di PIHPS, seperti minyak goreng, beras SPHP, dan kedelai. Kolom volatilitas memakai adaptasi metode <em>Excessive Food Price Variability EWS</em> dari IFPRI, yaitu menghitung berapa hari dalam 90 hari terakhir yang kenaikan harganya ekstrem, dengan ukuran “ekstrem” diambil dari persentil ke-95 riwayat komoditas itu sendiri. Tabel diurutkan dari kenaikan 30 hari terbesar. Perlu diingat, mutu pencatatan di sumbernya tidak selalu seragam, terutama untuk sayuran.</p>`;
+      <p class="sub">Ini sumber kedua yang berdiri sendiri, yaitu pencatatan harian Dinas Pertanian dan Ketahanan Pangan DIY. Cakupannya lebih luas karena memuat komoditas yang tidak ada di PIHPS, seperti minyak goreng, beras SPHP, dan kedelai. Kolom volatilitas memakai adaptasi metode <em>Excessive Food Price Variability EWS</em> dari IFPRI, yaitu menghitung berapa hari dalam 90 hari terakhir yang kenaikan harganya ekstrem, dengan ukuran “ekstrem” diambil dari persentil ke-95 riwayat komoditas itu sendiri, tetapi tidak pernah di bawah 2% (lantai signifikansi ekonomi, supaya kenaikan beberapa puluh rupiah pada komoditas yang jarang berubah tidak terhitung ekstrem). Tabel diurutkan dari kenaikan 30 hari terbesar. Perlu diingat, mutu pencatatan di sumbernya tidak selalu seragam, terutama untuk sayuran.</p>`;
     if (dpkpTabel) {
       const VTAG = { TINGGI: '<span class="tag bahaya">tinggi</span>', SEDANG: '<span class="tag waspada">sedang</span>', RENDAH: '<span class="tag aman">rendah</span>' };
       const w = el("div", "tabel-wrap");
@@ -2700,7 +2712,7 @@ async function render() {
       <p class="catatan"><strong>Ambang tiap pilar.</strong> <em>Cuaca:</em> ada wilayah dengan hujan ≥50&nbsp;mm atau berlabel ekstrem menjadi Waspada; tiga wilayah atau lebih menjadi Bahaya. <em>ENSO:</em> El&nbsp;Niño atau La&nbsp;Niña lemah sampai moderat menjadi Waspada, yang kuat menjadi Bahaya. <em>Cadangan:</em> dasar penilaian adalah <em>median puncak harian 14 hari</em> dari <em>setara beras</em> (beras medium + beras premium + 0,6274 × GKG, rendemen BPS) pada snapshot portal cadangan pangan DIY; komoditas lain (kedelai, kacang, jagung) tidak dijumlahkan dengan beras dan dipantau terpisah. Angka portal = laporan pada tanggal data terakhir, jadi tally terbesar tiap hari dianggap laporan terlengkap hari itu. Nilai per komoditas/wilayah yang tidak tercatat pada suatu jam diturunkan dari nilai terakhirnya dengan kendala jumlah per wilayah = jumlah per komoditas = angka portal (skrip <code>seri_cadangan.py</code>); wilayah disajikan per kabupaten/kota, lembaga yang melapor di tingkat kecamatan digabung ke kabupatennya; 200&nbsp;ton ke atas Aman, di bawah 200 ton Waspada (ambang indikatif). Pilar ini tidak pernah kami beri Bahaya sendirian, karena angka rendah di portal bisa berarti baru sedikit lembaga yang melapor. Kalau tanggal data portal lebih dari 45 hari tidak bergerak, pilar ditandai "tidak dapat dinilai". <strong>Koreksi 8 Okt 2026:</strong> versi sebelumnya menyebut portal ini tidak diperbarui 8 tahun; itu salah baca di pihak kami (filter tahun diabaikan server, pemisah ribuan terbaca desimal), sudah diperbaiki dan riwayat sejak 30 Agustus 2026 dihitung ulang dalam kilogram. <em>Pasokan SIMOTANDI:</em> rasio lahan generatif ditambah panen 12% ke atas Aman, 6 sampai 12% Waspada, di bawah 6% Bahaya. <em>Trends:</em> ada lonjakan pencarian menjadi Waspada. <em>SP2KP:</em> ada varian naik lebih dari 10% dalam 30 hari menjadi Waspada. <em>DPKP:</em> ada komoditas naik lebih dari 10% dalam 30 hari menjadi Waspada, dan Waspada adalah level tertinggi yang kami berikan untuk pilar ini karena mutu pencatatan di sumbernya tidak selalu seragam.</p>
       <p class="catatan"><strong>Prakiraan risiko harga (tab Prakiraan):</strong> uji-mundur <em>rolling-origin</em> atas 14 komoditas DPKP, 228 minggu (Apr 2022–Agu 2026), membandingkan delapan pendekatan: naif atau <em>random walk</em>, drift, SES, Theta, Holt teredam, ARIMA(1,1,1), naif musiman, dan regresi Ridge lag+musim. Hasil: <strong>tidak ada model yang mengalahkan penduga naif</strong> pada horizon 1 minggu (MASE terbaik = 1,000), dan pada horizon 1 bulan naif tetap unggul rata-rata (SES menang di 5 dari 14 komoditas dan ARIMA di 7 dari 14, tetapi keduanya kalah pada rerata lintas komoditas). Hasil ini sejalan dengan sifat harga komoditas jangka pendek yang mendekati <em>martingale</em>. Karena itu penduga titik dipertahankan sebagai harga terkini, dan yang diprakirakan adalah <strong>ketidakpastiannya</strong>: interval dari kuantil empiris nonparametrik perubahan h-langkah tiap komoditas. Kalibrasi teruji: cakupan interval 80% tercapai 76,0% (h=1 minggu) dan 82,7% (h=1 bulan); interval 95% tercapai 94,5% dan 94,1%. Prakiraan peluang menembus ambang memiliki <em>Brier skill</em> +10,3% terhadap acuan iklim. Pengondisian pada bulan kalender diuji dan <strong>dilaporkan tidak membantu</strong> (skill turun ke +4,8%) sehingga tidak dipakai. Deret PIHPS tidak dipakai untuk prakiraan karena berbentuk fungsi tangga (9 nilai unik dalam 260 hari).</p>
       <p class="catatan"><strong>Hujan, El Niño, dan panen (tab Konteks &amp; Pasokan):</strong> hujan bulanan 1991–kini diambil dari Open-Meteo (reanalisis ERA5/ERA5-Land ECMWF) pada lima titik kabupaten/kota lalu dirata-rata, karena arsip stasiun BMKG tidak terbuka untuk mesin; normal memakai 1991–2020. Hubungan El Niño–kemarau diuji dengan korelasi Pearson antara ONI Agu–Okt dan total hujan Juni–November tiap tahun (±35 tahun), ditambah komposit tahun El Niño (ONI ≥ +0,5), netral, dan La Niña (≤ −0,5) serta bulan datangnya musim hujan (bulan pertama ≥ 150 mm setelah Agustus). Hubungan hujan–tanam–panen memakai luas tanam/panen SIMOTANDI provinsi per bulan dengan jeda 0–6 bulan; deretnya baru ±30 bulan, jadi hasilnya deskriptif (irama musiman), bukan bukti kausal.</p>
-      <p class="catatan"><strong>Uji volatilitas berlebih (data DPKP):</strong> adaptasi metode <em>Excessive Food Price Variability Early Warning System</em> (IFPRI / Food Security Portal), dengan ambang nonparametrik pada persentil ke-95 kenaikan harian historis tiap komoditas, lalu jumlah hari ekstrem dalam jendela 90 hari dibandingkan dengan harapan statistiknya (5% observasi): melebihi dua kali lipat → tinggi, melebihi harapan → sedang. Diterapkan pada deret DPKP yang bergerak harian; deret PIHPS provinsi terlalu bertangga untuk uji ini. Kesesuaian hasil kedua metode (tipologi &amp; volatilitas) menjadi validasi silang.</p>
+      <p class="catatan"><strong>Uji volatilitas berlebih (data DPKP):</strong> adaptasi metode <em>Excessive Food Price Variability Early Warning System</em> (IFPRI / Food Security Portal), dengan ambang nonparametrik pada persentil ke-95 perubahan harian historis tiap komoditas, ditambah <em>lantai signifikansi ekonomi</em> 2% (ambang efektif = nilai terbesar antara persentil ke-95 dan 2%; tanpa lantai, ambang beras premium hanya 0,36% sehingga kenaikan yang tidak berarti secara ekonomi terhitung ekstrem). Uji kepekaan pada data paper: lantai 1,5% sampai 6% memberi kesimpulan yang sama, jadi 2% dipilih sebagai nilai terendah yang stabil. Jumlah hari ekstrem dalam jendela 90 hari dibandingkan dengan harapan statistiknya (5% observasi): melebihi dua kali lipat → tinggi, melebihi harapan → sedang. Diterapkan pada deret DPKP yang bergerak harian; deret PIHPS provinsi terlalu bertangga untuk uji ini. Kesesuaian hasil kedua metode (tipologi &amp; volatilitas) menjadi validasi silang.</p>
       <p class="catatan"><strong>Metode &amp; rujukan:</strong> deteksi anomali z-score bergulir 14 hari; pengayaan konteks cuaca/iklim/sinyal publik; verifikasi tekstual otomatis mengikuti bukti fusi sinyal harga+berita (Bakry dkk., 2025, AUC 0,94 vs 0,46), dipicu oleh anomali PIHPS dan, sejak 10 Okt 2026, juga oleh varian SP2KP yang naik lebih dari 10% dalam 30 hari (anomali PIHPS hanya muncul di akhir bulan, saat datanya diperbarui); klasifikasi volatilitas mengikuti kerangka IFPRI di atas. <strong>Yang kami akui belum beres:</strong> harga PIHPS masih rata-rata provinsi, bukan per pasar. Pilar SIMOTANDI baru setengah otomatis karena server sumbernya menolak akses dari layanan cloud yang kami pakai. Kliping berita masih indikatif, sebab berasal dari pencarian otomatis dan belum disaring manusia. Dan ini purwarupa riset, bukan produk resmi pemerintah.</p>`;
     s.appendChild(at);
     T5.appendChild(s);
