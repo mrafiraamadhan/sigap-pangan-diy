@@ -1,12 +1,12 @@
 pilar,berkas,otomatis,dicek_pada_utc,baris,berubah
-PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-21T01:30:00+00:00,26800,True
+PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-21T08:25:11+00:00,26800,False
 SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False
-DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-21T01:30:00+00:00,7730,False
+DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-21T08:25:11+00:00,7730,False
 SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False
-Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-21T01:30:00+00:00,260,False
-BMKG,cuaca_diy.csv,True,2026-10-21T01:30:00+00:00,28200,True
-NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-21T01:30:00+00:00,920,False
-Google Trends,google_trends_panik.csv,True,2026-10-21T01:30:00+00:00,93,False
-Sinyal Media,validasi_berita.csv,True,2026-10-21T01:30:00+00:00,1430,False
-Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-21T01:30:00+00:00,26800,True
-Prakiraan harga,prakiraan_harga.csv,True,2026-10-21T01:30:00+00:00,70,True
+Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-21T08:25:11+00:00,286,True
+BMKG,cuaca_diy.csv,True,2026-10-21T08:25:11+00:00,28295,True
+NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-21T08:25:11+00:00,920,False
+Google Trends,google_trends_panik.csv,True,2026-10-21T08:25:11+00:00,93,True
+Sinyal Media,validasi_berita.csv,True,2026-10-21T08:25:11+00:00,1430,False
+Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-21T08:25:11+00:00,26800,True
+Prakiraan harga,prakiraan_harga.csv,True,2026-10-21T08:25:11+00:00,70,True
