@@ -1,5 +1,5 @@
 {
- "dibuat_utc": "2026-11-05T14:35:28.941561+00:00",
+ "dibuat_utc": "2026-11-06T03:27:08.904758+00:00",
  "sumber": {
   "hujan": "Open-Meteo Historical Weather API (reanalisis ERA5/ERA5-Land ECMWF), rata-rata 5 titik kab/kota DIY",
   "oni": "NOAA CPC Oceanic Nino Index",
@@ -364,49 +364,49 @@
    },
    {
     "ym": "2026-10",
-    "mm": 84.9,
+    "mm": 86.7,
     "normal": 168.1,
-    "anomali_pct": -49,
+    "anomali_pct": -48,
     "oni": null,
     "status": null
    }
   ],
   "terakhir": {
    "ym": "2026-10",
-   "mm": 84.9,
+   "mm": 86.7,
    "normal": 168.1,
-   "anomali_pct": -49
+   "anomali_pct": -48
   },
   "per_kab_terakhir": [
    {
     "kab": "Bantul",
-    "mm": 45.4,
+    "mm": 47.4,
     "normal": 179.3
    },
    {
     "kab": "Gunungkidul",
-    "mm": 48.5,
+    "mm": 50.0,
     "normal": 82.0
    },
    {
     "kab": "Kota Yogyakarta",
-    "mm": 86.8,
+    "mm": 87.1,
     "normal": 185.4
    },
    {
     "kab": "Kulon Progo",
-    "mm": 121.0,
+    "mm": 123.5,
     "normal": 192.1
    },
    {
     "kab": "Sleman",
-    "mm": 122.8,
+    "mm": 125.7,
     "normal": 201.7
    }
   ],
   "kemarau_berjalan": {
    "bulan": "Jun-Okt 2026",
-   "mm": 177.0,
+   "mm": 179.0,
    "normal": 417.0,
    "anomali_pct": -57,
    "peringkat_terkering": 10,
@@ -1116,5 +1116,5 @@
    }
   ]
  },
- "ringkasan_teks": "Hujan Okt 2026 di DIY rata-rata 85 mm, 49% lebih sedikit dari normalnya (168 mm). Kemarau tahun ini (Jun-Okt 2026) baru 177 mm, 57% di bawah normal (417 mm), peringkat ke-10 terkering dari 36 tahun sejak 1991. Dalam 35 tahun (1991-2025), makin tinggi ONI Agustus-Oktober, makin sedikit hujan Juni-November di DIY (r = -0.70, hubungan kuat, signifikan). Pada tahun El Niño, hujan Juni-November rata-rata 401 mm dibanding 1110 mm pada tahun La Niña dan 833 mm pada tahun netral. Musim hujan (bulan pertama >= 150 mm) rata-rata datang pada bulan ke-11.2 saat El Niño dan ke-9.9 saat La Niña (9 = September, 10 = Oktober, 11 = November); El Niño menunda hujan sekitar 1.3 bulan. Pada data SIMOTANDI (31 bulan), luas panen bergerak searah dengan hujan 1 bulan sebelumnya (r = +0.64): panen raya DIY jatuh di tengah musim hujan (Februari-Maret), sehingga keduanya naik-turun bersama. Jeda tanam-ke-panen 3-4 bulan tidak tampak sebagai korelasi karena sawah irigasi DIY tetap ditanami di musim kemarau. Deretnya masih pendek, jadi ini gambaran irama musiman, bukan bukti sebab-akibat. Pengaruh langsung El Niño ke luas panen belum terdeteksi pada 31 bulan data (r terbesar +0.13); deret SIMOTANDI baru memuat satu siklus El Niño, jadi jalur yang terbaca adalah El Niño -> hujan, dan hujan -> panen."
+ "ringkasan_teks": "Hujan Okt 2026 di DIY rata-rata 87 mm, 48% lebih sedikit dari normalnya (168 mm). Kemarau tahun ini (Jun-Okt 2026) baru 179 mm, 57% di bawah normal (417 mm), peringkat ke-10 terkering dari 36 tahun sejak 1991. Dalam 35 tahun (1991-2025), makin tinggi ONI Agustus-Oktober, makin sedikit hujan Juni-November di DIY (r = -0.70, hubungan kuat, signifikan). Pada tahun El Niño, hujan Juni-November rata-rata 401 mm dibanding 1110 mm pada tahun La Niña dan 833 mm pada tahun netral. Musim hujan (bulan pertama >= 150 mm) rata-rata datang pada bulan ke-11.2 saat El Niño dan ke-9.9 saat La Niña (9 = September, 10 = Oktober, 11 = November); El Niño menunda hujan sekitar 1.3 bulan. Pada data SIMOTANDI (31 bulan), luas panen bergerak searah dengan hujan 1 bulan sebelumnya (r = +0.64): panen raya DIY jatuh di tengah musim hujan (Februari-Maret), sehingga keduanya naik-turun bersama. Jeda tanam-ke-panen 3-4 bulan tidak tampak sebagai korelasi karena sawah irigasi DIY tetap ditanami di musim kemarau. Deretnya masih pendek, jadi ini gambaran irama musiman, bukan bukti sebab-akibat. Pengaruh langsung El Niño ke luas panen belum terdeteksi pada 31 bulan data (r terbesar +0.13); deret SIMOTANDI baru memuat satu siklus El Niño, jadi jalur yang terbaca adalah El Niño -> hujan, dan hujan -> panen."
 }
