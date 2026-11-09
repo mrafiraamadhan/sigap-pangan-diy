@@ -1,0 +1,1057 @@
+run_utc,pilar,berkas,otomatis,dicek_pada_utc,baris,berubah,asal_arsip
+2026-09-29T03:23:58+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-09-29T03:23:58+00:00,26480,True,8fa9a4d
+2026-09-29T03:23:58+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,112915,True,8fa9a4d
+2026-09-29T03:23:58+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-09-29T03:23:58+00:00,7490,False,8fa9a4d
+2026-09-29T03:23:58+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,True,8fa9a4d
+2026-09-29T03:23:58+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-09-29T03:23:58+00:00,1090,True,8fa9a4d
+2026-09-29T03:23:58+00:00,BMKG,cuaca_diy.csv,True,2026-09-29T03:23:58+00:00,19550,True,8fa9a4d
+2026-09-29T03:23:58+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-09-29T03:23:58+00:00,919,True,8fa9a4d
+2026-09-29T03:23:58+00:00,Google Trends,google_trends_panik.csv,True,2026-09-29T03:23:58+00:00,93,True,8fa9a4d
+2026-09-29T03:23:58+00:00,Sinyal Media,validasi_berita.csv,True,2026-09-29T03:23:58+00:00,822,True,8fa9a4d
+2026-09-29T03:23:58+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-09-29T03:23:58+00:00,26480,True,8fa9a4d
+2026-09-29T03:23:58+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-09-29T03:23:58+00:00,72,True,8fa9a4d
+2026-10-09T02:17:38+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-09T02:17:38+00:00,26640,True,b721eb1
+2026-10-09T02:17:38+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,112915,False,b721eb1
+2026-10-09T02:17:38+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-09T02:17:38+00:00,7610,False,b721eb1
+2026-10-09T02:17:38+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,b721eb1
+2026-10-09T02:17:38+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-09T02:17:38+00:00,215,True,b721eb1
+2026-10-09T02:17:38+00:00,BMKG,cuaca_diy.csv,True,2026-10-09T02:17:38+00:00,24731,True,b721eb1
+2026-10-09T02:17:38+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-09T02:17:38+00:00,920,False,b721eb1
+2026-10-09T02:17:38+00:00,Google Trends,google_trends_panik.csv,True,2026-10-09T02:17:38+00:00,93,False,b721eb1
+2026-10-09T02:17:38+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-09T02:17:38+00:00,822,False,b721eb1
+2026-10-09T02:17:38+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-09T02:17:38+00:00,26640,True,b721eb1
+2026-10-09T02:17:38+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-09T02:17:38+00:00,72,True,b721eb1
+2026-10-09T10:17:53+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-09T10:17:53+00:00,26640,False,a65d505
+2026-10-09T10:17:53+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,112915,False,a65d505
+2026-10-09T10:17:53+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-09T10:17:53+00:00,7610,False,a65d505
+2026-10-09T10:17:53+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,a65d505
+2026-10-09T10:17:53+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-09T10:17:53+00:00,215,False,a65d505
+2026-10-09T10:17:53+00:00,BMKG,cuaca_diy.csv,True,2026-10-09T10:17:53+00:00,24823,True,a65d505
+2026-10-09T10:17:53+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-09T10:17:53+00:00,920,False,a65d505
+2026-10-09T10:17:53+00:00,Google Trends,google_trends_panik.csv,True,2026-10-09T10:17:53+00:00,186,True,a65d505
+2026-10-09T10:17:53+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-09T10:17:53+00:00,822,False,a65d505
+2026-10-09T10:17:53+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-09T10:17:53+00:00,26640,True,a65d505
+2026-10-09T10:17:53+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-09T10:17:53+00:00,72,True,a65d505
+2026-10-09T13:09:01+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-09T13:09:01+00:00,26640,False,73d43df
+2026-10-09T13:09:01+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,112915,False,73d43df
+2026-10-09T13:09:01+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-09T13:09:01+00:00,7610,False,73d43df
+2026-10-09T13:09:01+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,73d43df
+2026-10-09T13:09:01+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-09T13:09:01+00:00,215,False,73d43df
+2026-10-09T13:09:01+00:00,BMKG,cuaca_diy.csv,True,2026-10-09T13:09:01+00:00,24912,True,73d43df
+2026-10-09T13:09:01+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-09T13:09:01+00:00,920,False,73d43df
+2026-10-09T13:09:01+00:00,Google Trends,google_trends_panik.csv,True,2026-10-09T13:09:01+00:00,186,False,73d43df
+2026-10-09T13:09:01+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-09T13:09:01+00:00,822,False,73d43df
+2026-10-09T13:09:01+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-09T13:09:01+00:00,26640,True,73d43df
+2026-10-09T13:09:01+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-09T13:09:01+00:00,72,True,73d43df
+2026-10-10T02:18:23+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-10T02:18:23+00:00,26640,False,6a0e5e0
+2026-10-10T02:18:23+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,112915,False,6a0e5e0
+2026-10-10T02:18:23+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-10T02:18:23+00:00,7610,False,6a0e5e0
+2026-10-10T02:18:23+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,6a0e5e0
+2026-10-10T02:18:23+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-10T02:18:23+00:00,215,False,6a0e5e0
+2026-10-10T02:18:23+00:00,BMKG,cuaca_diy.csv,True,2026-10-10T02:18:23+00:00,25017,True,6a0e5e0
+2026-10-10T02:18:23+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-10T02:18:23+00:00,920,False,6a0e5e0
+2026-10-10T02:18:23+00:00,Google Trends,google_trends_panik.csv,True,2026-10-10T02:18:23+00:00,93,True,6a0e5e0
+2026-10-10T02:18:23+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-10T02:18:23+00:00,822,False,6a0e5e0
+2026-10-10T02:18:23+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-10T02:18:23+00:00,26640,False,6a0e5e0
+2026-10-10T02:18:23+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-10T02:18:23+00:00,72,True,6a0e5e0
+2026-10-10T09:38:40+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-10T09:38:40+00:00,26640,False,2988959
+2026-10-10T09:38:40+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,2988959
+2026-10-10T09:38:40+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-10T09:38:40+00:00,7610,False,2988959
+2026-10-10T09:38:40+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,2988959
+2026-10-10T09:38:40+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-10T09:38:40+00:00,215,False,2988959
+2026-10-10T09:38:40+00:00,BMKG,cuaca_diy.csv,True,2026-10-10T09:38:40+00:00,25112,True,2988959
+2026-10-10T09:38:40+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-10T09:38:40+00:00,920,False,2988959
+2026-10-10T09:38:40+00:00,Google Trends,google_trends_panik.csv,True,2026-10-10T09:38:40+00:00,93,True,2988959
+2026-10-10T09:38:40+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-10T09:38:40+00:00,822,False,2988959
+2026-10-10T09:38:40+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-10T09:38:40+00:00,26640,False,2988959
+2026-10-10T09:38:40+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-10T09:38:40+00:00,72,True,2988959
+2026-10-10T12:24:51+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-10T12:24:51+00:00,26640,False,ecf88b1
+2026-10-10T12:24:51+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,ecf88b1
+2026-10-10T12:24:51+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-10T12:24:51+00:00,7610,False,ecf88b1
+2026-10-10T12:24:51+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,ecf88b1
+2026-10-10T12:24:51+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-10T12:24:51+00:00,215,False,ecf88b1
+2026-10-10T12:24:51+00:00,BMKG,cuaca_diy.csv,True,2026-10-10T12:24:51+00:00,25202,True,ecf88b1
+2026-10-10T12:24:51+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-10T12:24:51+00:00,920,False,ecf88b1
+2026-10-10T12:24:51+00:00,Google Trends,google_trends_panik.csv,True,2026-10-10T12:24:51+00:00,279,True,ecf88b1
+2026-10-10T12:24:51+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-10T12:24:51+00:00,822,False,ecf88b1
+2026-10-10T12:24:51+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-10T12:24:51+00:00,26640,False,ecf88b1
+2026-10-10T12:24:51+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-10T12:24:51+00:00,72,True,ecf88b1
+2026-10-11T01:50:28+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-11T01:50:28+00:00,26640,False,891b42b
+2026-10-11T01:50:28+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,891b42b
+2026-10-11T01:50:28+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-11T01:50:28+00:00,7610,False,891b42b
+2026-10-11T01:50:28+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,891b42b
+2026-10-11T01:50:28+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-11T01:50:28+00:00,215,False,891b42b
+2026-10-11T01:50:28+00:00,BMKG,cuaca_diy.csv,True,2026-10-11T01:50:28+00:00,25307,True,891b42b
+2026-10-11T01:50:28+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-11T01:50:28+00:00,920,False,891b42b
+2026-10-11T01:50:28+00:00,Google Trends,google_trends_panik.csv,True,2026-10-11T01:50:28+00:00,93,True,891b42b
+2026-10-11T01:50:28+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-11T01:50:28+00:00,875,True,891b42b
+2026-10-11T01:50:28+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-11T01:50:28+00:00,26640,False,891b42b
+2026-10-11T01:50:28+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-11T01:50:28+00:00,72,True,891b42b
+2026-10-11T09:51:31+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-11T09:51:31+00:00,26640,False,35c5f28
+2026-10-11T09:51:31+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,35c5f28
+2026-10-11T09:51:31+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-11T09:51:31+00:00,7610,False,35c5f28
+2026-10-11T09:51:31+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,35c5f28
+2026-10-11T09:51:31+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-11T09:51:31+00:00,215,False,35c5f28
+2026-10-11T09:51:31+00:00,BMKG,cuaca_diy.csv,True,2026-10-11T09:51:31+00:00,25402,True,35c5f28
+2026-10-11T09:51:31+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-11T09:51:31+00:00,920,False,35c5f28
+2026-10-11T09:51:31+00:00,Google Trends,google_trends_panik.csv,True,2026-10-11T09:51:31+00:00,279,True,35c5f28
+2026-10-11T09:51:31+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-11T09:51:31+00:00,923,True,35c5f28
+2026-10-11T09:51:31+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-11T09:51:31+00:00,26640,False,35c5f28
+2026-10-11T09:51:31+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-11T09:51:31+00:00,72,True,35c5f28
+2026-10-11T12:46:44+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-11T12:46:44+00:00,26640,False,a45834c
+2026-10-11T12:46:44+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,a45834c
+2026-10-11T12:46:44+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-11T12:46:44+00:00,7610,False,a45834c
+2026-10-11T12:46:44+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,a45834c
+2026-10-11T12:46:44+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-11T12:46:44+00:00,215,False,a45834c
+2026-10-11T12:46:44+00:00,BMKG,cuaca_diy.csv,True,2026-10-11T12:46:44+00:00,25492,True,a45834c
+2026-10-11T12:46:44+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-11T12:46:44+00:00,920,False,a45834c
+2026-10-11T12:46:44+00:00,Google Trends,google_trends_panik.csv,True,2026-10-11T12:46:44+00:00,279,True,a45834c
+2026-10-11T12:46:44+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-11T12:46:44+00:00,975,True,a45834c
+2026-10-11T12:46:44+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-11T12:46:44+00:00,26640,False,a45834c
+2026-10-11T12:46:44+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-11T12:46:44+00:00,72,True,a45834c
+2026-10-12T02:19:28+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-12T02:19:28+00:00,26660,True,79959ed
+2026-10-12T02:19:28+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,79959ed
+2026-10-12T02:19:28+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-12T02:19:28+00:00,7610,False,79959ed
+2026-10-12T02:19:28+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,79959ed
+2026-10-12T02:19:28+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-12T02:19:28+00:00,215,False,79959ed
+2026-10-12T02:19:28+00:00,BMKG,cuaca_diy.csv,True,2026-10-12T02:19:28+00:00,25597,True,79959ed
+2026-10-12T02:19:28+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-12T02:19:28+00:00,920,False,79959ed
+2026-10-12T02:19:28+00:00,Google Trends,google_trends_panik.csv,True,2026-10-12T02:19:28+00:00,279,True,79959ed
+2026-10-12T02:19:28+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-12T02:19:28+00:00,1026,True,79959ed
+2026-10-12T02:19:28+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-12T02:19:28+00:00,26660,True,79959ed
+2026-10-12T02:19:28+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-12T02:19:28+00:00,72,True,79959ed
+2026-10-12T10:36:16+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-12T10:36:16+00:00,26660,False,10d45fe
+2026-10-12T10:36:16+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,10d45fe
+2026-10-12T10:36:16+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-12T10:36:16+00:00,7610,False,10d45fe
+2026-10-12T10:36:16+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,10d45fe
+2026-10-12T10:36:16+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-12T10:36:16+00:00,215,False,10d45fe
+2026-10-12T10:36:16+00:00,BMKG,cuaca_diy.csv,True,2026-10-12T10:36:16+00:00,25690,True,10d45fe
+2026-10-12T10:36:16+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-12T10:36:16+00:00,920,False,10d45fe
+2026-10-12T10:36:16+00:00,Google Trends,google_trends_panik.csv,True,2026-10-12T10:36:16+00:00,279,False,10d45fe
+2026-10-12T10:36:16+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-12T10:36:16+00:00,1102,True,10d45fe
+2026-10-12T10:36:16+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-12T10:36:16+00:00,26660,True,10d45fe
+2026-10-12T10:36:16+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-12T10:36:16+00:00,72,True,10d45fe
+2026-10-12T15:15:11+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-12T15:15:11+00:00,26660,False,3c720a4
+2026-10-12T15:15:11+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,3c720a4
+2026-10-12T15:15:11+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-12T15:15:11+00:00,7610,False,3c720a4
+2026-10-12T15:15:11+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,3c720a4
+2026-10-12T15:15:11+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-12T15:15:11+00:00,215,False,3c720a4
+2026-10-12T15:15:11+00:00,BMKG,cuaca_diy.csv,True,2026-10-12T15:15:11+00:00,25775,True,3c720a4
+2026-10-12T15:15:11+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-12T15:15:11+00:00,920,False,3c720a4
+2026-10-12T15:15:11+00:00,Google Trends,google_trends_panik.csv,True,2026-10-12T15:15:11+00:00,186,True,3c720a4
+2026-10-12T15:15:11+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-12T15:15:11+00:00,1158,True,3c720a4
+2026-10-12T15:15:11+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-12T15:15:11+00:00,26660,True,3c720a4
+2026-10-12T15:15:11+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-12T15:15:11+00:00,72,True,3c720a4
+2026-10-13T03:32:44+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-13T03:32:44+00:00,26680,True,e518479
+2026-10-13T03:32:44+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,e518479
+2026-10-13T03:32:44+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-13T03:32:44+00:00,7610,False,e518479
+2026-10-13T03:32:44+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,e518479
+2026-10-13T03:32:44+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-13T03:32:44+00:00,241,True,e518479
+2026-10-13T03:32:44+00:00,BMKG,cuaca_diy.csv,True,2026-10-13T03:32:44+00:00,25880,True,e518479
+2026-10-13T03:32:44+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-13T03:32:44+00:00,920,False,e518479
+2026-10-13T03:32:44+00:00,Google Trends,google_trends_panik.csv,True,2026-10-13T03:32:44+00:00,186,False,e518479
+2026-10-13T03:32:44+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-13T03:32:44+00:00,1210,True,e518479
+2026-10-13T03:32:44+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-13T03:32:44+00:00,26680,True,e518479
+2026-10-13T03:32:44+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-13T03:32:44+00:00,72,True,e518479
+2026-10-13T10:21:19+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-13T10:21:19+00:00,26680,False,5df4c98
+2026-10-13T10:21:19+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,5df4c98
+2026-10-13T10:21:19+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-13T10:21:19+00:00,7610,False,5df4c98
+2026-10-13T10:21:19+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,5df4c98
+2026-10-13T10:21:19+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-13T10:21:19+00:00,246,True,5df4c98
+2026-10-13T10:21:19+00:00,BMKG,cuaca_diy.csv,True,2026-10-13T10:21:19+00:00,25971,True,5df4c98
+2026-10-13T10:21:19+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-13T10:21:19+00:00,920,False,5df4c98
+2026-10-13T10:21:19+00:00,Google Trends,google_trends_panik.csv,True,2026-10-13T10:21:19+00:00,93,True,5df4c98
+2026-10-13T10:21:19+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-13T10:21:19+00:00,1256,True,5df4c98
+2026-10-13T10:21:19+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-13T10:21:19+00:00,26680,True,5df4c98
+2026-10-13T10:21:19+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-13T10:21:19+00:00,72,True,5df4c98
+2026-10-13T14:06:35+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-13T14:06:35+00:00,26680,False,ffdf6c8
+2026-10-13T14:06:35+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,ffdf6c8
+2026-10-13T14:06:35+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-13T14:06:35+00:00,7610,False,ffdf6c8
+2026-10-13T14:06:35+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,ffdf6c8
+2026-10-13T14:06:35+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-13T14:06:35+00:00,246,False,ffdf6c8
+2026-10-13T14:06:35+00:00,BMKG,cuaca_diy.csv,True,2026-10-13T14:06:35+00:00,26056,True,ffdf6c8
+2026-10-13T14:06:35+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-13T14:06:35+00:00,920,False,ffdf6c8
+2026-10-13T14:06:35+00:00,Google Trends,google_trends_panik.csv,True,2026-10-13T14:06:35+00:00,93,True,ffdf6c8
+2026-10-13T14:06:35+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-13T14:06:35+00:00,1300,True,ffdf6c8
+2026-10-13T14:06:35+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-13T14:06:35+00:00,26680,True,ffdf6c8
+2026-10-13T14:06:35+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-13T14:06:35+00:00,72,True,ffdf6c8
+2026-10-14T01:51:00+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-14T01:51:00+00:00,26700,True,d6afdcf
+2026-10-14T01:51:00+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,d6afdcf
+2026-10-14T01:51:00+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-14T01:51:00+00:00,7610,False,d6afdcf
+2026-10-14T01:51:00+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,d6afdcf
+2026-10-14T01:51:00+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-14T01:51:00+00:00,246,False,d6afdcf
+2026-10-14T01:51:00+00:00,BMKG,cuaca_diy.csv,True,2026-10-14T01:51:00+00:00,26162,True,d6afdcf
+2026-10-14T01:51:00+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-14T01:51:00+00:00,920,False,d6afdcf
+2026-10-14T01:51:00+00:00,Google Trends,google_trends_panik.csv,True,2026-10-14T01:51:00+00:00,93,True,d6afdcf
+2026-10-14T01:51:00+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-14T01:51:00+00:00,1348,True,d6afdcf
+2026-10-14T01:51:00+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-14T01:51:00+00:00,26700,True,d6afdcf
+2026-10-14T01:51:00+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-14T01:51:00+00:00,72,True,d6afdcf
+2026-10-14T08:34:19+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-14T08:34:19+00:00,26700,False,6d79f6a
+2026-10-14T08:34:19+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,6d79f6a
+2026-10-14T08:34:19+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-14T08:34:19+00:00,7610,False,6d79f6a
+2026-10-14T08:34:19+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,6d79f6a
+2026-10-14T08:34:19+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-14T08:34:19+00:00,246,False,6d79f6a
+2026-10-14T08:34:19+00:00,BMKG,cuaca_diy.csv,True,2026-10-14T08:34:19+00:00,26257,True,6d79f6a
+2026-10-14T08:34:19+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-14T08:34:19+00:00,920,False,6d79f6a
+2026-10-14T08:34:19+00:00,Google Trends,google_trends_panik.csv,True,2026-10-14T08:34:19+00:00,93,True,6d79f6a
+2026-10-14T08:34:19+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-14T08:34:19+00:00,1393,True,6d79f6a
+2026-10-14T08:34:19+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-14T08:34:19+00:00,26700,True,6d79f6a
+2026-10-14T08:34:19+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-14T08:34:19+00:00,72,True,6d79f6a
+2026-10-14T11:43:50+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-14T11:43:50+00:00,26700,False,4c2893f
+2026-10-14T11:43:50+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,4c2893f
+2026-10-14T11:43:50+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-14T11:43:50+00:00,7610,False,4c2893f
+2026-10-14T11:43:50+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,4c2893f
+2026-10-14T11:43:50+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-14T11:43:50+00:00,246,False,4c2893f
+2026-10-14T11:43:50+00:00,BMKG,cuaca_diy.csv,True,2026-10-14T11:43:50+00:00,26347,True,4c2893f
+2026-10-14T11:43:50+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-14T11:43:50+00:00,920,False,4c2893f
+2026-10-14T11:43:50+00:00,Google Trends,google_trends_panik.csv,True,2026-10-14T11:43:50+00:00,186,True,4c2893f
+2026-10-14T11:43:50+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-14T11:43:50+00:00,1426,True,4c2893f
+2026-10-14T11:43:50+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-14T11:43:50+00:00,26700,True,4c2893f
+2026-10-14T11:43:50+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-14T11:43:50+00:00,72,True,4c2893f
+2026-10-15T01:25:16+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-15T01:25:16+00:00,26720,True,49644ca
+2026-10-15T01:25:16+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,49644ca
+2026-10-15T01:25:16+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-15T01:25:16+00:00,7610,False,49644ca
+2026-10-15T01:25:16+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,49644ca
+2026-10-15T01:25:16+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-15T01:25:16+00:00,246,False,49644ca
+2026-10-15T01:25:16+00:00,BMKG,cuaca_diy.csv,True,2026-10-15T01:25:16+00:00,26455,True,49644ca
+2026-10-15T01:25:16+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-15T01:25:16+00:00,920,False,49644ca
+2026-10-15T01:25:16+00:00,Google Trends,google_trends_panik.csv,True,2026-10-15T01:25:16+00:00,186,False,49644ca
+2026-10-15T01:25:16+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-15T01:25:16+00:00,1426,False,49644ca
+2026-10-15T01:25:16+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-15T01:25:16+00:00,26720,True,49644ca
+2026-10-15T01:25:16+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-15T01:25:16+00:00,72,True,49644ca
+2026-10-15T08:08:06+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-15T08:08:06+00:00,26720,False,8dc4382
+2026-10-15T08:08:06+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,8dc4382
+2026-10-15T08:08:06+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-15T08:08:06+00:00,7730,True,8dc4382
+2026-10-15T08:08:06+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,8dc4382
+2026-10-15T08:08:06+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-15T08:08:06+00:00,246,False,8dc4382
+2026-10-15T08:08:06+00:00,BMKG,cuaca_diy.csv,True,2026-10-15T08:08:06+00:00,26550,True,8dc4382
+2026-10-15T08:08:06+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-15T08:08:06+00:00,920,False,8dc4382
+2026-10-15T08:08:06+00:00,Google Trends,google_trends_panik.csv,True,2026-10-15T08:08:06+00:00,93,True,8dc4382
+2026-10-15T08:08:06+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-15T08:08:06+00:00,1426,False,8dc4382
+2026-10-15T08:08:06+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-15T08:08:06+00:00,26720,True,8dc4382
+2026-10-15T08:08:06+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-15T08:08:06+00:00,74,True,8dc4382
+2026-10-15T11:20:45+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-15T11:20:45+00:00,26720,False,ea8fc73
+2026-10-15T11:20:45+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,ea8fc73
+2026-10-15T11:20:45+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-15T11:20:45+00:00,7730,False,ea8fc73
+2026-10-15T11:20:45+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,ea8fc73
+2026-10-15T11:20:45+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-15T11:20:45+00:00,246,False,ea8fc73
+2026-10-15T11:20:45+00:00,BMKG,cuaca_diy.csv,True,2026-10-15T11:20:45+00:00,26640,True,ea8fc73
+2026-10-15T11:20:45+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-15T11:20:45+00:00,920,False,ea8fc73
+2026-10-15T11:20:45+00:00,Google Trends,google_trends_panik.csv,True,2026-10-15T11:20:45+00:00,186,True,ea8fc73
+2026-10-15T11:20:45+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-15T11:20:45+00:00,1426,False,ea8fc73
+2026-10-15T11:20:45+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-15T11:20:45+00:00,26720,True,ea8fc73
+2026-10-15T11:20:45+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-15T11:20:45+00:00,74,True,ea8fc73
+2026-10-16T01:13:27+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-16T01:13:27+00:00,26720,False,de23925
+2026-10-16T01:13:27+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,115725,False,de23925
+2026-10-16T01:13:27+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-16T01:13:27+00:00,7730,False,de23925
+2026-10-16T01:13:27+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6396,False,de23925
+2026-10-16T01:13:27+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-16T01:13:27+00:00,246,False,de23925
+2026-10-16T01:13:27+00:00,BMKG,cuaca_diy.csv,True,2026-10-16T01:13:27+00:00,26747,True,de23925
+2026-10-16T01:13:27+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-16T01:13:27+00:00,920,False,de23925
+2026-10-16T01:13:27+00:00,Google Trends,google_trends_panik.csv,True,2026-10-16T01:13:27+00:00,93,True,de23925
+2026-10-16T01:13:27+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-16T01:13:27+00:00,1426,False,de23925
+2026-10-16T01:13:27+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-16T01:13:27+00:00,26720,False,de23925
+2026-10-16T01:13:27+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-16T01:13:27+00:00,74,True,de23925
+2026-10-16T08:01:42+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-16T08:01:42+00:00,26740,True,15c4216
+2026-10-16T08:01:42+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,116849,False,15c4216
+2026-10-16T08:01:42+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-16T08:01:42+00:00,7730,False,15c4216
+2026-10-16T08:01:42+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6474,False,15c4216
+2026-10-16T08:01:42+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-16T08:01:42+00:00,246,False,15c4216
+2026-10-16T08:01:42+00:00,BMKG,cuaca_diy.csv,True,2026-10-16T08:01:42+00:00,26842,True,15c4216
+2026-10-16T08:01:42+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-16T08:01:42+00:00,920,False,15c4216
+2026-10-16T08:01:42+00:00,Google Trends,google_trends_panik.csv,True,2026-10-16T08:01:42+00:00,93,True,15c4216
+2026-10-16T08:01:42+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-16T08:01:42+00:00,1430,True,15c4216
+2026-10-16T08:01:42+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-16T08:01:42+00:00,26740,True,15c4216
+2026-10-16T08:01:42+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-16T08:01:42+00:00,70,True,15c4216
+2026-10-16T11:15:19+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-16T11:15:19+00:00,26740,False,e46c8fd
+2026-10-16T11:15:19+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,116849,False,e46c8fd
+2026-10-16T11:15:19+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-16T11:15:19+00:00,7730,False,e46c8fd
+2026-10-16T11:15:19+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6474,False,e46c8fd
+2026-10-16T11:15:19+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-16T11:15:19+00:00,246,False,e46c8fd
+2026-10-16T11:15:19+00:00,BMKG,cuaca_diy.csv,True,2026-10-16T11:15:19+00:00,26932,True,e46c8fd
+2026-10-16T11:15:19+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-16T11:15:19+00:00,920,False,e46c8fd
+2026-10-16T11:15:19+00:00,Google Trends,google_trends_panik.csv,True,2026-10-16T11:15:19+00:00,186,True,e46c8fd
+2026-10-16T11:15:19+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-16T11:15:19+00:00,1430,False,e46c8fd
+2026-10-16T11:15:19+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-16T11:15:19+00:00,26740,True,e46c8fd
+2026-10-16T11:15:19+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-16T11:15:19+00:00,70,True,e46c8fd
+2026-10-17T01:16:58+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-17T01:16:58+00:00,26740,False,0c409be
+2026-10-17T01:16:58+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,116849,False,0c409be
+2026-10-17T01:16:58+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-17T01:16:58+00:00,7730,False,0c409be
+2026-10-17T01:16:58+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6474,False,0c409be
+2026-10-17T01:16:58+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-17T01:16:58+00:00,246,False,0c409be
+2026-10-17T01:16:58+00:00,BMKG,cuaca_diy.csv,True,2026-10-17T01:16:58+00:00,27040,True,0c409be
+2026-10-17T01:16:58+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-17T01:16:58+00:00,920,False,0c409be
+2026-10-17T01:16:58+00:00,Google Trends,google_trends_panik.csv,True,2026-10-17T01:16:58+00:00,186,True,0c409be
+2026-10-17T01:16:58+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-17T01:16:58+00:00,1430,False,0c409be
+2026-10-17T01:16:58+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-17T01:16:58+00:00,26740,False,0c409be
+2026-10-17T01:16:58+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-17T01:16:58+00:00,70,True,0c409be
+2026-10-17T07:39:28+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-17T07:39:28+00:00,26740,False,94394db
+2026-10-17T07:39:28+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,116849,False,94394db
+2026-10-17T07:39:28+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-17T07:39:28+00:00,7730,False,94394db
+2026-10-17T07:39:28+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6474,False,94394db
+2026-10-17T07:39:28+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-17T07:39:28+00:00,255,True,94394db
+2026-10-17T07:39:28+00:00,BMKG,cuaca_diy.csv,True,2026-10-17T07:39:28+00:00,27135,True,94394db
+2026-10-17T07:39:28+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-17T07:39:28+00:00,920,False,94394db
+2026-10-17T07:39:28+00:00,Google Trends,google_trends_panik.csv,True,2026-10-17T07:39:28+00:00,186,True,94394db
+2026-10-17T07:39:28+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-17T07:39:28+00:00,1430,False,94394db
+2026-10-17T07:39:28+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-17T07:39:28+00:00,26740,False,94394db
+2026-10-17T07:39:28+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-17T07:39:28+00:00,70,True,94394db
+2026-10-17T10:34:22+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-17T10:34:22+00:00,26740,False,ff59e1f
+2026-10-17T10:34:22+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,116849,False,ff59e1f
+2026-10-17T10:34:22+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-17T10:34:22+00:00,7730,False,ff59e1f
+2026-10-17T10:34:22+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6474,False,ff59e1f
+2026-10-17T10:34:22+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-17T10:34:22+00:00,255,False,ff59e1f
+2026-10-17T10:34:22+00:00,BMKG,cuaca_diy.csv,True,2026-10-17T10:34:22+00:00,27225,True,ff59e1f
+2026-10-17T10:34:22+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-17T10:34:22+00:00,920,False,ff59e1f
+2026-10-17T10:34:22+00:00,Google Trends,google_trends_panik.csv,True,2026-10-17T10:34:22+00:00,279,True,ff59e1f
+2026-10-17T10:34:22+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-17T10:34:22+00:00,1430,False,ff59e1f
+2026-10-17T10:34:22+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-17T10:34:22+00:00,26740,False,ff59e1f
+2026-10-17T10:34:22+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-17T10:34:22+00:00,70,True,ff59e1f
+2026-10-18T00:54:04+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-18T00:54:04+00:00,26740,False,b3a62d1
+2026-10-18T00:54:04+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,b3a62d1
+2026-10-18T00:54:04+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-18T00:54:04+00:00,7730,False,b3a62d1
+2026-10-18T00:54:04+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6474,False,b3a62d1
+2026-10-18T00:54:04+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-18T00:54:04+00:00,255,False,b3a62d1
+2026-10-18T00:54:04+00:00,BMKG,cuaca_diy.csv,True,2026-10-18T00:54:04+00:00,27335,True,b3a62d1
+2026-10-18T00:54:04+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-18T00:54:04+00:00,920,False,b3a62d1
+2026-10-18T00:54:04+00:00,Google Trends,google_trends_panik.csv,True,2026-10-18T00:54:04+00:00,186,True,b3a62d1
+2026-10-18T00:54:04+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-18T00:54:04+00:00,1430,False,b3a62d1
+2026-10-18T00:54:04+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-18T00:54:04+00:00,26740,False,b3a62d1
+2026-10-18T00:54:04+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-18T00:54:04+00:00,70,True,b3a62d1
+2026-10-18T07:54:45+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-18T07:54:45+00:00,26740,False,bbb63c7
+2026-10-18T07:54:45+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,bbb63c7
+2026-10-18T07:54:45+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-18T07:54:45+00:00,7730,False,bbb63c7
+2026-10-18T07:54:45+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6474,False,bbb63c7
+2026-10-18T07:54:45+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-18T07:54:45+00:00,255,False,bbb63c7
+2026-10-18T07:54:45+00:00,BMKG,cuaca_diy.csv,True,2026-10-18T07:54:45+00:00,27431,True,bbb63c7
+2026-10-18T07:54:45+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-18T07:54:45+00:00,920,False,bbb63c7
+2026-10-18T07:54:45+00:00,Google Trends,google_trends_panik.csv,True,2026-10-18T07:54:45+00:00,279,True,bbb63c7
+2026-10-18T07:54:45+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-18T07:54:45+00:00,1430,False,bbb63c7
+2026-10-18T07:54:45+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-18T07:54:45+00:00,26740,False,bbb63c7
+2026-10-18T07:54:45+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-18T07:54:45+00:00,70,True,bbb63c7
+2026-10-18T10:55:37+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-18T10:55:37+00:00,26740,False,75f2351
+2026-10-18T10:55:37+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,75f2351
+2026-10-18T10:55:37+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-18T10:55:37+00:00,7730,False,75f2351
+2026-10-18T10:55:37+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6474,False,75f2351
+2026-10-18T10:55:37+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-18T10:55:37+00:00,255,False,75f2351
+2026-10-18T10:55:37+00:00,BMKG,cuaca_diy.csv,True,2026-10-18T10:55:37+00:00,27521,True,75f2351
+2026-10-18T10:55:37+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-18T10:55:37+00:00,920,False,75f2351
+2026-10-18T10:55:37+00:00,Google Trends,google_trends_panik.csv,True,2026-10-18T10:55:37+00:00,93,True,75f2351
+2026-10-18T10:55:37+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-18T10:55:37+00:00,1430,False,75f2351
+2026-10-18T10:55:37+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-18T10:55:37+00:00,26740,False,75f2351
+2026-10-18T10:55:37+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-18T10:55:37+00:00,70,True,75f2351
+2026-10-19T01:07:05+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-19T01:07:05+00:00,26760,True,adb749f
+2026-10-19T01:07:05+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,adb749f
+2026-10-19T01:07:05+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-19T01:07:05+00:00,7730,False,adb749f
+2026-10-19T01:07:05+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,adb749f
+2026-10-19T01:07:05+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-19T01:07:05+00:00,255,False,adb749f
+2026-10-19T01:07:05+00:00,BMKG,cuaca_diy.csv,True,2026-10-19T01:07:05+00:00,27630,True,adb749f
+2026-10-19T01:07:05+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-19T01:07:05+00:00,920,False,adb749f
+2026-10-19T01:07:05+00:00,Google Trends,google_trends_panik.csv,True,2026-10-19T01:07:05+00:00,93,True,adb749f
+2026-10-19T01:07:05+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-19T01:07:05+00:00,1430,False,adb749f
+2026-10-19T01:07:05+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-19T01:07:05+00:00,26760,True,adb749f
+2026-10-19T01:07:05+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-19T01:07:05+00:00,70,True,adb749f
+2026-10-19T08:39:40+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-19T08:39:40+00:00,26760,False,dcf815a
+2026-10-19T08:39:40+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,dcf815a
+2026-10-19T08:39:40+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-19T08:39:40+00:00,7730,False,dcf815a
+2026-10-19T08:39:40+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,dcf815a
+2026-10-19T08:39:40+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-19T08:39:40+00:00,255,False,dcf815a
+2026-10-19T08:39:40+00:00,BMKG,cuaca_diy.csv,True,2026-10-19T08:39:40+00:00,27725,True,dcf815a
+2026-10-19T08:39:40+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-19T08:39:40+00:00,920,False,dcf815a
+2026-10-19T08:39:40+00:00,Google Trends,google_trends_panik.csv,True,2026-10-19T08:39:40+00:00,186,True,dcf815a
+2026-10-19T08:39:40+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-19T08:39:40+00:00,1430,False,dcf815a
+2026-10-19T08:39:40+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-19T08:39:40+00:00,26760,True,dcf815a
+2026-10-19T08:39:40+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-19T08:39:40+00:00,70,True,dcf815a
+2026-10-19T12:57:46+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-19T12:57:46+00:00,26760,False,bc2ec9f
+2026-10-19T12:57:46+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,bc2ec9f
+2026-10-19T12:57:46+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-19T12:57:46+00:00,7730,False,bc2ec9f
+2026-10-19T12:57:46+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,bc2ec9f
+2026-10-19T12:57:46+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-19T12:57:46+00:00,255,False,bc2ec9f
+2026-10-19T12:57:46+00:00,BMKG,cuaca_diy.csv,True,2026-10-19T12:57:46+00:00,27815,True,bc2ec9f
+2026-10-19T12:57:46+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-19T12:57:46+00:00,920,False,bc2ec9f
+2026-10-19T12:57:46+00:00,Google Trends,google_trends_panik.csv,True,2026-10-19T12:57:46+00:00,93,True,bc2ec9f
+2026-10-19T12:57:46+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-19T12:57:46+00:00,1430,False,bc2ec9f
+2026-10-19T12:57:46+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-19T12:57:46+00:00,26760,True,bc2ec9f
+2026-10-19T12:57:46+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-19T12:57:46+00:00,70,True,bc2ec9f
+2026-10-20T01:43:48+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-20T01:43:48+00:00,26780,True,abfa9f5
+2026-10-20T01:43:48+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,abfa9f5
+2026-10-20T01:43:48+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-20T01:43:48+00:00,7730,False,abfa9f5
+2026-10-20T01:43:48+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,abfa9f5
+2026-10-20T01:43:48+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-20T01:43:48+00:00,255,False,abfa9f5
+2026-10-20T01:43:48+00:00,BMKG,cuaca_diy.csv,True,2026-10-20T01:43:48+00:00,27920,True,abfa9f5
+2026-10-20T01:43:48+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-20T01:43:48+00:00,920,False,abfa9f5
+2026-10-20T01:43:48+00:00,Google Trends,google_trends_panik.csv,True,2026-10-20T01:43:48+00:00,93,False,abfa9f5
+2026-10-20T01:43:48+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-20T01:43:48+00:00,1430,False,abfa9f5
+2026-10-20T01:43:48+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-20T01:43:48+00:00,26780,True,abfa9f5
+2026-10-20T01:43:48+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-20T01:43:48+00:00,70,True,abfa9f5
+2026-10-20T08:21:00+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-20T08:21:00+00:00,26780,False,31b119e
+2026-10-20T08:21:00+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,31b119e
+2026-10-20T08:21:00+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-20T08:21:00+00:00,7730,False,31b119e
+2026-10-20T08:21:00+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,31b119e
+2026-10-20T08:21:00+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-20T08:21:00+00:00,260,True,31b119e
+2026-10-20T08:21:00+00:00,BMKG,cuaca_diy.csv,True,2026-10-20T08:21:00+00:00,28020,True,31b119e
+2026-10-20T08:21:00+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-20T08:21:00+00:00,920,False,31b119e
+2026-10-20T08:21:00+00:00,Google Trends,google_trends_panik.csv,True,2026-10-20T08:21:00+00:00,93,True,31b119e
+2026-10-20T08:21:00+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-20T08:21:00+00:00,1430,False,31b119e
+2026-10-20T08:21:00+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-20T08:21:00+00:00,26780,True,31b119e
+2026-10-20T08:21:00+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-20T08:21:00+00:00,70,True,31b119e
+2026-10-20T11:25:24+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-20T11:25:24+00:00,26780,False,9e55f3e
+2026-10-20T11:25:24+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,9e55f3e
+2026-10-20T11:25:24+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-20T11:25:24+00:00,7730,False,9e55f3e
+2026-10-20T11:25:24+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,9e55f3e
+2026-10-20T11:25:24+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-20T11:25:24+00:00,260,False,9e55f3e
+2026-10-20T11:25:24+00:00,BMKG,cuaca_diy.csv,True,2026-10-20T11:25:24+00:00,28120,True,9e55f3e
+2026-10-20T11:25:24+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-20T11:25:24+00:00,920,False,9e55f3e
+2026-10-20T11:25:24+00:00,Google Trends,google_trends_panik.csv,True,2026-10-20T11:25:24+00:00,93,True,9e55f3e
+2026-10-20T11:25:24+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-20T11:25:24+00:00,1430,False,9e55f3e
+2026-10-20T11:25:24+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-20T11:25:24+00:00,26780,True,9e55f3e
+2026-10-20T11:25:24+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-20T11:25:24+00:00,70,True,9e55f3e
+2026-10-21T01:30:00+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-21T01:30:00+00:00,26800,True,79e6493
+2026-10-21T01:30:00+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,79e6493
+2026-10-21T01:30:00+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-21T01:30:00+00:00,7730,False,79e6493
+2026-10-21T01:30:00+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,79e6493
+2026-10-21T01:30:00+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-21T01:30:00+00:00,260,False,79e6493
+2026-10-21T01:30:00+00:00,BMKG,cuaca_diy.csv,True,2026-10-21T01:30:00+00:00,28200,True,79e6493
+2026-10-21T01:30:00+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-21T01:30:00+00:00,920,False,79e6493
+2026-10-21T01:30:00+00:00,Google Trends,google_trends_panik.csv,True,2026-10-21T01:30:00+00:00,93,False,79e6493
+2026-10-21T01:30:00+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-21T01:30:00+00:00,1430,False,79e6493
+2026-10-21T01:30:00+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-21T01:30:00+00:00,26800,True,79e6493
+2026-10-21T01:30:00+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-21T01:30:00+00:00,70,True,79e6493
+2026-10-21T08:25:11+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-21T08:25:11+00:00,26800,False,80e10ac
+2026-10-21T08:25:11+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,80e10ac
+2026-10-21T08:25:11+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-21T08:25:11+00:00,7730,False,80e10ac
+2026-10-21T08:25:11+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,80e10ac
+2026-10-21T08:25:11+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-21T08:25:11+00:00,286,True,80e10ac
+2026-10-21T08:25:11+00:00,BMKG,cuaca_diy.csv,True,2026-10-21T08:25:11+00:00,28295,True,80e10ac
+2026-10-21T08:25:11+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-21T08:25:11+00:00,920,False,80e10ac
+2026-10-21T08:25:11+00:00,Google Trends,google_trends_panik.csv,True,2026-10-21T08:25:11+00:00,93,True,80e10ac
+2026-10-21T08:25:11+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-21T08:25:11+00:00,1430,False,80e10ac
+2026-10-21T08:25:11+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-21T08:25:11+00:00,26800,True,80e10ac
+2026-10-21T08:25:11+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-21T08:25:11+00:00,70,True,80e10ac
+2026-10-21T11:40:42+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-21T11:40:42+00:00,26800,False,1603962
+2026-10-21T11:40:42+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,1603962
+2026-10-21T11:40:42+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-21T11:40:42+00:00,7730,False,1603962
+2026-10-21T11:40:42+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,1603962
+2026-10-21T11:40:42+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-21T11:40:42+00:00,286,False,1603962
+2026-10-21T11:40:42+00:00,BMKG,cuaca_diy.csv,True,2026-10-21T11:40:42+00:00,28385,True,1603962
+2026-10-21T11:40:42+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-21T11:40:42+00:00,920,False,1603962
+2026-10-21T11:40:42+00:00,Google Trends,google_trends_panik.csv,True,2026-10-21T11:40:42+00:00,186,True,1603962
+2026-10-21T11:40:42+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-21T11:40:42+00:00,1430,False,1603962
+2026-10-21T11:40:42+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-21T11:40:42+00:00,26800,True,1603962
+2026-10-21T11:40:42+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-21T11:40:42+00:00,70,True,1603962
+2026-10-22T01:30:47+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-22T01:30:47+00:00,26820,True,a228bbd
+2026-10-22T01:30:47+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,a228bbd
+2026-10-22T01:30:47+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-22T01:30:47+00:00,7730,False,a228bbd
+2026-10-22T01:30:47+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,a228bbd
+2026-10-22T01:30:47+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-22T01:30:47+00:00,286,False,a228bbd
+2026-10-22T01:30:47+00:00,BMKG,cuaca_diy.csv,True,2026-10-22T01:30:47+00:00,28490,True,a228bbd
+2026-10-22T01:30:47+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-22T01:30:47+00:00,920,False,a228bbd
+2026-10-22T01:30:47+00:00,Google Trends,google_trends_panik.csv,True,2026-10-22T01:30:47+00:00,93,True,a228bbd
+2026-10-22T01:30:47+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-22T01:30:47+00:00,1430,False,a228bbd
+2026-10-22T01:30:47+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-22T01:30:47+00:00,26820,True,a228bbd
+2026-10-22T01:30:47+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-22T01:30:47+00:00,70,True,a228bbd
+2026-10-22T08:32:11+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-22T08:32:11+00:00,26820,False,7d583f3
+2026-10-22T08:32:11+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,7d583f3
+2026-10-22T08:32:11+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-22T08:32:11+00:00,7730,False,7d583f3
+2026-10-22T08:32:11+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,7d583f3
+2026-10-22T08:32:11+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-22T08:32:11+00:00,286,False,7d583f3
+2026-10-22T08:32:11+00:00,BMKG,cuaca_diy.csv,True,2026-10-22T08:32:11+00:00,28585,True,7d583f3
+2026-10-22T08:32:11+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-22T08:32:11+00:00,920,False,7d583f3
+2026-10-22T08:32:11+00:00,Google Trends,google_trends_panik.csv,True,2026-10-22T08:32:11+00:00,93,True,7d583f3
+2026-10-22T08:32:11+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-22T08:32:11+00:00,1430,False,7d583f3
+2026-10-22T08:32:11+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-22T08:32:11+00:00,26820,True,7d583f3
+2026-10-22T08:32:11+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-22T08:32:11+00:00,70,True,7d583f3
+2026-10-22T11:56:47+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-22T11:56:47+00:00,26820,False,472ad72
+2026-10-22T11:56:47+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,472ad72
+2026-10-22T11:56:47+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-22T11:56:47+00:00,7730,False,472ad72
+2026-10-22T11:56:47+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,472ad72
+2026-10-22T11:56:47+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-22T11:56:47+00:00,286,False,472ad72
+2026-10-22T11:56:47+00:00,BMKG,cuaca_diy.csv,True,2026-10-22T11:56:47+00:00,28675,True,472ad72
+2026-10-22T11:56:47+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-22T11:56:47+00:00,920,False,472ad72
+2026-10-22T11:56:47+00:00,Google Trends,google_trends_panik.csv,True,2026-10-22T11:56:47+00:00,93,True,472ad72
+2026-10-22T11:56:47+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-22T11:56:47+00:00,1430,False,472ad72
+2026-10-22T11:56:47+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-22T11:56:47+00:00,26820,True,472ad72
+2026-10-22T11:56:47+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-22T11:56:47+00:00,70,True,472ad72
+2026-10-23T01:30:24+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-23T01:30:24+00:00,26820,False,81c2af5
+2026-10-23T01:30:24+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,81c2af5
+2026-10-23T01:30:24+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-23T01:30:24+00:00,7730,False,81c2af5
+2026-10-23T01:30:24+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,81c2af5
+2026-10-23T01:30:24+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-23T01:30:24+00:00,286,False,81c2af5
+2026-10-23T01:30:24+00:00,BMKG,cuaca_diy.csv,True,2026-10-23T01:30:24+00:00,28782,True,81c2af5
+2026-10-23T01:30:24+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-23T01:30:24+00:00,920,False,81c2af5
+2026-10-23T01:30:24+00:00,Google Trends,google_trends_panik.csv,True,2026-10-23T01:30:24+00:00,93,True,81c2af5
+2026-10-23T01:30:24+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-23T01:30:24+00:00,1430,False,81c2af5
+2026-10-23T01:30:24+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-23T01:30:24+00:00,26820,False,81c2af5
+2026-10-23T01:30:24+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-23T01:30:24+00:00,70,True,81c2af5
+2026-10-23T08:27:44+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-23T08:27:44+00:00,26840,True,f9b2eed
+2026-10-23T08:27:44+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,f9b2eed
+2026-10-23T08:27:44+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-23T08:27:44+00:00,7730,False,f9b2eed
+2026-10-23T08:27:44+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,f9b2eed
+2026-10-23T08:27:44+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-23T08:27:44+00:00,286,False,f9b2eed
+2026-10-23T08:27:44+00:00,BMKG,cuaca_diy.csv,True,2026-10-23T08:27:44+00:00,28877,True,f9b2eed
+2026-10-23T08:27:44+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-23T08:27:44+00:00,920,False,f9b2eed
+2026-10-23T08:27:44+00:00,Google Trends,google_trends_panik.csv,True,2026-10-23T08:27:44+00:00,93,False,f9b2eed
+2026-10-23T08:27:44+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-23T08:27:44+00:00,1430,False,f9b2eed
+2026-10-23T08:27:44+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-23T08:27:44+00:00,26840,True,f9b2eed
+2026-10-23T08:27:44+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-23T08:27:44+00:00,70,True,f9b2eed
+2026-10-23T11:34:00+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-23T11:34:00+00:00,26840,False,e7e1392
+2026-10-23T11:34:00+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,e7e1392
+2026-10-23T11:34:00+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-23T11:34:00+00:00,7730,False,e7e1392
+2026-10-23T11:34:00+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,e7e1392
+2026-10-23T11:34:00+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-23T11:34:00+00:00,286,False,e7e1392
+2026-10-23T11:34:00+00:00,BMKG,cuaca_diy.csv,True,2026-10-23T11:34:00+00:00,28967,True,e7e1392
+2026-10-23T11:34:00+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-23T11:34:00+00:00,920,False,e7e1392
+2026-10-23T11:34:00+00:00,Google Trends,google_trends_panik.csv,True,2026-10-23T11:34:00+00:00,93,True,e7e1392
+2026-10-23T11:34:00+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-23T11:34:00+00:00,1430,False,e7e1392
+2026-10-23T11:34:00+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-23T11:34:00+00:00,26840,True,e7e1392
+2026-10-23T11:34:00+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-23T11:34:00+00:00,70,True,e7e1392
+2026-10-24T01:35:01+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-24T01:35:01+00:00,26840,False,ef01158
+2026-10-24T01:35:01+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,ef01158
+2026-10-24T01:35:01+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-24T01:35:01+00:00,7730,False,ef01158
+2026-10-24T01:35:01+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,ef01158
+2026-10-24T01:35:01+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-24T01:35:01+00:00,286,False,ef01158
+2026-10-24T01:35:01+00:00,BMKG,cuaca_diy.csv,True,2026-10-24T01:35:01+00:00,29073,True,ef01158
+2026-10-24T01:35:01+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-24T01:35:01+00:00,920,False,ef01158
+2026-10-24T01:35:01+00:00,Google Trends,google_trends_panik.csv,True,2026-10-24T01:35:01+00:00,93,False,ef01158
+2026-10-24T01:35:01+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-24T01:35:01+00:00,1430,False,ef01158
+2026-10-24T01:35:01+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-24T01:35:01+00:00,26840,False,ef01158
+2026-10-24T01:35:01+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-24T01:35:01+00:00,70,True,ef01158
+2026-10-24T08:03:37+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-24T08:03:37+00:00,26840,False,b84552c
+2026-10-24T08:03:37+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,b84552c
+2026-10-24T08:03:37+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-24T08:03:37+00:00,7730,False,b84552c
+2026-10-24T08:03:37+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,b84552c
+2026-10-24T08:03:37+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-24T08:03:37+00:00,286,False,b84552c
+2026-10-24T08:03:37+00:00,BMKG,cuaca_diy.csv,True,2026-10-24T08:03:37+00:00,29168,True,b84552c
+2026-10-24T08:03:37+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-24T08:03:37+00:00,920,False,b84552c
+2026-10-24T08:03:37+00:00,Google Trends,google_trends_panik.csv,True,2026-10-24T08:03:37+00:00,93,False,b84552c
+2026-10-24T08:03:37+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-24T08:03:37+00:00,1430,False,b84552c
+2026-10-24T08:03:37+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-24T08:03:37+00:00,26840,False,b84552c
+2026-10-24T08:03:37+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-24T08:03:37+00:00,70,True,b84552c
+2026-10-24T10:53:16+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-24T10:53:16+00:00,26840,False,7d59eae
+2026-10-24T10:53:16+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,7d59eae
+2026-10-24T10:53:16+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-24T10:53:16+00:00,7730,False,7d59eae
+2026-10-24T10:53:16+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,7d59eae
+2026-10-24T10:53:16+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-24T10:53:16+00:00,286,False,7d59eae
+2026-10-24T10:53:16+00:00,BMKG,cuaca_diy.csv,True,2026-10-24T10:53:16+00:00,29258,True,7d59eae
+2026-10-24T10:53:16+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-24T10:53:16+00:00,920,False,7d59eae
+2026-10-24T10:53:16+00:00,Google Trends,google_trends_panik.csv,True,2026-10-24T10:53:16+00:00,93,False,7d59eae
+2026-10-24T10:53:16+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-24T10:53:16+00:00,1430,False,7d59eae
+2026-10-24T10:53:16+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-24T10:53:16+00:00,26840,False,7d59eae
+2026-10-24T10:53:16+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-24T10:53:16+00:00,70,True,7d59eae
+2026-10-25T01:06:33+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-25T01:06:33+00:00,26840,False,b5eb725
+2026-10-25T01:06:33+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,b5eb725
+2026-10-25T01:06:33+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-25T01:06:33+00:00,7730,False,b5eb725
+2026-10-25T01:06:33+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,b5eb725
+2026-10-25T01:06:33+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-25T01:06:33+00:00,286,False,b5eb725
+2026-10-25T01:06:33+00:00,BMKG,cuaca_diy.csv,True,2026-10-25T01:06:33+00:00,29364,True,b5eb725
+2026-10-25T01:06:33+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-25T01:06:33+00:00,920,False,b5eb725
+2026-10-25T01:06:33+00:00,Google Trends,google_trends_panik.csv,True,2026-10-25T01:06:33+00:00,186,True,b5eb725
+2026-10-25T01:06:33+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-25T01:06:33+00:00,1430,False,b5eb725
+2026-10-25T01:06:33+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-25T01:06:33+00:00,26840,False,b5eb725
+2026-10-25T01:06:33+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-25T01:06:33+00:00,70,True,b5eb725
+2026-10-25T08:19:15+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-25T08:19:15+00:00,26840,False,c6748ac
+2026-10-25T08:19:15+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,c6748ac
+2026-10-25T08:19:15+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-25T08:19:15+00:00,7730,False,c6748ac
+2026-10-25T08:19:15+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,c6748ac
+2026-10-25T08:19:15+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-25T08:19:15+00:00,286,False,c6748ac
+2026-10-25T08:19:15+00:00,BMKG,cuaca_diy.csv,True,2026-10-25T08:19:15+00:00,29459,True,c6748ac
+2026-10-25T08:19:15+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-25T08:19:15+00:00,920,False,c6748ac
+2026-10-25T08:19:15+00:00,Google Trends,google_trends_panik.csv,True,2026-10-25T08:19:15+00:00,186,True,c6748ac
+2026-10-25T08:19:15+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-25T08:19:15+00:00,1430,False,c6748ac
+2026-10-25T08:19:15+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-25T08:19:15+00:00,26840,False,c6748ac
+2026-10-25T08:19:15+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-25T08:19:15+00:00,70,True,c6748ac
+2026-10-25T11:19:19+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-25T11:19:19+00:00,26840,False,2809c39
+2026-10-25T11:19:19+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,2809c39
+2026-10-25T11:19:19+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-25T11:19:19+00:00,7730,False,2809c39
+2026-10-25T11:19:19+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,2809c39
+2026-10-25T11:19:19+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-25T11:19:19+00:00,286,False,2809c39
+2026-10-25T11:19:19+00:00,BMKG,cuaca_diy.csv,True,2026-10-25T11:19:19+00:00,29549,True,2809c39
+2026-10-25T11:19:19+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-25T11:19:19+00:00,920,False,2809c39
+2026-10-25T11:19:19+00:00,Google Trends,google_trends_panik.csv,True,2026-10-25T11:19:19+00:00,93,True,2809c39
+2026-10-25T11:19:19+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-25T11:19:19+00:00,1430,False,2809c39
+2026-10-25T11:19:19+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-25T11:19:19+00:00,26840,False,2809c39
+2026-10-25T11:19:19+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-25T11:19:19+00:00,70,True,2809c39
+2026-10-26T01:12:16+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-26T01:12:16+00:00,26860,True,5cd7dc0
+2026-10-26T01:12:16+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,5cd7dc0
+2026-10-26T01:12:16+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-26T01:12:16+00:00,7730,False,5cd7dc0
+2026-10-26T01:12:16+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,5cd7dc0
+2026-10-26T01:12:16+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-26T01:12:16+00:00,286,False,5cd7dc0
+2026-10-26T01:12:16+00:00,BMKG,cuaca_diy.csv,True,2026-10-26T01:12:16+00:00,29657,True,5cd7dc0
+2026-10-26T01:12:16+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-26T01:12:16+00:00,920,False,5cd7dc0
+2026-10-26T01:12:16+00:00,Google Trends,google_trends_panik.csv,True,2026-10-26T01:12:16+00:00,93,True,5cd7dc0
+2026-10-26T01:12:16+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-26T01:12:16+00:00,1466,True,5cd7dc0
+2026-10-26T01:12:16+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-26T01:12:16+00:00,26860,True,5cd7dc0
+2026-10-26T01:12:16+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-26T01:12:16+00:00,70,True,5cd7dc0
+2026-10-26T08:45:45+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-26T08:45:45+00:00,26860,False,2822cc6
+2026-10-26T08:45:45+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,2822cc6
+2026-10-26T08:45:45+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-26T08:45:45+00:00,7730,False,2822cc6
+2026-10-26T08:45:45+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,2822cc6
+2026-10-26T08:45:45+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-26T08:45:45+00:00,286,False,2822cc6
+2026-10-26T08:45:45+00:00,BMKG,cuaca_diy.csv,True,2026-10-26T08:45:45+00:00,29752,True,2822cc6
+2026-10-26T08:45:45+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-26T08:45:45+00:00,920,False,2822cc6
+2026-10-26T08:45:45+00:00,Google Trends,google_trends_panik.csv,True,2026-10-26T08:45:45+00:00,279,True,2822cc6
+2026-10-26T08:45:45+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-26T08:45:45+00:00,1466,False,2822cc6
+2026-10-26T08:45:45+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-26T08:45:45+00:00,26860,True,2822cc6
+2026-10-26T08:45:45+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-26T08:45:45+00:00,70,True,2822cc6
+2026-10-26T12:52:43+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-26T12:52:43+00:00,26860,False,bd78f18
+2026-10-26T12:52:43+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,bd78f18
+2026-10-26T12:52:43+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-26T12:52:43+00:00,7730,False,bd78f18
+2026-10-26T12:52:43+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,bd78f18
+2026-10-26T12:52:43+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-26T12:52:43+00:00,286,False,bd78f18
+2026-10-26T12:52:43+00:00,BMKG,cuaca_diy.csv,True,2026-10-26T12:52:43+00:00,29842,True,bd78f18
+2026-10-26T12:52:43+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-26T12:52:43+00:00,920,False,bd78f18
+2026-10-26T12:52:43+00:00,Google Trends,google_trends_panik.csv,True,2026-10-26T12:52:43+00:00,279,True,bd78f18
+2026-10-26T12:52:43+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-26T12:52:43+00:00,1466,False,bd78f18
+2026-10-26T12:52:43+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-26T12:52:43+00:00,26860,True,bd78f18
+2026-10-26T12:52:43+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-26T12:52:43+00:00,70,True,bd78f18
+2026-10-27T02:04:39+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-27T02:04:39+00:00,26860,False,5a1e4c7
+2026-10-27T02:04:39+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,5a1e4c7
+2026-10-27T02:04:39+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-27T02:04:39+00:00,7730,False,5a1e4c7
+2026-10-27T02:04:39+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,5a1e4c7
+2026-10-27T02:04:39+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-27T02:04:39+00:00,286,False,5a1e4c7
+2026-10-27T02:04:39+00:00,BMKG,cuaca_diy.csv,True,2026-10-27T02:04:39+00:00,29947,True,5a1e4c7
+2026-10-27T02:04:39+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-27T02:04:39+00:00,920,False,5a1e4c7
+2026-10-27T02:04:39+00:00,Google Trends,google_trends_panik.csv,True,2026-10-27T02:04:39+00:00,93,True,5a1e4c7
+2026-10-27T02:04:39+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-27T02:04:39+00:00,1466,False,5a1e4c7
+2026-10-27T02:04:39+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-27T02:04:39+00:00,26860,False,5a1e4c7
+2026-10-27T02:04:39+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-27T02:04:39+00:00,70,True,5a1e4c7
+2026-10-27T08:52:22+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-27T08:52:22+00:00,26880,True,08608bf
+2026-10-27T08:52:22+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,08608bf
+2026-10-27T08:52:22+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-27T08:52:22+00:00,7730,False,08608bf
+2026-10-27T08:52:22+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,08608bf
+2026-10-27T08:52:22+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-27T08:52:22+00:00,286,False,08608bf
+2026-10-27T08:52:22+00:00,BMKG,cuaca_diy.csv,True,2026-10-27T08:52:22+00:00,30042,True,08608bf
+2026-10-27T08:52:22+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-27T08:52:22+00:00,920,False,08608bf
+2026-10-27T08:52:22+00:00,Google Trends,google_trends_panik.csv,True,2026-10-27T08:52:22+00:00,279,True,08608bf
+2026-10-27T08:52:22+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-27T08:52:22+00:00,1466,False,08608bf
+2026-10-27T08:52:22+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-27T08:52:22+00:00,26880,True,08608bf
+2026-10-27T08:52:22+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-27T08:52:22+00:00,70,True,08608bf
+2026-10-27T12:05:43+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-27T12:05:43+00:00,26880,False,4f40b56
+2026-10-27T12:05:43+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,4f40b56
+2026-10-27T12:05:43+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-27T12:05:43+00:00,7730,False,4f40b56
+2026-10-27T12:05:43+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,4f40b56
+2026-10-27T12:05:43+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-27T12:05:43+00:00,286,False,4f40b56
+2026-10-27T12:05:43+00:00,BMKG,cuaca_diy.csv,True,2026-10-27T12:05:43+00:00,30132,True,4f40b56
+2026-10-27T12:05:43+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-27T12:05:43+00:00,920,False,4f40b56
+2026-10-27T12:05:43+00:00,Google Trends,google_trends_panik.csv,True,2026-10-27T12:05:43+00:00,279,True,4f40b56
+2026-10-27T12:05:43+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-27T12:05:43+00:00,1466,False,4f40b56
+2026-10-27T12:05:43+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-27T12:05:43+00:00,26880,True,4f40b56
+2026-10-27T12:05:43+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-27T12:05:43+00:00,70,True,4f40b56
+2026-10-28T02:13:03+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-28T02:13:03+00:00,26900,True,8845179
+2026-10-28T02:13:03+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,8845179
+2026-10-28T02:13:03+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-28T02:13:03+00:00,7730,False,8845179
+2026-10-28T02:13:03+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,8845179
+2026-10-28T02:13:03+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-28T02:13:03+00:00,286,False,8845179
+2026-10-28T02:13:03+00:00,BMKG,cuaca_diy.csv,True,2026-10-28T02:13:03+00:00,30237,True,8845179
+2026-10-28T02:13:03+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-28T02:13:03+00:00,920,False,8845179
+2026-10-28T02:13:03+00:00,Google Trends,google_trends_panik.csv,True,2026-10-28T02:13:03+00:00,186,True,8845179
+2026-10-28T02:13:03+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-28T02:13:03+00:00,1466,False,8845179
+2026-10-28T02:13:03+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-28T02:13:03+00:00,26900,True,8845179
+2026-10-28T02:13:03+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-28T02:13:03+00:00,70,True,8845179
+2026-10-28T09:32:37+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-28T09:32:37+00:00,26900,False,220235f
+2026-10-28T09:32:37+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,220235f
+2026-10-28T09:32:37+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-28T09:32:37+00:00,7730,False,220235f
+2026-10-28T09:32:37+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,220235f
+2026-10-28T09:32:37+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-28T09:32:37+00:00,286,False,220235f
+2026-10-28T09:32:37+00:00,BMKG,cuaca_diy.csv,True,2026-10-28T09:32:37+00:00,30332,True,220235f
+2026-10-28T09:32:37+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-28T09:32:37+00:00,920,False,220235f
+2026-10-28T09:32:37+00:00,Google Trends,google_trends_panik.csv,True,2026-10-28T09:32:37+00:00,93,True,220235f
+2026-10-28T09:32:37+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-28T09:32:37+00:00,1466,False,220235f
+2026-10-28T09:32:37+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-28T09:32:37+00:00,26900,True,220235f
+2026-10-28T09:32:37+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-28T09:32:37+00:00,70,True,220235f
+2026-10-28T12:46:01+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-28T12:46:01+00:00,26900,False,4a1449e
+2026-10-28T12:46:01+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,4a1449e
+2026-10-28T12:46:01+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-28T12:46:01+00:00,7730,False,4a1449e
+2026-10-28T12:46:01+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,4a1449e
+2026-10-28T12:46:01+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-28T12:46:01+00:00,286,False,4a1449e
+2026-10-28T12:46:01+00:00,BMKG,cuaca_diy.csv,True,2026-10-28T12:46:01+00:00,30422,True,4a1449e
+2026-10-28T12:46:01+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-28T12:46:01+00:00,920,False,4a1449e
+2026-10-28T12:46:01+00:00,Google Trends,google_trends_panik.csv,True,2026-10-28T12:46:01+00:00,93,True,4a1449e
+2026-10-28T12:46:01+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-28T12:46:01+00:00,1466,False,4a1449e
+2026-10-28T12:46:01+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-28T12:46:01+00:00,26900,True,4a1449e
+2026-10-28T12:46:01+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-28T12:46:01+00:00,70,True,4a1449e
+2026-10-29T02:25:01+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-29T02:25:01+00:00,26920,True,d1612c3
+2026-10-29T02:25:01+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,d1612c3
+2026-10-29T02:25:01+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-29T02:25:01+00:00,7730,False,d1612c3
+2026-10-29T02:25:01+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,d1612c3
+2026-10-29T02:25:01+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-29T02:25:01+00:00,286,False,d1612c3
+2026-10-29T02:25:01+00:00,BMKG,cuaca_diy.csv,True,2026-10-29T02:25:01+00:00,30527,True,d1612c3
+2026-10-29T02:25:01+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-29T02:25:01+00:00,920,False,d1612c3
+2026-10-29T02:25:01+00:00,Google Trends,google_trends_panik.csv,True,2026-10-29T02:25:01+00:00,93,False,d1612c3
+2026-10-29T02:25:01+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-29T02:25:01+00:00,1466,False,d1612c3
+2026-10-29T02:25:01+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-29T02:25:01+00:00,26920,True,d1612c3
+2026-10-29T02:25:01+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-29T02:25:01+00:00,70,True,d1612c3
+2026-10-29T09:44:29+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-29T09:44:29+00:00,26920,False,4057de0
+2026-10-29T09:44:29+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,4057de0
+2026-10-29T09:44:29+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-29T09:44:29+00:00,7730,False,4057de0
+2026-10-29T09:44:29+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,4057de0
+2026-10-29T09:44:29+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-29T09:44:29+00:00,286,False,4057de0
+2026-10-29T09:44:29+00:00,BMKG,cuaca_diy.csv,True,2026-10-29T09:44:29+00:00,30622,True,4057de0
+2026-10-29T09:44:29+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-29T09:44:29+00:00,920,False,4057de0
+2026-10-29T09:44:29+00:00,Google Trends,google_trends_panik.csv,True,2026-10-29T09:44:29+00:00,279,True,4057de0
+2026-10-29T09:44:29+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-29T09:44:29+00:00,1466,False,4057de0
+2026-10-29T09:44:29+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-29T09:44:29+00:00,26920,True,4057de0
+2026-10-29T09:44:29+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-29T09:44:29+00:00,70,True,4057de0
+2026-10-29T12:54:52+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-29T12:54:52+00:00,26920,False,5e5ba7d
+2026-10-29T12:54:52+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,5e5ba7d
+2026-10-29T12:54:52+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-29T12:54:52+00:00,7730,False,5e5ba7d
+2026-10-29T12:54:52+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,5e5ba7d
+2026-10-29T12:54:52+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-29T12:54:52+00:00,286,False,5e5ba7d
+2026-10-29T12:54:52+00:00,BMKG,cuaca_diy.csv,True,2026-10-29T12:54:52+00:00,30712,True,5e5ba7d
+2026-10-29T12:54:52+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-29T12:54:52+00:00,920,False,5e5ba7d
+2026-10-29T12:54:52+00:00,Google Trends,google_trends_panik.csv,True,2026-10-29T12:54:52+00:00,279,True,5e5ba7d
+2026-10-29T12:54:52+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-29T12:54:52+00:00,1466,False,5e5ba7d
+2026-10-29T12:54:52+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-29T12:54:52+00:00,26920,True,5e5ba7d
+2026-10-29T12:54:52+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-29T12:54:52+00:00,70,True,5e5ba7d
+2026-10-30T02:37:35+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-30T02:37:35+00:00,26940,True,b3e837e
+2026-10-30T02:37:35+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,b3e837e
+2026-10-30T02:37:35+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-30T02:37:35+00:00,7730,False,b3e837e
+2026-10-30T02:37:35+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,b3e837e
+2026-10-30T02:37:35+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-30T02:37:35+00:00,286,False,b3e837e
+2026-10-30T02:37:35+00:00,BMKG,cuaca_diy.csv,True,2026-10-30T02:37:35+00:00,30817,True,b3e837e
+2026-10-30T02:37:35+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-30T02:37:35+00:00,920,False,b3e837e
+2026-10-30T02:37:35+00:00,Google Trends,google_trends_panik.csv,True,2026-10-30T02:37:35+00:00,279,True,b3e837e
+2026-10-30T02:37:35+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-30T02:37:35+00:00,1466,False,b3e837e
+2026-10-30T02:37:35+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-30T02:37:35+00:00,26940,True,b3e837e
+2026-10-30T02:37:35+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-30T02:37:35+00:00,70,True,b3e837e
+2026-10-30T09:50:21+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-30T09:50:21+00:00,26940,False,8a54f8d
+2026-10-30T09:50:21+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,8a54f8d
+2026-10-30T09:50:21+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-30T09:50:21+00:00,7730,False,8a54f8d
+2026-10-30T09:50:21+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,8a54f8d
+2026-10-30T09:50:21+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-30T09:50:21+00:00,286,False,8a54f8d
+2026-10-30T09:50:21+00:00,BMKG,cuaca_diy.csv,True,2026-10-30T09:50:21+00:00,30912,True,8a54f8d
+2026-10-30T09:50:21+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-30T09:50:21+00:00,920,False,8a54f8d
+2026-10-30T09:50:21+00:00,Google Trends,google_trends_panik.csv,True,2026-10-30T09:50:21+00:00,93,True,8a54f8d
+2026-10-30T09:50:21+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-30T09:50:21+00:00,1466,False,8a54f8d
+2026-10-30T09:50:21+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-30T09:50:21+00:00,26940,True,8a54f8d
+2026-10-30T09:50:21+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-30T09:50:21+00:00,70,True,8a54f8d
+2026-10-30T12:46:41+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-30T12:46:41+00:00,26940,False,e4d5c1a
+2026-10-30T12:46:41+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,e4d5c1a
+2026-10-30T12:46:41+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-30T12:46:41+00:00,7730,False,e4d5c1a
+2026-10-30T12:46:41+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,e4d5c1a
+2026-10-30T12:46:41+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-30T12:46:41+00:00,286,False,e4d5c1a
+2026-10-30T12:46:41+00:00,BMKG,cuaca_diy.csv,True,2026-10-30T12:46:41+00:00,31002,True,e4d5c1a
+2026-10-30T12:46:41+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-30T12:46:41+00:00,920,False,e4d5c1a
+2026-10-30T12:46:41+00:00,Google Trends,google_trends_panik.csv,True,2026-10-30T12:46:41+00:00,93,True,e4d5c1a
+2026-10-30T12:46:41+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-30T12:46:41+00:00,1466,False,e4d5c1a
+2026-10-30T12:46:41+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-30T12:46:41+00:00,26940,True,e4d5c1a
+2026-10-30T12:46:41+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-30T12:46:41+00:00,70,True,e4d5c1a
+2026-10-31T02:20:15+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-31T02:20:15+00:00,26940,False,53df6f5
+2026-10-31T02:20:15+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,53df6f5
+2026-10-31T02:20:15+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-31T02:20:15+00:00,7730,False,53df6f5
+2026-10-31T02:20:15+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,53df6f5
+2026-10-31T02:20:15+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-31T02:20:15+00:00,286,False,53df6f5
+2026-10-31T02:20:15+00:00,BMKG,cuaca_diy.csv,True,2026-10-31T02:20:15+00:00,31107,True,53df6f5
+2026-10-31T02:20:15+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-31T02:20:15+00:00,920,False,53df6f5
+2026-10-31T02:20:15+00:00,Google Trends,google_trends_panik.csv,True,2026-10-31T02:20:15+00:00,93,True,53df6f5
+2026-10-31T02:20:15+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-31T02:20:15+00:00,1466,False,53df6f5
+2026-10-31T02:20:15+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-31T02:20:15+00:00,26940,False,53df6f5
+2026-10-31T02:20:15+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-31T02:20:15+00:00,70,True,53df6f5
+2026-10-31T09:30:30+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-31T09:30:30+00:00,26940,False,8a0431d
+2026-10-31T09:30:30+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,8a0431d
+2026-10-31T09:30:30+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-31T09:30:30+00:00,7730,False,8a0431d
+2026-10-31T09:30:30+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,8a0431d
+2026-10-31T09:30:30+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-31T09:30:30+00:00,286,False,8a0431d
+2026-10-31T09:30:30+00:00,BMKG,cuaca_diy.csv,True,2026-10-31T09:30:30+00:00,31202,True,8a0431d
+2026-10-31T09:30:30+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-31T09:30:30+00:00,920,False,8a0431d
+2026-10-31T09:30:30+00:00,Google Trends,google_trends_panik.csv,True,2026-10-31T09:30:30+00:00,93,True,8a0431d
+2026-10-31T09:30:30+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-31T09:30:30+00:00,1466,False,8a0431d
+2026-10-31T09:30:30+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-31T09:30:30+00:00,26940,False,8a0431d
+2026-10-31T09:30:30+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-31T09:30:30+00:00,70,True,8a0431d
+2026-10-31T12:16:11+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-10-31T12:16:11+00:00,26940,False,6e3fa96
+2026-10-31T12:16:11+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,6e3fa96
+2026-10-31T12:16:11+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-10-31T12:16:11+00:00,7730,False,6e3fa96
+2026-10-31T12:16:11+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,6e3fa96
+2026-10-31T12:16:11+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-10-31T12:16:11+00:00,286,False,6e3fa96
+2026-10-31T12:16:11+00:00,BMKG,cuaca_diy.csv,True,2026-10-31T12:16:11+00:00,31292,True,6e3fa96
+2026-10-31T12:16:11+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-10-31T12:16:11+00:00,920,False,6e3fa96
+2026-10-31T12:16:11+00:00,Google Trends,google_trends_panik.csv,True,2026-10-31T12:16:11+00:00,93,True,6e3fa96
+2026-10-31T12:16:11+00:00,Sinyal Media,validasi_berita.csv,True,2026-10-31T12:16:11+00:00,1466,False,6e3fa96
+2026-10-31T12:16:11+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-10-31T12:16:11+00:00,26940,False,6e3fa96
+2026-10-31T12:16:11+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-10-31T12:16:11+00:00,70,True,6e3fa96
+2026-11-01T02:11:33+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-01T02:11:33+00:00,26940,False,40e4ef9
+2026-11-01T02:11:33+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,40e4ef9
+2026-11-01T02:11:33+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-01T02:11:33+00:00,7730,False,40e4ef9
+2026-11-01T02:11:33+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,40e4ef9
+2026-11-01T02:11:33+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-01T02:11:33+00:00,286,False,40e4ef9
+2026-11-01T02:11:33+00:00,BMKG,cuaca_diy.csv,True,2026-11-01T02:11:33+00:00,31397,True,40e4ef9
+2026-11-01T02:11:33+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-01T02:11:33+00:00,920,False,40e4ef9
+2026-11-01T02:11:33+00:00,Google Trends,google_trends_panik.csv,True,2026-11-01T02:11:33+00:00,186,True,40e4ef9
+2026-11-01T02:11:33+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-01T02:11:33+00:00,1466,False,40e4ef9
+2026-11-01T02:11:33+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-01T02:11:33+00:00,26940,False,40e4ef9
+2026-11-01T02:11:33+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-01T02:11:33+00:00,70,True,40e4ef9
+2026-11-01T10:20:40+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-01T10:20:40+00:00,26940,False,fe1fc8c
+2026-11-01T10:20:40+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,fe1fc8c
+2026-11-01T10:20:40+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-01T10:20:40+00:00,7730,False,fe1fc8c
+2026-11-01T10:20:40+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,fe1fc8c
+2026-11-01T10:20:40+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-01T10:20:40+00:00,286,False,fe1fc8c
+2026-11-01T10:20:40+00:00,BMKG,cuaca_diy.csv,True,2026-11-01T10:20:40+00:00,31488,True,fe1fc8c
+2026-11-01T10:20:40+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-01T10:20:40+00:00,920,False,fe1fc8c
+2026-11-01T10:20:40+00:00,Google Trends,google_trends_panik.csv,True,2026-11-01T10:20:40+00:00,93,True,fe1fc8c
+2026-11-01T10:20:40+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-01T10:20:40+00:00,1466,False,fe1fc8c
+2026-11-01T10:20:40+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-01T10:20:40+00:00,26940,False,fe1fc8c
+2026-11-01T10:20:40+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-01T10:20:40+00:00,70,True,fe1fc8c
+2026-11-01T13:15:46+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-01T13:15:46+00:00,26940,False,347ae7c
+2026-11-01T13:15:46+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,347ae7c
+2026-11-01T13:15:46+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-01T13:15:46+00:00,7730,False,347ae7c
+2026-11-01T13:15:46+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,347ae7c
+2026-11-01T13:15:46+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-01T13:15:46+00:00,286,False,347ae7c
+2026-11-01T13:15:46+00:00,BMKG,cuaca_diy.csv,True,2026-11-01T13:15:46+00:00,31576,True,347ae7c
+2026-11-01T13:15:46+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-01T13:15:46+00:00,920,False,347ae7c
+2026-11-01T13:15:46+00:00,Google Trends,google_trends_panik.csv,True,2026-11-01T13:15:46+00:00,186,True,347ae7c
+2026-11-01T13:15:46+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-01T13:15:46+00:00,1466,False,347ae7c
+2026-11-01T13:15:46+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-01T13:15:46+00:00,26940,False,347ae7c
+2026-11-01T13:15:46+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-01T13:15:46+00:00,70,True,347ae7c
+2026-11-02T02:27:22+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-02T02:27:22+00:00,26960,True,6e20876
+2026-11-02T02:27:22+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,6e20876
+2026-11-02T02:27:22+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-02T02:27:22+00:00,7730,False,6e20876
+2026-11-02T02:27:22+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,6e20876
+2026-11-02T02:27:22+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-02T02:27:22+00:00,286,False,6e20876
+2026-11-02T02:27:22+00:00,BMKG,cuaca_diy.csv,True,2026-11-02T02:27:22+00:00,31681,True,6e20876
+2026-11-02T02:27:22+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-02T02:27:22+00:00,920,False,6e20876
+2026-11-02T02:27:22+00:00,Google Trends,google_trends_panik.csv,True,2026-11-02T02:27:22+00:00,279,True,6e20876
+2026-11-02T02:27:22+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-02T02:27:22+00:00,1466,False,6e20876
+2026-11-02T02:27:22+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-02T02:27:22+00:00,26960,True,6e20876
+2026-11-02T02:27:22+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-02T02:27:22+00:00,70,True,6e20876
+2026-11-02T10:48:50+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-02T10:48:50+00:00,26960,False,c7fd534
+2026-11-02T10:48:50+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,c7fd534
+2026-11-02T10:48:50+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-02T10:48:50+00:00,7730,False,c7fd534
+2026-11-02T10:48:50+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,c7fd534
+2026-11-02T10:48:50+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-02T10:48:50+00:00,286,False,c7fd534
+2026-11-02T10:48:50+00:00,BMKG,cuaca_diy.csv,True,2026-11-02T10:48:50+00:00,31773,True,c7fd534
+2026-11-02T10:48:50+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-02T10:48:50+00:00,920,False,c7fd534
+2026-11-02T10:48:50+00:00,Google Trends,google_trends_panik.csv,True,2026-11-02T10:48:50+00:00,279,True,c7fd534
+2026-11-02T10:48:50+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-02T10:48:50+00:00,1466,False,c7fd534
+2026-11-02T10:48:50+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-02T10:48:50+00:00,26960,True,c7fd534
+2026-11-02T10:48:50+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-02T10:48:50+00:00,70,True,c7fd534
+2026-11-02T15:40:57+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-02T15:40:57+00:00,26960,False,5f6d4f4
+2026-11-02T15:40:57+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,5f6d4f4
+2026-11-02T15:40:57+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-02T15:40:57+00:00,7730,False,5f6d4f4
+2026-11-02T15:40:57+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,5f6d4f4
+2026-11-02T15:40:57+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-02T15:40:57+00:00,286,False,5f6d4f4
+2026-11-02T15:40:57+00:00,BMKG,cuaca_diy.csv,True,2026-11-02T15:40:57+00:00,31858,True,5f6d4f4
+2026-11-02T15:40:57+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-02T15:40:57+00:00,920,False,5f6d4f4
+2026-11-02T15:40:57+00:00,Google Trends,google_trends_panik.csv,True,2026-11-02T15:40:57+00:00,93,True,5f6d4f4
+2026-11-02T15:40:57+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-02T15:40:57+00:00,1466,False,5f6d4f4
+2026-11-02T15:40:57+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-02T15:40:57+00:00,26960,True,5f6d4f4
+2026-11-02T15:40:57+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-02T15:40:57+00:00,70,True,5f6d4f4
+2026-11-03T03:59:33+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-03T03:59:33+00:00,26980,True,f3b02f6
+2026-11-03T03:59:33+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,f3b02f6
+2026-11-03T03:59:33+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-03T03:59:33+00:00,7730,False,f3b02f6
+2026-11-03T03:59:33+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,f3b02f6
+2026-11-03T03:59:33+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-03T03:59:33+00:00,286,False,f3b02f6
+2026-11-03T03:59:33+00:00,BMKG,cuaca_diy.csv,True,2026-11-03T03:59:33+00:00,31963,True,f3b02f6
+2026-11-03T03:59:33+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-03T03:59:33+00:00,920,False,f3b02f6
+2026-11-03T03:59:33+00:00,Google Trends,google_trends_panik.csv,True,2026-11-03T03:59:33+00:00,93,True,f3b02f6
+2026-11-03T03:59:33+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-03T03:59:33+00:00,1466,False,f3b02f6
+2026-11-03T03:59:33+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-03T03:59:33+00:00,26980,True,f3b02f6
+2026-11-03T03:59:33+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-03T03:59:33+00:00,70,True,f3b02f6
+2026-11-03T10:44:28+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-03T10:44:28+00:00,26980,False,c8f4f09
+2026-11-03T10:44:28+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,c8f4f09
+2026-11-03T10:44:28+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-03T10:44:28+00:00,7730,False,c8f4f09
+2026-11-03T10:44:28+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,c8f4f09
+2026-11-03T10:44:28+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-03T10:44:28+00:00,286,False,c8f4f09
+2026-11-03T10:44:28+00:00,BMKG,cuaca_diy.csv,True,2026-11-03T10:44:28+00:00,32055,True,c8f4f09
+2026-11-03T10:44:28+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-03T10:44:28+00:00,920,False,c8f4f09
+2026-11-03T10:44:28+00:00,Google Trends,google_trends_panik.csv,True,2026-11-03T10:44:28+00:00,93,True,c8f4f09
+2026-11-03T10:44:28+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-03T10:44:28+00:00,1466,False,c8f4f09
+2026-11-03T10:44:28+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-03T10:44:28+00:00,26980,True,c8f4f09
+2026-11-03T10:44:28+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-03T10:44:28+00:00,70,True,c8f4f09
+2026-11-03T14:06:51+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-03T14:06:51+00:00,26980,False,c930f1d
+2026-11-03T14:06:51+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,c930f1d
+2026-11-03T14:06:51+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-03T14:06:51+00:00,7730,False,c930f1d
+2026-11-03T14:06:51+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,c930f1d
+2026-11-03T14:06:51+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-03T14:06:51+00:00,286,False,c930f1d
+2026-11-03T14:06:51+00:00,BMKG,cuaca_diy.csv,True,2026-11-03T14:06:51+00:00,32140,True,c930f1d
+2026-11-03T14:06:51+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-03T14:06:51+00:00,920,False,c930f1d
+2026-11-03T14:06:51+00:00,Google Trends,google_trends_panik.csv,True,2026-11-03T14:06:51+00:00,279,True,c930f1d
+2026-11-03T14:06:51+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-03T14:06:51+00:00,1466,False,c930f1d
+2026-11-03T14:06:51+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-03T14:06:51+00:00,26980,True,c930f1d
+2026-11-03T14:06:51+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-03T14:06:51+00:00,70,True,c930f1d
+2026-11-04T03:03:56+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-04T03:03:56+00:00,27000,True,924f7b2
+2026-11-04T03:03:56+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,924f7b2
+2026-11-04T03:03:56+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-04T03:03:56+00:00,7730,False,924f7b2
+2026-11-04T03:03:56+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,924f7b2
+2026-11-04T03:03:56+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-04T03:03:56+00:00,286,False,924f7b2
+2026-11-04T03:03:56+00:00,BMKG,cuaca_diy.csv,True,2026-11-04T03:03:56+00:00,32245,True,924f7b2
+2026-11-04T03:03:56+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-04T03:03:56+00:00,921,True,924f7b2
+2026-11-04T03:03:56+00:00,Google Trends,google_trends_panik.csv,True,2026-11-04T03:03:56+00:00,93,True,924f7b2
+2026-11-04T03:03:56+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-04T03:03:56+00:00,1466,False,924f7b2
+2026-11-04T03:03:56+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-04T03:03:56+00:00,27000,True,924f7b2
+2026-11-04T03:03:56+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-04T03:03:56+00:00,70,True,924f7b2
+2026-11-04T14:25:24+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-04T14:25:24+00:00,27000,False,685f05a
+2026-11-04T14:25:24+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,685f05a
+2026-11-04T14:25:24+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-04T14:25:24+00:00,7730,False,685f05a
+2026-11-04T14:25:24+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,685f05a
+2026-11-04T14:25:24+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-04T14:25:24+00:00,286,False,685f05a
+2026-11-04T14:25:24+00:00,BMKG,cuaca_diy.csv,True,2026-11-04T14:25:24+00:00,32330,True,685f05a
+2026-11-04T14:25:24+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-04T14:25:24+00:00,921,False,685f05a
+2026-11-04T14:25:24+00:00,Google Trends,google_trends_panik.csv,True,2026-11-04T14:25:24+00:00,93,False,685f05a
+2026-11-04T14:25:24+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-04T14:25:24+00:00,1466,False,685f05a
+2026-11-04T14:25:24+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-04T14:25:24+00:00,27000,True,685f05a
+2026-11-04T14:25:24+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-04T14:25:24+00:00,70,True,685f05a
+2026-11-05T03:30:53+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-05T03:30:53+00:00,27020,True,f0e73ee
+2026-11-05T03:30:53+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,f0e73ee
+2026-11-05T03:30:53+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-05T03:30:53+00:00,7730,False,f0e73ee
+2026-11-05T03:30:53+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,f0e73ee
+2026-11-05T03:30:53+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-05T03:30:53+00:00,286,False,f0e73ee
+2026-11-05T03:30:53+00:00,BMKG,cuaca_diy.csv,True,2026-11-05T03:30:53+00:00,32435,True,f0e73ee
+2026-11-05T03:30:53+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-05T03:30:53+00:00,921,False,f0e73ee
+2026-11-05T03:30:53+00:00,Google Trends,google_trends_panik.csv,True,2026-11-05T03:30:53+00:00,186,True,f0e73ee
+2026-11-05T03:30:53+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-05T03:30:53+00:00,1466,False,f0e73ee
+2026-11-05T03:30:53+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-05T03:30:53+00:00,27020,True,f0e73ee
+2026-11-05T03:30:53+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-05T03:30:53+00:00,70,True,f0e73ee
+2026-11-05T10:37:43+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-05T10:37:43+00:00,27020,False,ff2f557
+2026-11-05T10:37:43+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,ff2f557
+2026-11-05T10:37:43+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-05T10:37:43+00:00,7730,False,ff2f557
+2026-11-05T10:37:43+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,ff2f557
+2026-11-05T10:37:43+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-05T10:37:43+00:00,286,False,ff2f557
+2026-11-05T10:37:43+00:00,BMKG,cuaca_diy.csv,True,2026-11-05T10:37:43+00:00,32528,True,ff2f557
+2026-11-05T10:37:43+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-05T10:37:43+00:00,921,False,ff2f557
+2026-11-05T10:37:43+00:00,Google Trends,google_trends_panik.csv,True,2026-11-05T10:37:43+00:00,186,True,ff2f557
+2026-11-05T10:37:43+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-05T10:37:43+00:00,1466,False,ff2f557
+2026-11-05T10:37:43+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-05T10:37:43+00:00,27020,True,ff2f557
+2026-11-05T10:37:43+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-05T10:37:43+00:00,70,True,ff2f557
+2026-11-05T14:35:33+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-05T14:35:33+00:00,27020,False,467a959
+2026-11-05T14:35:33+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,467a959
+2026-11-05T14:35:33+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-05T14:35:33+00:00,7730,False,467a959
+2026-11-05T14:35:33+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,467a959
+2026-11-05T14:35:33+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-05T14:35:33+00:00,286,False,467a959
+2026-11-05T14:35:33+00:00,BMKG,cuaca_diy.csv,True,2026-11-05T14:35:33+00:00,32613,True,467a959
+2026-11-05T14:35:33+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-05T14:35:33+00:00,921,False,467a959
+2026-11-05T14:35:33+00:00,Google Trends,google_trends_panik.csv,True,2026-11-05T14:35:33+00:00,186,True,467a959
+2026-11-05T14:35:33+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-05T14:35:33+00:00,1466,False,467a959
+2026-11-05T14:35:33+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-05T14:35:33+00:00,27020,True,467a959
+2026-11-05T14:35:33+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-05T14:35:33+00:00,70,True,467a959
+2026-11-06T03:27:13+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-06T03:27:13+00:00,27040,True,24c3890
+2026-11-06T03:27:13+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,24c3890
+2026-11-06T03:27:13+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-06T03:27:13+00:00,7730,False,24c3890
+2026-11-06T03:27:13+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,24c3890
+2026-11-06T03:27:13+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-06T03:27:13+00:00,286,False,24c3890
+2026-11-06T03:27:13+00:00,BMKG,cuaca_diy.csv,True,2026-11-06T03:27:13+00:00,32718,True,24c3890
+2026-11-06T03:27:13+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-06T03:27:13+00:00,921,False,24c3890
+2026-11-06T03:27:13+00:00,Google Trends,google_trends_panik.csv,True,2026-11-06T03:27:13+00:00,279,True,24c3890
+2026-11-06T03:27:13+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-06T03:27:13+00:00,1466,False,24c3890
+2026-11-06T03:27:13+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-06T03:27:13+00:00,27040,True,24c3890
+2026-11-06T03:27:13+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-06T03:27:13+00:00,70,True,24c3890
+2026-11-06T10:50:14+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-06T10:50:14+00:00,27040,False,e4e382f
+2026-11-06T10:50:14+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,e4e382f
+2026-11-06T10:50:14+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-06T10:50:14+00:00,7730,False,e4e382f
+2026-11-06T10:50:14+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,e4e382f
+2026-11-06T10:50:14+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-06T10:50:14+00:00,286,False,e4e382f
+2026-11-06T10:50:14+00:00,BMKG,cuaca_diy.csv,True,2026-11-06T10:50:14+00:00,32810,True,e4e382f
+2026-11-06T10:50:14+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-06T10:50:14+00:00,921,False,e4e382f
+2026-11-06T10:50:14+00:00,Google Trends,google_trends_panik.csv,True,2026-11-06T10:50:14+00:00,93,True,e4e382f
+2026-11-06T10:50:14+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-06T10:50:14+00:00,1466,False,e4e382f
+2026-11-06T10:50:14+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-06T10:50:14+00:00,27040,True,e4e382f
+2026-11-06T10:50:14+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-06T10:50:14+00:00,70,True,e4e382f
+2026-11-06T14:13:43+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-06T14:13:43+00:00,27040,False,1731191
+2026-11-06T14:13:43+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,1731191
+2026-11-06T14:13:43+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-06T14:13:43+00:00,7730,False,1731191
+2026-11-06T14:13:43+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,1731191
+2026-11-06T14:13:43+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-06T14:13:43+00:00,286,False,1731191
+2026-11-06T14:13:43+00:00,BMKG,cuaca_diy.csv,True,2026-11-06T14:13:43+00:00,32895,True,1731191
+2026-11-06T14:13:43+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-06T14:13:43+00:00,921,False,1731191
+2026-11-06T14:13:43+00:00,Google Trends,google_trends_panik.csv,True,2026-11-06T14:13:43+00:00,279,True,1731191
+2026-11-06T14:13:43+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-06T14:13:43+00:00,1466,False,1731191
+2026-11-06T14:13:43+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-06T14:13:43+00:00,27040,True,1731191
+2026-11-06T14:13:43+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-06T14:13:43+00:00,70,True,1731191
+2026-11-07T02:48:49+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-07T02:48:49+00:00,27040,False,4a910dc
+2026-11-07T02:48:49+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,4a910dc
+2026-11-07T02:48:49+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-07T02:48:49+00:00,7730,False,4a910dc
+2026-11-07T02:48:49+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,4a910dc
+2026-11-07T02:48:49+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-07T02:48:49+00:00,286,False,4a910dc
+2026-11-07T02:48:49+00:00,BMKG,cuaca_diy.csv,True,2026-11-07T02:48:49+00:00,33000,True,4a910dc
+2026-11-07T02:48:49+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-07T02:48:49+00:00,921,False,4a910dc
+2026-11-07T02:48:49+00:00,Google Trends,google_trends_panik.csv,True,2026-11-07T02:48:49+00:00,186,True,4a910dc
+2026-11-07T02:48:49+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-07T02:48:49+00:00,1466,False,4a910dc
+2026-11-07T02:48:49+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-07T02:48:49+00:00,27040,False,4a910dc
+2026-11-07T02:48:49+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-07T02:48:49+00:00,70,True,4a910dc
+2026-11-07T09:52:35+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-07T09:52:35+00:00,27040,False,f8bc7cb
+2026-11-07T09:52:35+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,f8bc7cb
+2026-11-07T09:52:35+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-07T09:52:35+00:00,7730,False,f8bc7cb
+2026-11-07T09:52:35+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,f8bc7cb
+2026-11-07T09:52:35+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-07T09:52:35+00:00,286,False,f8bc7cb
+2026-11-07T09:52:35+00:00,BMKG,cuaca_diy.csv,True,2026-11-07T09:52:35+00:00,33095,True,f8bc7cb
+2026-11-07T09:52:35+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-07T09:52:35+00:00,921,False,f8bc7cb
+2026-11-07T09:52:35+00:00,Google Trends,google_trends_panik.csv,True,2026-11-07T09:52:35+00:00,93,True,f8bc7cb
+2026-11-07T09:52:35+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-07T09:52:35+00:00,1466,False,f8bc7cb
+2026-11-07T09:52:35+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-07T09:52:35+00:00,27040,False,f8bc7cb
+2026-11-07T09:52:35+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-07T09:52:35+00:00,70,True,f8bc7cb
+2026-11-07T12:57:04+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-07T12:57:04+00:00,27040,False,20dd8ca
+2026-11-07T12:57:04+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,20dd8ca
+2026-11-07T12:57:04+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-07T12:57:04+00:00,7730,False,20dd8ca
+2026-11-07T12:57:04+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,20dd8ca
+2026-11-07T12:57:04+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-07T12:57:04+00:00,286,False,20dd8ca
+2026-11-07T12:57:04+00:00,BMKG,cuaca_diy.csv,True,2026-11-07T12:57:04+00:00,33185,True,20dd8ca
+2026-11-07T12:57:04+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-07T12:57:04+00:00,921,False,20dd8ca
+2026-11-07T12:57:04+00:00,Google Trends,google_trends_panik.csv,True,2026-11-07T12:57:04+00:00,186,True,20dd8ca
+2026-11-07T12:57:04+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-07T12:57:04+00:00,1466,False,20dd8ca
+2026-11-07T12:57:04+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-07T12:57:04+00:00,27040,False,20dd8ca
+2026-11-07T12:57:04+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-07T12:57:04+00:00,70,True,20dd8ca
+2026-11-08T02:24:43+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-08T02:24:43+00:00,27040,False,fd8ef4d
+2026-11-08T02:24:43+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,fd8ef4d
+2026-11-08T02:24:43+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-08T02:24:43+00:00,7730,False,fd8ef4d
+2026-11-08T02:24:43+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,fd8ef4d
+2026-11-08T02:24:43+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-08T02:24:43+00:00,286,False,fd8ef4d
+2026-11-08T02:24:43+00:00,BMKG,cuaca_diy.csv,True,2026-11-08T02:24:43+00:00,33290,True,fd8ef4d
+2026-11-08T02:24:43+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-08T02:24:43+00:00,921,False,fd8ef4d
+2026-11-08T02:24:43+00:00,Google Trends,google_trends_panik.csv,True,2026-11-08T02:24:43+00:00,186,True,fd8ef4d
+2026-11-08T02:24:43+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-08T02:24:43+00:00,1466,False,fd8ef4d
+2026-11-08T02:24:43+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-08T02:24:43+00:00,27040,False,fd8ef4d
+2026-11-08T02:24:43+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-08T02:24:43+00:00,70,True,fd8ef4d
+2026-11-08T10:04:21+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-08T10:04:21+00:00,27040,False,011048a
+2026-11-08T10:04:21+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,011048a
+2026-11-08T10:04:21+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-08T10:04:21+00:00,7730,False,011048a
+2026-11-08T10:04:21+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,011048a
+2026-11-08T10:04:21+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-08T10:04:21+00:00,286,False,011048a
+2026-11-08T10:04:21+00:00,BMKG,cuaca_diy.csv,True,2026-11-08T10:04:21+00:00,33385,True,011048a
+2026-11-08T10:04:21+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-08T10:04:21+00:00,921,False,011048a
+2026-11-08T10:04:21+00:00,Google Trends,google_trends_panik.csv,True,2026-11-08T10:04:21+00:00,186,False,011048a
+2026-11-08T10:04:21+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-08T10:04:21+00:00,1466,False,011048a
+2026-11-08T10:04:21+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-08T10:04:21+00:00,27040,False,011048a
+2026-11-08T10:04:21+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-08T10:04:21+00:00,70,True,011048a
+2026-11-08T13:18:28+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-08T13:18:28+00:00,27040,False,b1be6e4
+2026-11-08T13:18:28+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,b1be6e4
+2026-11-08T13:18:28+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-08T13:18:28+00:00,7730,False,b1be6e4
+2026-11-08T13:18:28+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,b1be6e4
+2026-11-08T13:18:28+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-08T13:18:28+00:00,286,False,b1be6e4
+2026-11-08T13:18:28+00:00,BMKG,cuaca_diy.csv,True,2026-11-08T13:18:28+00:00,33472,True,b1be6e4
+2026-11-08T13:18:28+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-08T13:18:28+00:00,921,False,b1be6e4
+2026-11-08T13:18:28+00:00,Google Trends,google_trends_panik.csv,True,2026-11-08T13:18:28+00:00,186,True,b1be6e4
+2026-11-08T13:18:28+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-08T13:18:28+00:00,1466,False,b1be6e4
+2026-11-08T13:18:28+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-08T13:18:28+00:00,27040,False,b1be6e4
+2026-11-08T13:18:28+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-08T13:18:28+00:00,70,True,b1be6e4
+2026-11-09T02:39:40+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-09T02:39:40+00:00,27060,True,abdd85b
+2026-11-09T02:39:40+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,abdd85b
+2026-11-09T02:39:40+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-09T02:39:40+00:00,7730,False,abdd85b
+2026-11-09T02:39:40+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,abdd85b
+2026-11-09T02:39:40+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-09T02:39:40+00:00,286,False,abdd85b
+2026-11-09T02:39:40+00:00,BMKG,cuaca_diy.csv,True,2026-11-09T02:39:40+00:00,33577,True,abdd85b
+2026-11-09T02:39:40+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-09T02:39:40+00:00,921,False,abdd85b
+2026-11-09T02:39:40+00:00,Google Trends,google_trends_panik.csv,True,2026-11-09T02:39:40+00:00,93,True,abdd85b
+2026-11-09T02:39:40+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-09T02:39:40+00:00,1466,False,abdd85b
+2026-11-09T02:39:40+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-09T02:39:40+00:00,27060,True,abdd85b
+2026-11-09T02:39:40+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-09T02:39:40+00:00,70,True,abdd85b
+2026-11-09T11:12:18+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-09T11:12:18+00:00,27060,False,bfb95f1
+2026-11-09T11:12:18+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,bfb95f1
+2026-11-09T11:12:18+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-09T11:12:18+00:00,7730,False,bfb95f1
+2026-11-09T11:12:18+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,bfb95f1
+2026-11-09T11:12:18+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-09T11:12:18+00:00,286,False,bfb95f1
+2026-11-09T11:12:18+00:00,BMKG,cuaca_diy.csv,True,2026-11-09T11:12:18+00:00,33667,True,bfb95f1
+2026-11-09T11:12:18+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-09T11:12:18+00:00,921,False,bfb95f1
+2026-11-09T11:12:18+00:00,Google Trends,google_trends_panik.csv,True,2026-11-09T11:12:18+00:00,186,True,bfb95f1
+2026-11-09T11:12:18+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-09T11:12:18+00:00,1466,False,bfb95f1
+2026-11-09T11:12:18+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-09T11:12:18+00:00,27060,True,bfb95f1
+2026-11-09T11:12:18+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-09T11:12:18+00:00,70,True,bfb95f1
+2026-11-09T16:05:09+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-09T16:05:09+00:00,27060,False,b83c2d9
+2026-11-09T16:05:09+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,False,,117130,False,b83c2d9
+2026-11-09T16:05:09+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-09T16:05:09+00:00,7730,False,b83c2d9
+2026-11-09T16:05:09+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,b83c2d9
+2026-11-09T16:05:09+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-09T16:05:09+00:00,286,False,b83c2d9
+2026-11-09T16:05:09+00:00,BMKG,cuaca_diy.csv,True,2026-11-09T16:05:09+00:00,33754,True,b83c2d9
+2026-11-09T16:05:09+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-09T16:05:09+00:00,921,False,b83c2d9
+2026-11-09T16:05:09+00:00,Google Trends,google_trends_panik.csv,True,2026-11-09T16:05:09+00:00,186,True,b83c2d9
+2026-11-09T16:05:09+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-09T16:05:09+00:00,1466,False,b83c2d9
+2026-11-09T16:05:09+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-09T16:05:09+00:00,27060,True,b83c2d9
+2026-11-09T16:05:09+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-09T16:05:09+00:00,70,True,b83c2d9

@@ -80,7 +80,12 @@ def deteksi_lonjakan(df: pd.DataFrame, z_threshold: float = 2.0) -> pd.DataFrame
         g["z_score"] = (g["skor_minat"] - g["rolling_mean"]) / g["rolling_std"]
         g["lonjakan_minat"] = g["z_score"].abs() > z_threshold
         return g
-    return df.groupby("keyword", group_keys=False).apply(_per_keyword)
+    out = df.groupby("keyword", group_keys=False).apply(_per_keyword)
+    # pandas versi baru membuang kolom pengelompok dari hasil apply, sehingga
+    # berkas keluaran kehilangan label keyword (dua seri tercampur tanpa nama).
+    if "keyword" not in out.columns:
+        out.insert(1, "keyword", df.loc[out.index, "keyword"].values)
+    return out
 
 
 def main():

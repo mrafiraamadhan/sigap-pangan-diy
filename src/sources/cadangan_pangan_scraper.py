@@ -82,26 +82,52 @@ def tanggal_data_dari(html: str):
         return None
 
 
+# Log SETIAP cek (berhasil maupun gagal) -> data/arsip/log_cadangan.csv.
+# Riwayat utama (cadangan_pangan_diy.csv) hanya menulis baris saat angka BERUBAH,
+# sehingga tanpa log ini "portal tidak bergerak" dan "pengambilan gagal" tampak sama.
+LOG_PATH = os.path.join(HERE, "..", "..", "data", "arsip", "log_cadangan.csv")
+INFO = {"status": "belum", "http": "", "tanggal_data": "", "total_kg": "", "n_tabel": 0, "panjang_html": 0}
+
+
+def catat_log(baris_baru):
+    try:
+        os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+        baris = dict(cek_utc=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                     **INFO, baris_baru=baris_baru)
+        pd.DataFrame([baris]).to_csv(LOG_PATH, mode="a", index=False,
+                                     header=not os.path.isfile(LOG_PATH))
+    except Exception as e:
+        print(f"(log cadangan gagal ditulis: {type(e).__name__}: {str(e)[:120]})")
+
+
 def fetch_snapshot() -> list:
     try:
         resp = requests.get(BASE_URL, headers=HEADERS, timeout=30)
+        INFO["http"] = resp.status_code
         resp.raise_for_status()
     except Exception as e:
+        INFO["status"] = "gagal_request"
         print(f"GAGAL request ({str(e)[:200]})")
         return []
     html = resp.text
+    INFO["panjang_html"] = len(html)
     try:
         # thousands="." & decimal="," : format angka Indonesia ("140.350" = 140350 kg).
         tables = pd.read_html(io.StringIO(html), thousands=".", decimal=",")
     except Exception as e:
+        INFO["status"] = "gagal_parse"
         print(f"Gagal parse tabel -- {type(e).__name__}: {str(e)[:150]} "
               f"(HTTP {resp.status_code}, {len(html)} char)")
         return []
     if not tables:
+        INFO["status"] = "tanpa_tabel"
         print(f"Tidak ada tabel di HTML (HTTP {resp.status_code}, {len(html)} char)")
         return []
+    INFO["n_tabel"] = len(tables)
 
     tgl_data = tanggal_data_dari(html)
+    INFO["tanggal_data"] = tgl_data or ""
+    INFO["status"] = "ok"
     diambil = datetime.now(timezone.utc).isoformat()
     frames = []
     for df in tables:
@@ -122,6 +148,7 @@ def fetch_snapshot() -> list:
             baris_total = tot[tot["Wilayah"].astype(str).str.strip() == "Total"]
             if len(baris_total):
                 kg = float(baris_total["Jumlah Stok (Kg)"].iloc[0])
+                INFO["total_kg"] = kg
                 print(f"Snapshot portal per {tgl_data or '?'}: total {kg:,.0f} kg = {kg/1000:,.1f} ton")
     else:
         print("Tabel ditemukan tapi tidak ada yang terlihat seperti data asli.")
@@ -156,7 +183,7 @@ def simpan_hasil(frames):
     pantau bisa merekonstruksi keadaan terkini dengan 'nilai terakhir per kunci'."""
     if not frames:
         print("Tidak ada data untuk disimpan.")
-        return
+        return 0
     result = pd.concat(frames, ignore_index=True)
     # Penanda bahwa baris ini sudah dalam kilogram yang benar (riwayat lama
     # dimigrasi oleh src/pipeline/migrasi_cadangan_kg.py dengan penanda yang sama).
@@ -178,6 +205,7 @@ def simpan_hasil(frames):
         result.to_csv(OUTPUT_PATH, index=False)
         baru = len(result)
     print(f"{baru} baris baru ditambahkan ke {OUTPUT_PATH} (dari {len(result)} baris hasil fetch).")
+    return baru
 
 
 def main():
@@ -186,7 +214,8 @@ def main():
     parser.add_argument("--semua-tahun", action="store_true", help="(tidak dipakai lagi)")
     parser.parse_args()
     print("Mengambil snapshot cadangan pangan DIY...")
-    simpan_hasil(fetch_snapshot())
+    baru = simpan_hasil(fetch_snapshot())
+    catat_log(baru)
 
 
 if __name__ == "__main__":
@@ -194,4 +223,6 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         print(f"GAGAL total: {type(e).__name__}: {str(e)[:300]}")
+        INFO["status"] = f"gagal_total:{type(e).__name__}"
+        catat_log("")
         raise SystemExit(1)

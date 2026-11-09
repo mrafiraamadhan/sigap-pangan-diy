@@ -84,6 +84,14 @@ def main():
         print(f"  {b['pilar']:28s} {b['baris']:7d} baris  {'BERUBAH' if b['berubah'] else 'tetap  '}  "
               f"{'dicek ' + kini if b['otomatis'] else 'manual'}", flush=True)
     print(f"Status pipeline disimpan ke {KELUARAN}")
+    # Arsip tambah-saja untuk berkas yang ditimpa tiap run (prakiraan, status cek,
+    # Google Trends, berita) -> data/arsip/. Tidak boleh menggagalkan langkah ini.
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import arsip_harian
+        arsip_harian.main(run_utc=kini)
+    except Exception as e:
+        print(f"Arsip harian gagal: {type(e).__name__}: {str(e)[:200]}")
     return 0
 
 
