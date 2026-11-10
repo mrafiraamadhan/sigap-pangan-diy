@@ -526,7 +526,7 @@ document.documentElement.classList.add("anim");
   </div>
   <div class="hero-meta masuk" style="--tunda:640ms">
     <span><b>Dirancang untuk:</b> TPID (Tim Pengendalian Inflasi Daerah) DIY · Bank Indonesia · DPKP · Bulog</span>
-    <span><b>9 pilar data</b> · 7 diperbarui otomatis</span>
+    <span><b>9 pilar data</b> · 8 diperbarui otomatis</span>
     <span id="badge-update">Memuat…</span>
   </div>
 </div>
@@ -999,7 +999,7 @@ async function render() {
       const naik10 = daftar.filter(d => (d.u30 ?? 0) > 10);
       sp2kpData = { daftar, tMaks, nPasar: Math.max(...daftar.map(d => d.nPasar || 1)) };
       sp2kpInfo = { nama: "Harga Pasar (SP2KP Kemendag)", sumber: "Dasar penghitungan IPH (Indeks Perkembangan Harga) · " + sp2kpData.nPasar + " pasar melapor", tgl: sp2kpData.tMaks,
-        tglTeks: "data harian s.d. " + fmtTgl(sp2kpData.tMaks) + " (diunduh manual)",
+        tglTeks: "data harian s.d. " + fmtTgl(sp2kpData.tMaks),
         lv: naik10.length === 0 ? "AMAN" : "WASPADA",
         baca: `${naik10.length} dari ${daftar.length}`, bacaKet: "varian naik >10% / 30 hari",
         ket: (naik10.length
@@ -2807,13 +2807,13 @@ async function render() {
     T5.appendChild(s);
 
     const s2 = el("section", "blok");
-    s2.innerHTML = `<h2>Riwayat Pembaruan Data</h2><p class="sub">Tujuh sumber ditarik otomatis oleh pipeline (GitHub Actions) tiga kali sehari: <strong>06.05 WIB</strong> (pagi, siap sebelum jam kantor), <strong>10.05 WIB</strong> (menangkap harga PIHPS hari berjalan, yang diterbitkan Bank Indonesia sekitar pukul 08.00–09.00; siap untuk rapat pagi), dan <strong>13.05 WIB</strong> (siang, selesai sebelum jam istirahat berakhir; siap untuk rapat sore). Jam mulai bisa bergeser 5–30 menit mengikuti antrean server GitHub. Dua sumber, SP2KP dan SIMOTANDI, diunduh manual dari portal resminya karena servernya memblokir akses otomatis, lalu dimasukkan lewat skrip konverter. Tidak ada satu pun angka yang diketik tangan. Kolom <em>data terakhir</em> = tanggal pengamatan terbaru di dalam data. Kolom <em>dicek / data baru</em> berisi dua baris: <em>dicek</em> = kapan pipeline terakhir memeriksa sumber itu (sama untuk semua sumber otomatis pada run yang sama), dan <em>data baru terakhir</em> = kapan terakhir kali sumber itu benar-benar memuat angka baru. Sumber yang jarang terbit (misalnya ONI bulanan) wajar punya tanggal data baru yang lebih lama daripada tanggal dicek.</p>`;
+    s2.innerHTML = `<h2>Riwayat Pembaruan Data</h2><p class="sub">Delapan sumber ditarik otomatis oleh pipeline (GitHub Actions) tiga kali sehari: <strong>06.05 WIB</strong> (pagi, siap sebelum jam kantor), <strong>10.05 WIB</strong> (menangkap harga PIHPS hari berjalan, yang diterbitkan Bank Indonesia sekitar pukul 08.00–09.00; siap untuk rapat pagi), dan <strong>13.05 WIB</strong> (siang, selesai sebelum jam istirahat berakhir; siap untuk rapat sore). Jam mulai bisa bergeser 5–30 menit mengikuti antrean server GitHub. Satu sumber, SIMOTANDI, masih diunduh manual dari portal resminya karena servernya memblokir akses dari server GitHub, lalu dimasukkan lewat skrip konverter; selama menunggu unggahan, fase terkininya diperkirakan otomatis (panel "Perkiraan Hari Ini" di tab Konteks &amp; Pasokan). SP2KP ditarik otomatis sejak 10 Nov 2026 lewat endpoint yang dipakai portal resminya. Tidak ada satu pun angka yang diketik tangan. Kolom <em>data terakhir</em> = tanggal pengamatan terbaru di dalam data. Kolom <em>dicek / data baru</em> berisi dua baris: <em>dicek</em> = kapan pipeline terakhir memeriksa sumber itu (sama untuk semua sumber otomatis pada run yang sama), dan <em>data baru terakhir</em> = kapan terakhir kali sumber itu benar-benar memuat angka baru. Sumber yang jarang terbit (misalnya ONI bulanan) wajar punya tanggal data baru yang lebih lama daripada tanggal dicek.</p>`;
     // [nama, data, cara, jadwal, pengambil waktu-ambil (per baris), teks data terakhir (dari seluruh data)]
     const maksKolom = (data, ...kolom) => { let m = null; data.forEach(r => { for (const k of kolom) if (r[k]) { const v = String(r[k]).slice(0, 10); if (!m || v > m) m = v; break; } }); return m; };
     const tglRapi = v => v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? fmtTgl(v) : v;
     const DAFTAR = [
       ["PIHPS Bank Indonesia", gab || pihps, "otomatis", "06.05 · 10.05 · 13.05 WIB (harga hari ini masuk di run 10.05)", r => r.diambil_pada_utc, d => tglRapi(maksKolom(d, "tanggal"))],
-      ["SP2KP Kemendag", sp2kp, "manual", "unduh Excel per pasar, bulanan", r => r.diambil_pada_utc, d => tglRapi(maksKolom(d, "tanggal"))],
+      ["SP2KP Kemendag", sp2kp, "otomatis", "06.05 · 10.05 · 13.05 WIB (6 pasar, 30 hari terakhir)", r => r.diambil_pada_utc, d => tglRapi(maksKolom(d, "tanggal"))],
       ["DPKP DIY", dpkp, "otomatis", "06.05 · 10.05 · 13.05 WIB", r => r.diambil_pada_utc, d => { const k = Object.keys(d[0] || {}).find(c => String(c).startsWith("Tanggal")); return k ? tglRapi(maksKolom(d, k)) : null; }],
       ["SIMOTANDI Kementan", simo, "manual", "unduh Excel per periode 12 hari", r => r.diambil_pada_utc, d => { const m = maksKolom(d, "periode_mulai"); const r = d.find(x => String(x.periode_mulai).slice(0, 10) === m); return r && r.periode ? "periode " + r.periode : tglRapi(m); }],
       ["Cadangan Pangan DIY", cad, "otomatis", "06.05 · 10.05 · 13.05 WIB (snapshot portal)", r => r.diambil_pada_utc, d => { const m = maksKolom(d, "tanggal_data"); if (m) return "data portal per " + tglRapi(m); const a = maksWaktu(d.map(r => r.diambil_pada_utc)); return a ? "snapshot " + fmtTgl(a) : null; }],

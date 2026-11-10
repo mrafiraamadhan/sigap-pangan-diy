@@ -21,11 +21,11 @@ from datetime import datetime, timezone
 DATA = "data"
 KELUARAN = os.path.join(DATA, "status_pipeline.csv")
 
-# (pilar, berkas, otomatis?) -- SP2KP & SIMOTANDI dicoba pipeline tetapi sumbernya
-# menolak akses otomatis, jadi "dicek" tidak berarti apa-apa bagi keduanya.
+# (pilar, berkas, otomatis?) -- SIMOTANDI dicoba pipeline tetapi servernya menolak akses dari
+# GitHub (Cloudflare 403), jadi "dicek" tidak berarti apa-apa baginya. SP2KP otomatis sejak 10 Nov 2026.
 PILAR = [
     ("PIHPS Bank Indonesia", "harga_pangan_diy.csv", True),
-    ("SP2KP Kemendag", "harga_sp2kp_diy.csv", False),
+    ("SP2KP Kemendag", "harga_sp2kp_diy.csv", True),
     ("DPKP DIY", "harga_pangan_dpkp_diy.csv", True),
     ("SIMOTANDI Kementan", "simotandi_fase_tanam_diy.csv", False),
     ("Cadangan Pangan DIY", "cadangan_pangan_diy.csv", True),
