@@ -863,6 +863,9 @@ async function render() {
     ambilCsv("enso_oni.csv"), ambilCsv("google_trends_panik.csv"), ambilCsv("validasi_berita.csv"),
   ]);
   const prakiraan = await ambilCsv("prakiraan_harga.csv");
+  // Nowcast SIMOTANDI (src/pipeline/simotandi_nowcast.py): fase periode yang belum terbit + prakiraan panen; opsional.
+  const [simoNow, simoPanen, simoAkurasi] = await Promise.all([
+    ambilCsv("simotandi_nowcast_diy.csv"), ambilCsv("simotandi_outlook_panen_diy.csv"), ambilCsv("simotandi_nowcast_akurasi.csv")]);
   // Pembanding manual stok beras Bulog (dari pemberitaan resmi); opsional.
   const bulog = await ambilCsv("cadangan_bulog_manual.csv");
   // Deret per komoditas / per wilayah hasil rekonstruksi (src/pipeline/seri_cadangan.py); opsional.
@@ -1077,7 +1080,7 @@ async function render() {
     if (musim) ketS += ` Panen bulan ${musim.bulanKini.nama} biasanya hanya sekitar ${musim.posisi.toFixed(0)}% dari bulan puncaknya, yaitu ${musim.puncak.nama}.`;
     const simoAkhir = st.map(r => r.periode_selesai).filter(Boolean).sort().pop() || st.map(r => r.periode_mulai).filter(Boolean).sort().pop();
     simoInfo = { nama: "Pasokan Padi (SIMOTANDI)", sumber: "Citra satelit Kementan",
-      tgl: simoAkhir, tglTeks: "periode " + (simoData.periode || "-") + " (diunduh manual)",
+      tgl: simoAkhir, tglTeks: "periode " + (simoData.periode || "-"),
       lv: rasio >= 12 ? "AMAN" : rasio >= 6 ? "WASPADA" : "BAHAYA",
       baca: fmtN(dekatPanen) + " ha", bacaKet: "fase generatif + panen (" + rasio.toFixed(0) + "% luas baku sawah)",
       ket: ketS, tab: "konteks" };
@@ -1641,6 +1644,92 @@ async function render() {
         (simoData.rasio >= 12 ? "Luas lahan yang menuju panen masih sehat, sehingga pasokan beras lokal 1–2 bulan ke depan relatif aman." : "Luas lahan yang menuju panen menipis. Perlu ada antisipasi untuk jeda di antara dua gelombang panen.")));
       grid.appendChild(p2);
       sS.appendChild(grid);
+
+      // --- NOWCAST: fase hari ini (periode yang belum diterbitkan Kementan) + prakiraan panen ---
+      if (simoNow && simoNow.length && simoPanen && simoPanen.length) {
+        try {
+          const KF = ["bera_ha", "persiapan_lahan_ha", "tanam_ha", "vegetatif_1_ha", "vegetatif_2_ha", "generatif_1_ha", "generatif_2_ha", "panen_ha"];
+          const NAMA_F = { bera_ha: "Bera / bukan padi", persiapan_lahan_ha: "Persiapan lahan", tanam_ha: "Tanam (1–12 HST)",
+            vegetatif_1_ha: "Vegetatif 1 (13–36 HST)", vegetatif_2_ha: "Vegetatif 2 (37–60 HST)", generatif_1_ha: "Generatif 1 (61–84 HST)",
+            generatif_2_ha: "Generatif 2 (85–120 HST)", panen_ha: "Panen" };
+          const KODE_F = { bera_ha: "bera", persiapan_lahan_ha: "siap", tanam_ha: "tanam", vegetatif_1_ha: "veg1", vegetatif_2_ha: "veg2",
+            generatif_1_ha: "gen1", generatif_2_ha: "gen2", panen_ha: "panen" };
+          const pKini = Math.max(...simoNow.map(r => Number(r.periode_kode)));
+          const rk = simoNow.filter(r => Number(r.periode_kode) === pKini);
+          const h = Number(rk[0].horizon_periode);
+          const tot = (rows, f) => rows.reduce((a, r) => a + (Number(r[f]) || 0), 0);
+          const resmiAkhir = simo.filter(r => String(r.periode_kode) === String(Math.max(...simo.map(x => Number(x.periode_kode) || 0))));
+          const galat = (f, basi) => {
+            if (!simoAkurasi) return null;
+            const hh = Math.min(h, Math.max(...simoAkurasi.map(a => Number(a.horizon))));
+            const a = simoAkurasi.find(x => x.fase === KODE_F[f] && Number(x.horizon) === hh);
+            return a ? Number(basi ? a.mape_diy_basi_pct : a.mape_diy_pct) : null;
+          };
+          const menujuK = tot(rk, "generatif_1_ha") + tot(rk, "generatif_2_ha") + tot(rk, "panen_ha");
+          const menujuR = tot(resmiAkhir, "generatif_1_ha") + tot(resmiAkhir, "generatif_2_ha") + tot(resmiAkhir, "panen_ha");
+          const nS1 = rk.filter(r => r.metode_tanam === "sentinel-1").length;
+          const pn = el("div", "panel");
+          pn.style.marginTop = "14px";
+          pn.innerHTML = `<h3>Perkiraan Hari Ini, Sebelum SIMOTANDI Terbit</h3>
+            <div class="sumber">Periode ${fmtTgl(rk[0].periode_mulai)} – ${fmtTgl(rk[0].periode_selesai)} · ${h} periode setelah data resmi terakhir (${resmiAkhir[0] ? resmiAkhir[0].periode : "-"}) · dihitung ${fmtTgl(rk[0].dibuat_utc)}</div>
+            <div class="grid-2" style="margin-top:10px">
+              <div><div class="angka-hero tnum">${fmtN(menujuK)} ha</div>
+                <div class="angka-ket">perkiraan luas generatif + panen sekarang (data resmi terakhir: ${fmtN(menujuR)} ha)</div>
+                <div class="tabel-wrap" style="margin-top:10px;max-height:none"><table><thead><tr><th>Fase</th><th class="num">Resmi terakhir</th><th class="num">Perkiraan kini</th><th class="num">Galat tipikal</th></tr></thead><tbody>
+                ${KF.map(f => { const g = galat(f), gb = galat(f, true);
+                  return `<tr><td>${NAMA_F[f]}</td><td class="num tnum">${fmtN(tot(resmiAkhir, f))}</td><td class="num tnum"><strong>${fmtN(tot(rk, f))}</strong></td>
+                    <td class="num tnum" title="Bila memakai angka resmi terakhir apa adanya: ±${gb !== null ? gb.toFixed(0) : "–"}%">±${g !== null ? g.toFixed(0) : "–"}%</td></tr>`; }).join("")}
+                </tbody></table></div></div>
+              <div><div class="wadah-chart" style="height:260px"><canvas id="ch-simo-outlook"></canvas></div>
+                <div class="sumber" style="margin-top:6px">Batang prakiraan: hijau tua = dari kohort tanam resmi · hijau muda = tanam dari Sentinel-1 · pucat = pola musiman (paling tidak pasti)</div></div>
+            </div>`;
+          const gS = galat("generatif_1_ha"), gSb = galat("generatif_1_ha", true);
+          const diy = simoPanen.filter(r => r.wilayah === "DIY");
+          const puncak = diy.reduce((a, r) => (Number(r.panen_ha_perkiraan) > Number(a.panen_ha_perkiraan) ? r : a), diy[0]);
+          const sampaiResmi = diy.filter(r => String(r.sumber_tanam).startsWith("resmi")).map(r => r.periode_selesai).pop();
+          const telat = resmiAkhir[0] ? Math.round((Date.now() - new Date(resmiAkhir[0].periode_selesai)) / 864e5) : null;
+          pn.appendChild(el("div", "insight",
+            `<strong>Cara membacanya.</strong> Data resmi SIMOTANDI terakhir berakhir ${resmiAkhir[0] ? fmtTgl(resmiAkhir[0].periode_selesai) : "-"}` + (telat !== null ? `, ${telat} hari lalu` : "") + `. Celah itu kami isi dengan dua hal: ` +
+            `(1) fase SIMOTANDI bergerak seperti buku besar kohort tanam — lahan yang tercatat tanam pada suatu periode akan tercatat Vegetatif 1 dua periode berikutnya, lalu Vegetatif 2, Generatif, dan panen — sehingga sebagian besar angka periode yang belum terbit sebenarnya sudah tertulis di data yang terbit; ` +
+            `(2) luas tanam baru diperkirakan dari radar Sentinel-1 (citra yang sama dengan dasar SIMOTANDI) yang terbit beberapa jam setelah perekaman` +
+            (nS1 ? ` (periode ini: ${nS1} kecamatan memakai sinyal satelit, sisanya pola musiman)` : ` (citra periode ini belum ada, sehingga tanam baru memakai pola musiman)`) + `. ` +
+            `Uji mundur 24 periode: untuk fase Generatif 1 galatnya ±${gS !== null ? gS.toFixed(0) : "–"}%, dibanding ±${gSb !== null ? gSb.toFixed(0) : "–"}% bila angka resmi terakhir dipakai apa adanya. ` +
+            `Prakiraan panen bertumpu pada data resmi sampai ${sampaiResmi ? fmtTgl(sampaiResmi) : "-"}; puncak terdekat sekitar <strong>${fmtTgl(puncak.periode_mulai)}</strong> (±${fmtN(puncak.panen_ha_perkiraan)} ha per 12 hari). Angka resmi tetap menjadi acuan begitu terbit.`));
+          sS.appendChild(pn);
+
+          daftarChart("konteks", () => {
+            const co = document.getElementById("ch-simo-outlook");
+            if (!(co && window.Chart)) { if (co) pesanTanpaChart(co.parentElement); return; }
+            const histP = [...new Set(simo.map(r => Number(r.periode_kode)))].sort((a, b) => a - b).slice(-10);
+            const hist = histP.map(p => ({ p, lbl: (simo.find(r => Number(r.periode_kode) === p) || {}).periode_mulai,
+              v: simo.filter(r => Number(r.periode_kode) === p).reduce((a, r) => a + (Number(r.panen_ha) || 0), 0) }));
+            const labels = [...hist.map(x => fmtTglPdk(x.lbl)), ...diy.map(r => fmtTglPdk(r.periode_mulai))];
+            const n0 = hist.length;
+            const warna = r => String(r.sumber_tanam).startsWith("resmi") ? "#2f7a4c" : r.sumber_tanam === "sentinel-1" ? "#7bb890" : "#c9dccf";
+            new Chart(co.getContext("2d"), {
+              type: "bar",
+              data: { labels, datasets: [
+                { label: "Panen resmi SIMOTANDI (ha)", data: [...hist.map(x => Math.round(x.v)), ...diy.map(() => null)],
+                  backgroundColor: "#9a9384", borderRadius: 3, barPercentage: .8, grouped: false },
+                { label: "Prakiraan panen (ha)", data: [...hist.map(() => null), ...diy.map(r => Math.round(r.panen_ha_perkiraan))],
+                  backgroundColor: [...hist.map(() => "#2f7a4c"), ...diy.map(warna)], borderRadius: 3, barPercentage: .8, grouped: false },
+                { label: "Rentang galat tipikal", data: [...hist.map(() => null), ...diy.map(r => [Number(r.batas_bawah_ha), Number(r.batas_atas_ha)])],
+                  backgroundColor: "rgba(28,74,46,.10)", borderColor: "rgba(28,74,46,.35)", borderWidth: 1, barPercentage: .35, grouped: false },
+              ] },
+              options: { responsive: true, maintainAspectRatio: false, animation: false,
+                plugins: { legend: { position: "bottom", labels: { boxWidth: 11, font: { size: 9 } } },
+                  tooltip: { callbacks: {
+                    label: it => {
+                      if (it.raw == null) return null;
+                      if (Array.isArray(it.raw)) return `Rentang: ${fmtN(it.raw[0])}–${fmtN(it.raw[1])} ha`;
+                      if (it.datasetIndex === 1) { const r = diy[it.dataIndex - n0]; return `Prakiraan: ${fmtN(it.raw)} ha (dasar: ${r.sumber_tanam}; galat ±${Number(r.galat_tipikal_pct).toFixed(0)}%)`; }
+                      return `${it.dataset.label}: ${fmtN(it.raw)} ha`; } } } },
+                scales: { y: { ticks: { callback: v => fmtN(v), font: { size: 10 } }, grid: { color: "#efece2" }, title: { display: true, text: "ha per periode 12 hari", font: { size: 9 } } },
+                          x: { ticks: { font: { size: 8 }, maxRotation: 60, autoSkip: true, maxTicksLimit: 14 }, grid: { display: false } } } },
+            });
+          });
+        } catch (e) { sS.appendChild(seksiGagal("Perkiraan SIMOTANDI hari ini", e)); }
+      }
 
       // --- PETA KOROPLET per kecamatan ---
       if (petaKec && petaKec.features && petaKec.features.length) {
