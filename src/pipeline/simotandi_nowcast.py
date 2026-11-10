@@ -86,7 +86,7 @@ def muat_s1(sumber, kode):
         return None, None
     s1["t"] = pd.to_datetime(s1.tanggal).dt.date.map(t_dari_tanggal)
     # buang tanggal di sela akhir tahun (26-31 Des) yang tidak masuk periode mana pun
-    s1 = s1[pd.to_datetime(s1.tanggal).dt.dayofyear <= 360]
+    s1 = s1[pd.to_datetime(s1.tanggal).dt.day_of_year <= 360]
     fb = s1.groupby(["t", "kode_wilayah"]).f_basah.mean().unstack().reindex(columns=kode)
     nsaw = s1.groupby("kode_wilayah").n_sawah.max().reindex(kode).fillna(0)
     fb.loc[:, nsaw < MIN_SAWAH_S1] = np.nan
