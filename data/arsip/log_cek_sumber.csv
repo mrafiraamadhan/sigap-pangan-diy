@@ -1187,3 +1187,14 @@ run_utc,pilar,berkas,otomatis,dicek_pada_utc,baris,berubah,asal_arsip
 2026-11-13T03:26:59+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-13T03:26:59+00:00,1478,False,pipeline
 2026-11-13T03:26:59+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-13T03:26:59+00:00,27140,True,pipeline
 2026-11-13T03:26:59+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-13T03:26:59+00:00,72,True,pipeline
+2026-11-13T10:49:05+00:00,PIHPS Bank Indonesia,harga_pangan_diy.csv,True,2026-11-13T10:49:05+00:00,27140,False,pipeline
+2026-11-13T10:49:05+00:00,SP2KP Kemendag,harga_sp2kp_diy.csv,True,2026-11-13T10:49:05+00:00,122750,True,pipeline
+2026-11-13T10:49:05+00:00,DPKP DIY,harga_pangan_dpkp_diy.csv,True,2026-11-13T10:49:05+00:00,7730,False,pipeline
+2026-11-13T10:49:05+00:00,SIMOTANDI Kementan,simotandi_fase_tanam_diy.csv,False,,6552,False,pipeline
+2026-11-13T10:49:05+00:00,Cadangan Pangan DIY,cadangan_pangan_diy.csv,True,2026-11-13T10:49:05+00:00,286,False,pipeline
+2026-11-13T10:49:05+00:00,BMKG,cuaca_diy.csv,True,2026-11-13T10:49:05+00:00,35007,True,pipeline
+2026-11-13T10:49:05+00:00,NOAA (ENSO/ONI),enso_oni.csv,True,2026-11-13T10:49:05+00:00,921,False,pipeline
+2026-11-13T10:49:05+00:00,Google Trends,google_trends_panik.csv,True,2026-11-13T10:49:05+00:00,279,True,pipeline
+2026-11-13T10:49:05+00:00,Sinyal Media,validasi_berita.csv,True,2026-11-13T10:49:05+00:00,1478,False,pipeline
+2026-11-13T10:49:05+00:00,Gabungan & deteksi anomali,gabungan_anomali.csv,True,2026-11-13T10:49:05+00:00,27140,True,pipeline
+2026-11-13T10:49:05+00:00,Prakiraan harga,prakiraan_harga.csv,True,2026-11-13T10:49:05+00:00,72,True,pipeline
