@@ -428,8 +428,8 @@ tahun,bulan,kabupaten_kota,hujan_mm,hari_hujan,hari_data,sumber,diambil_pada_utc
 2026,7,Bantul,10.6,5,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,8,Bantul,7.3,2,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,9,Bantul,5.3,1,30,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-07T02:41:21.064824+00:00
-2026,10,Bantul,47.4,16,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
-2026,11,Bantul,148.2,20,21,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
+2026,10,Bantul,47.4,16,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
+2026,11,Bantul,154.9,21,22,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
 1991,1,Gunungkidul,402.2,31,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 1991,2,Gunungkidul,161.7,27,28,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 1991,3,Gunungkidul,158.5,23,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
@@ -859,8 +859,8 @@ tahun,bulan,kabupaten_kota,hujan_mm,hari_hujan,hari_data,sumber,diambil_pada_utc
 2026,7,Gunungkidul,6.2,3,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,8,Gunungkidul,9.5,3,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,9,Gunungkidul,12.4,7,30,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-07T02:41:21.064824+00:00
-2026,10,Gunungkidul,50.0,16,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
-2026,11,Gunungkidul,125.8,18,21,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
+2026,10,Gunungkidul,50.0,16,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
+2026,11,Gunungkidul,131.1,19,22,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
 1991,1,Kota Yogyakarta,373.4,30,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 1991,2,Kota Yogyakarta,165.9,28,28,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 1991,3,Kota Yogyakarta,263.3,26,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
@@ -1290,8 +1290,8 @@ tahun,bulan,kabupaten_kota,hujan_mm,hari_hujan,hari_data,sumber,diambil_pada_utc
 2026,7,Kota Yogyakarta,7.6,2,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,8,Kota Yogyakarta,12.2,4,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,9,Kota Yogyakarta,15.3,6,30,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-07T02:41:21.064824+00:00
-2026,10,Kota Yogyakarta,87.1,15,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
-2026,11,Kota Yogyakarta,149.9,19,21,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
+2026,10,Kota Yogyakarta,87.1,15,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
+2026,11,Kota Yogyakarta,158.2,20,22,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
 1991,1,Kulon Progo,373.4,30,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 1991,2,Kulon Progo,165.9,28,28,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 1991,3,Kulon Progo,263.3,26,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
@@ -1721,8 +1721,8 @@ tahun,bulan,kabupaten_kota,hujan_mm,hari_hujan,hari_data,sumber,diambil_pada_utc
 2026,7,Kulon Progo,21.2,7,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,8,Kulon Progo,19.6,8,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,9,Kulon Progo,23.2,9,30,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-07T02:41:21.064824+00:00
-2026,10,Kulon Progo,123.5,22,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
-2026,11,Kulon Progo,215.9,21,21,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
+2026,10,Kulon Progo,123.5,22,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
+2026,11,Kulon Progo,226.7,22,22,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
 1991,1,Sleman,373.4,30,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 1991,2,Sleman,165.9,28,28,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 1991,3,Sleman,263.3,26,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
@@ -2152,5 +2152,5 @@ tahun,bulan,kabupaten_kota,hujan_mm,hari_hujan,hari_data,sumber,diambil_pada_utc
 2026,7,Sleman,12.8,5,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,8,Sleman,14.2,6,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-10-09T02:10:17.430367+00:00
 2026,9,Sleman,18.8,7,30,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-07T02:41:21.064824+00:00
-2026,10,Sleman,125.7,17,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
-2026,11,Sleman,215.6,19,21,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-27T16:32:07.718561+00:00
+2026,10,Sleman,125.7,17,31,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
+2026,11,Sleman,230.5,20,22,Open-Meteo ERA5 (ECMWF) reanalisis,2026-11-28T04:41:39.682358+00:00
